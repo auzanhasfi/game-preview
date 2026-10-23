@@ -1,0 +1,5 @@
+Halaman daftar (index.html) dijana dari data prompt-generator:
+  1. cd <folder prompt-generator> && node <repo ini>/_build/ambil.js > data.json
+  2. salin sampul (vid/template/<id>-edu.jpg / img/karya/<id>.jpg) ke sampul/<id>.jpg
+  3. ganti __DATA__ di _build/index.tpl.html dengan isi data (path tanpa "contoh/", img = sampul/<id>.jpg) -> index.html
+Atau edit langsung array DATA di index.html untuk menambah satu game.
