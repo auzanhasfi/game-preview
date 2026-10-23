@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Kartu Pasangan Perkalian</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#ffe9c7;background:radial-gradient(circle at 50% 0,#fff4df,#ffd99a);display:grid;place-items:center}
+#board{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(8px,1.6vw,16px);width:min(94vw,640px,calc((100vh - 100px)*1.28));margin-top:56px;perspective:900px}
+.card{aspect-ratio:3/3.4;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,1.3,.5,1)}
+.card.open,.card.done{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:grid;place-items:center;box-shadow:0 6px 0 rgba(120,60,0,.25)}
+.back{background:#FD5E2B;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.14) 0 10px,transparent 10px 20px);border:4px solid #fff}
+.back svg{width:46%}
+.front{transform:rotateY(180deg);background:#fff;border:4px solid #ffcf8a;font:700 clamp(20px,4.4vw,38px) 'Space Mono',monospace;color:#3a2410}
+.front.q{color:#6a3aa8}.done .front{background:#d9f7e6;border-color:#3ecf8e}
+.card.shake{animation:sh .4s}@keyframes sh{25%{transform:rotateY(180deg) translateX(-8px)}75%{transform:rotateY(180deg) translateX(8px)}}
+</style></head><body>
+<div id="board"></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Kartu Pasangan Perkalian: terinspirasi kubowania/memory-game (tanpa lisensi, kode ditulis sendiri dari nol). */
+var G={cards:[],open:[],moves:0,pairs:0,score:0,lock:false,t0:0,iv:null,seen:{}};
+EDU.hud({title:'Kartu Pasangan Perkalian',timer:true,credit:'Terinspirasi Memory Game · Ania Kubów (tanpa lisensi, kode baru)',});
+EDU.$('.edu-credit').classList.add('dark');
+function deal(){
+  var used={},pairs=[];while(pairs.length<6){var q=EDU.Q.kali();if(used[q.a])continue;used[q.a]=1;pairs.push(q)}
+  var list=[];pairs.forEach(function(p,i){list.push({id:i,t:p.q,q:1},{id:i,t:String(p.a)})});
+  G.cards=EDU.shuffle(list);var b=EDU.$('#board');b.innerHTML='';
+  G.cards.forEach(function(c,i){var el=document.createElement('div');el.className='card';el.innerHTML='<div class="face back">'+EDU.bulat('happy')+'</div><div class="face front'+(c.q?' q':'')+'">'+c.t+'</div>';
+    el.onclick=function(){flip(i)};c.el=el;b.appendChild(el)});
+}
+function flip(i){
+  var c=G.cards[i];if(G.lock||c.done||G.open.indexOf(i)>=0)return;
+  c.el.classList.add('open');G.open.push(i);G.seen[i]=1;EDU.sfx('pop');
+  if(G.open.length<2)return;
+  G.moves++;var a=G.cards[G.open[0]],b=G.cards[G.open[1]];G.lock=true;
+  if(a.id===b.id){setTimeout(function(){a.done=b.done=true;a.el.classList.add('done');b.el.classList.add('done');G.pairs++;G.score+=Math.max(5,20-G.moves);EDU.setScore(G.score);EDU.sfx('ok');
+      var r=b.el.getBoundingClientRect();EDU.floatText(r.left+r.width/2,r.top,(a.q?a.t:b.t)+' = '+(a.q?b.t:a.t),true);G.open=[];G.lock=false;if(G.pairs===6)setTimeout(finish,600)},380)}
+  else setTimeout(function(){a.el.classList.add('shake');b.el.classList.add('shake');EDU.sfx('bad');
+      setTimeout(function(){a.el.classList.remove('open','shake');b.el.classList.remove('open','shake');G.open=[];G.lock=false},420)},650);
+}
+function start(){G.open=[];G.moves=0;G.pairs=0;G.score=0;G.lock=false;G.seen={};EDU.setScore(0);deal();G.t0=Date.now();EDU.setQ('Cocokkan soal dengan hasilnya');
+  clearInterval(G.iv);G.iv=setInterval(function(){EDU.setTime(Math.floor((Date.now()-G.t0)/1000)+'s')},250);if(EDU.demo)setTimeout(auto,700)}
+function finish(){clearInterval(G.iv);EDU.end({key:'kartu',score:G.score,max:100,head:'Semua pasangan ketemu!',note:'<p>'+G.moves+' langkah · '+Math.floor((Date.now()-G.t0)/1000)+' detik</p>'},start)}
+/* demo: mengingat kartu yang pernah dibuka */
+function auto(){if(G.pairs===6)return;if(G.lock)return setTimeout(auto,200);
+  var idx=G.cards.map(function(c,i){return i}).filter(function(i){return !G.cards[i].done});
+  if(G.open.length===1){var a=G.cards[G.open[0]],m=idx.find(function(i){return i!==G.open[0]&&G.seen[i]&&G.cards[i].id===a.id});
+    flip(m!=null&&Math.random()<.85?m:EDU.pick(idx.filter(function(i){return i!==G.open[0]&&!G.seen[i]}).concat(idx.filter(function(i){return i!==G.open[0]})).slice(0,3)))}
+  else{var known=idx.find(function(i){return G.seen[i]&&idx.some(function(j){return j!==i&&G.seen[j]&&G.cards[j].id===G.cards[i].id})});
+    flip(known!=null?known:EDU.pick(idx.filter(function(i){return !G.seen[i]}).concat(idx).slice(0,4)))}
+  setTimeout(auto,520)}
+EDU.title({key:'kartu',title:'Kartu Pasangan Perkalian',mapel:'Matematika · SD Kelas 2–4',desc:'Buka dua kartu. Cocokkan soal perkalian dengan hasilnya.',how:['Klik kartu untuk membukanya.','Pasangkan "7 × 8" dengan "56".','Semakin sedikit langkah, semakin tinggi skornya.']},start);
+</script></body></html>

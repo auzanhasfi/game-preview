@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Invasi Huruf Hijaiyah</title><link rel="stylesheet" href="../_kit/edu.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&display=swap">
+<style>body{background:#06110f;display:grid;place-items:center}#cv{margin-top:52px;border-radius:16px;box-shadow:0 0 0 3px #1d4d3f,0 20px 60px rgba(0,0,0,.5);touch-action:none}</style></head><body>
+<canvas id="cv"></canvas>
+<div class="edu-pad touch" style="left:14px"><button data-k="L">◀</button><button data-k="R">▶</button></div><div class="edu-pad touch" style="right:14px"><button data-k="F">●</button></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Invasi Huruf Hijaiyah: terinspirasi Space Invaders (he-is-talha/html-css-javascript-games, MIT). Kode ditulis ulang. */
+var HJ=[['ا','Alif'],['ب','Ba'],['ت','Ta'],['ث','Tsa'],['ج','Jim'],['ح','Ha'],['خ','Kho'],['د','Dal'],['ذ','Dzal'],['ر','Ro'],['ز','Zai'],['س','Sin'],['ش','Syin'],['ص','Shod'],['ض','Dhod'],['ط','Tho'],['ظ','Zho'],['ع','Ain'],['غ','Ghoin'],['ف','Fa'],['ق','Qof'],['ك','Kaf'],['ل','Lam'],['م','Mim'],['ن','Nun'],['و','Wawu'],['ي','Ya']];
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),W,H,K={},G={};
+EDU.hud({title:'Invasi Huruf Hijaiyah',lives:true,credit:'Terinspirasi Space Invaders · he-is-talha (MIT)'});
+function size(){H=Math.min(innerHeight-90,720);W=Math.min(innerWidth-20,Math.round(H*1.15));cv.width=W;cv.height=H}size();
+function wave(){var cols=7,rows=3,letters=EDU.shuffle(HJ).slice(0,cols*rows),cw=Math.min(78,W/(cols+2.5));G.inv=letters.map(function(l,i){return {l:l,c:i%cols,r:Math.floor(i/cols),alive:true}});G.cw=cw;G.ox=W*.12;G.oy=60;G.dir=1;G.sp=.35+G.wave*.12;pickTarget();EDU.toast('Gelombang '+(G.wave+1))}
+function pickTarget(){var alive=G.inv.filter(function(v){return v.alive});if(!alive.length){G.wave++;return wave()}var open=alive.filter(function(v){return !alive.some(function(o){return o.c===v.c&&o.r>v.r})});G.t=EDU.pick(open).l;EDU.setQ('Tembak huruf: '+G.t[1])}
+function start(){G={wave:0,score:0,lives:3,run:true,p:{x:W/2},bul:[],eb:[],parts:[],cool:0,benar:0,salah:0,stars:[],tick:0};for(var i=0;i<70;i++)G.stars.push([Math.random()*W,Math.random()*H,Math.random()]);wave();EDU.setScore(0);EDU.setLives(3)}
+function pos(v){return [G.ox+v.c*G.cw*1.25,G.oy+v.r*G.cw*1.05]}
+function update(){G.tick++;var p=G.p;if(EDU.demo)demo();if(K.L)p.x-=6;if(K.R)p.x+=6;p.x=Math.max(30,Math.min(W-30,p.x));
+  if(K.F&&G.cool<=0){G.bul.push({x:p.x,y:H-60});G.cool=20;EDU.sfx('tick')}G.cool--;
+  var alive=G.inv.filter(function(v){return v.alive}),minX=1e9,maxX=-1e9,maxY=0;alive.forEach(function(v){var q=pos(v);minX=Math.min(minX,q[0]);maxX=Math.max(maxX,q[0]);maxY=Math.max(maxY,q[1])});
+  G.ox+=G.dir*G.sp;if(maxX+G.cw/2>W-10&&G.dir>0||minX-G.cw/2<10&&G.dir<0){G.dir*=-1;G.oy+=14}
+  if(maxY>H-110){G.lives=0;EDU.setLives(0);return over('Huruf sampai ke bawah!')}
+  G.bul=G.bul.filter(function(b){b.y-=13;var hit=null;alive.forEach(function(v){var q=pos(v);if(!hit&&Math.abs(b.x-q[0])<G.cw*.45&&Math.abs(b.y-q[1])<G.cw*.45)hit=v});
+    if(hit){hitInv(hit);return false}return b.y>40});
+  if(G.tick%Math.max(30,80-G.wave*10)===0&&alive.length){var s=EDU.pick(alive),q=pos(s);G.eb.push({x:q[0],y:q[1]+20})}
+  G.eb=G.eb.filter(function(b){b.y+=4;if(Math.abs(b.x-p.x)<22&&b.y>H-62&&b.y<H-30){G.lives--;EDU.setLives(G.lives);EDU.sfx('bad');boom(p.x,H-46,'#fff');if(G.lives<=0)over('Pesawat kena!');return false}return b.y<H})}
+function hitInv(v){var q=pos(v);if(v.l===G.t){v.alive=false;G.score+=10;G.benar++;EDU.setScore(G.score);EDU.sfx('ok');boom(q[0],q[1],'#5fe3a1');EDU.floatText(cv.getBoundingClientRect().left+q[0],cv.getBoundingClientRect().top+q[1],v.l[0]+' = '+v.l[1],true);pickTarget()}
+  else{G.salah++;G.score=Math.max(0,G.score-5);EDU.setScore(G.score);EDU.sfx('bad');boom(q[0],q[1],'#ff5a4a');v.flash=20;EDU.toast('Itu '+v.l[1]+' ('+v.l[0]+'). Cari '+G.t[1]+'!',false);G.eb.push({x:q[0],y:q[1]+20})}}
+function boom(px,py,c){for(var i=0;i<18;i++){var a=Math.random()*7,s=Math.random()*4;G.parts.push({x:px,y:py,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:30,c:c})}}
+function over(m){if(!G.run)return;G.run=false;EDU.toast(m,false);setTimeout(function(){EDU.end({key:'hijaiyah',score:G.score,benar:G.benar,salah:G.salah,max:300,head:'Gelombang '+(G.wave+1)},start)},600)}
+function demo(){var p=G.p;K.L=K.R=K.F=false;var t=G.inv.find(function(v){return v.alive&&v.l===G.t});if(!t)return;var q=pos(t);
+  var below=G.inv.some(function(v){if(!v.alive||v===t)return false;var r=pos(v);return Math.abs(r[0]-q[0])<G.cw*.5&&r[1]>q[1]});var tx=q[0]+G.dir*G.sp*((H-60-q[1])/13);
+  if(below){var gapX=q[0]+(q[0]<W/2?G.cw*.62:-G.cw*.62);tx=gapX}
+  var danger=G.eb.some(function(b){return Math.abs(b.x-p.x)<26&&b.y>H-180});if(danger){K[p.x<W/2?'R':'L']=true;return}
+  if(tx<p.x-5)K.L=true;else if(tx>p.x+5)K.R=true;else if(!below&&!G.bul.length&&Math.abs(tx-p.x)<5)K.F=true}
+function draw(){x.fillStyle='#071814';x.fillRect(0,0,W,H);G.stars.forEach(function(s){x.fillStyle='rgba(180,255,220,'+(.15+s[2]*.4)+')';x.fillRect(s[0],(s[1]+G.tick*s[2]*.3)%H,2,2)});
+  x.fillStyle='rgba(95,227,161,.12)';x.fillRect(0,H-30,W,30);
+  G.inv.forEach(function(v){if(!v.alive)return;var q=pos(v),r=G.cw*.46,isT=false;x.fillStyle=v.flash>0?'#ff5a4a':'#1d6b52';if(v.flash>0)v.flash--;x.beginPath();x.roundRect(q[0]-r,q[1]-r,r*2,r*2,r*.45);x.fill();
+    x.fillStyle='#2b8f6e';x.fillRect(q[0]-r*.9,q[1]+r*.75,r*.4,r*.35);x.fillRect(q[0]+r*.5,q[1]+r*.75,r*.4,r*.35);x.fillStyle='#e9fff6';x.font='700 '+Math.round(r*1.35)+'px Amiri, serif';x.textAlign='center';x.textBaseline='middle';x.fillText(v.l[0],q[0],q[1]-r*.05)});
+  x.fillStyle='#ffe066';G.bul.forEach(function(b){x.fillRect(b.x-2,b.y-10,4,12)});x.fillStyle='#ff7a6b';G.eb.forEach(function(b){x.beginPath();x.arc(b.x,b.y,4,0,7);x.fill()});
+  G.parts=G.parts.filter(function(q){q.x+=q.vx;q.y+=q.vy;x.globalAlpha=q.l/30;x.fillStyle=q.c;x.fillRect(q.x,q.y,3,3);x.globalAlpha=1;return --q.l>0});
+  var p=G.p;x.fillStyle='#FD5E2B';x.beginPath();x.moveTo(p.x,H-64);x.lineTo(p.x+24,H-36);x.lineTo(p.x-24,H-36);x.closePath();x.fill();x.fillStyle='#ffd0a8';x.fillRect(p.x-4,H-72,8,12);
+  if(G.t){x.fillStyle='rgba(255,250,240,.95)';x.beginPath();x.roundRect(W-150,H-26-2,140,24,10);x.fill();x.fillStyle='#0f3b2e';x.font='700 15px Space Grotesk';x.textAlign='center';x.fillText('Cari: '+G.t[1],W-80,H-14)}}
+function loop(){if(G.run)update();if(G.inv)draw();requestAnimationFrame(loop)}
+addEventListener('keydown',function(e){if(e.key==='ArrowLeft')K.L=true;if(e.key==='ArrowRight')K.R=true;if(e.key===' '){e.preventDefault();K.F=true}});addEventListener('keyup',function(e){if(e.key==='ArrowLeft')K.L=false;if(e.key==='ArrowRight')K.R=false;if(e.key===' ')K.F=false});
+document.querySelectorAll('.edu-pad button').forEach(function(b){b.addEventListener('pointerdown',function(e){e.preventDefault();K[b.dataset.k]=true});['pointerup','pointerleave','pointercancel'].forEach(function(ev){b.addEventListener(ev,function(){K[b.dataset.k]=false})})});
+cv.addEventListener('pointerdown',function(e){var r=cv.getBoundingClientRect();G.p.x=(e.clientX-r.left)*W/r.width;K.F=true});cv.addEventListener('pointerup',function(){K.F=false});
+requestAnimationFrame(loop);window.__G=function(){return G};
+EDU.title({key:'hijaiyah',title:'Invasi Huruf Hijaiyah',mapel:'PAI · Mengenal huruf hijaiyah · TK – SD Kelas 3',desc:'Huruf hijaiyah turun dari langit. Tembak huruf yang namanya disebut!',how:['Panah kiri/kanan untuk bergerak, spasi untuk menembak (di HP: tombol layar).','Huruf benar = +10. Huruf salah = −5 dan huruf itu membalas tembakan.','Hindari peluru merah. Habiskan semua huruf untuk gelombang berikutnya.']},start);
+</script></body></html>

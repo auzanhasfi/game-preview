@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Gelembung Warna</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>body{background:#0f1b33;background:radial-gradient(circle at 50% 0,#1f3366,#0b1428);display:grid;place-items:center}#cv{margin-top:52px;border-radius:16px;box-shadow:0 0 0 3px #2c4a86,0 20px 60px rgba(0,0,0,.5);touch-action:none;cursor:crosshair}</style></head><body>
+<canvas id="cv"></canvas>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Gelembung Warna: terinspirasi Bubble Shooter (he-is-talha/html-css-javascript-games, MIT). Kode ditulis ulang. */
+var COL=[['RED','merah','#ef4444'],['BLUE','biru','#3b82f6'],['GREEN','hijau','#22c55e'],['YELLOW','kuning','#facc15'],['PURPLE','ungu','#a855f7'],['ORANGE','oranye','#f97316']];
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),COLS=11,R,W,H,ROWH;
+var G={};
+EDU.hud({title:'Gelembung Warna',credit:'Terinspirasi Bubble Shooter · he-is-talha (MIT)'});
+function size(){H=Math.min(innerHeight-90,760);W=Math.min(innerWidth-20,H*.78);R=Math.floor(W/(COLS*2+1));W=R*(COLS*2+1);ROWH=R*1.74;cv.width=W;cv.height=H}size();
+function cx(r,c){return R+c*2*R+((r+G.off)%2?R:0)+R*0}function cy(r){return R+r*ROWH+G.drop}
+function cols(r){return (r+G.off)%2?COLS-1:COLS}
+function newShot(){var present={};G.g.forEach(function(row){row.forEach(function(v){if(v!=null)present[v]=1})});var pool=Object.keys(present).map(Number);if(!pool.length)pool=[0,1,2,3];
+  G.next=G.next2!=null&&pool.indexOf(G.next2)>=0?G.next2:EDU.pick(pool);G.next2=EDU.pick(pool);EDU.setQ('Tembak warna: '+COL[G.next][0])}
+function start(){G={g:[],off:0,drop:0,shot:null,ang:-Math.PI/2,score:0,run:true,shots:0,pops:0,parts:[],next2:null};for(var r=0;r<6;r++){G.g[r]=[];for(var c=0;c<cols(r);c++)G.g[r][c]=EDU.rand(0,5)}newShot();EDU.setScore(0)}
+function nb(r,c){var odd=(r+G.off)%2,d=odd?[[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]]:[[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]];return d.map(function(k){return [r+k[0],c+k[1]]}).filter(function(p){return p[0]>=0&&p[1]>=0&&p[1]<cols(p[0])})}
+function get(r,c){return G.g[r]?G.g[r][c]:undefined}
+function shoot(){if(!G.run||G.shot)return;var sp=R*.9;G.shot={x:W/2,y:H-R*2.2,vx:Math.cos(G.ang)*sp,vy:Math.sin(G.ang)*sp,c:G.next,lab:COL[G.next][0]};G.shots++;EDU.sfx('pop')}
+function snap(s){var best=null,bd=1e9,nr=G.g.length+1;for(var r=0;r<nr;r++){if(!G.g[r])G.g[r]=[];for(var c=0;c<cols(r);c++){if(get(r,c)!=null)continue;var d=Math.hypot(cx(r,c)-s.x,cy(r)-s.y);if(d<bd){bd=d;best=[r,c]}}}
+  var r0=best[0],c0=best[1];G.g[r0][c0]=s.c;
+  var same=[[r0,c0]],seen={},st=[[r0,c0]];seen[r0+','+c0]=1;while(st.length){var p=st.pop();nb(p[0],p[1]).forEach(function(q){var k=q[0]+','+q[1];if(!seen[k]&&get(q[0],q[1])===s.c){seen[k]=1;same.push(q);st.push(q)}})}
+  if(same.length>=3){same.forEach(function(p){burst(p[0],p[1],G.g[p[0]][p[1]]);G.g[p[0]][p[1]]=null});var fl=floating();fl.forEach(function(p){burst(p[0],p[1],G.g[p[0]][p[1]]);G.g[p[0]][p[1]]=null});
+    var pts=same.length*10+fl.length*20;G.score+=pts;G.pops++;EDU.setScore(G.score);EDU.sfx('ok');EDU.toast(COL[s.c][0]+' = '+COL[s.c][1]+' · +'+pts,true)}
+  else EDU.sfx('tick');
+  if(G.shots%6===0){G.g.unshift([]);G.off=(G.off+1)%2;for(var c2=0;c2<cols(0);c2++)G.g[0][c2]=EDU.rand(0,5)}
+  while(G.g.length&&G.g[G.g.length-1].every(function(v){return v==null}))G.g.pop();
+  var lowest=G.g.length-1;if(cy(lowest)>H-R*4.2)return over();
+  if(!G.g.some(function(row){return row.some(function(v){return v!=null})})){G.score+=200;EDU.setScore(G.score);EDU.toast('Bersih! +200',true);start();return}
+  newShot()}
+function floating(){var seen={},st=[];for(var c=0;c<cols(0);c++)if(get(0,c)!=null){seen['0,'+c]=1;st.push([0,c])}while(st.length){var p=st.pop();nb(p[0],p[1]).forEach(function(q){var k=q[0]+','+q[1];if(!seen[k]&&get(q[0],q[1])!=null){seen[k]=1;st.push(q)}})}
+  var out=[];G.g.forEach(function(row,r){row.forEach(function(v,c){if(v!=null&&!seen[r+','+c])out.push([r,c])})});return out}
+function burst(r,c,col){for(var i=0;i<8;i++){var a=Math.random()*7,s=Math.random()*4+1;G.parts.push({x:cx(r,c),y:cy(r),vx:Math.cos(a)*s,vy:Math.sin(a)*s-1,l:30,c:COL[col][2]})}}
+function over(){G.run=false;EDU.end({key:'gelembung',score:G.score,max:600,head:'Gelembung sampai bawah'},start)}
+function update(){var s=G.shot;if(!s)return;for(var k=0;k<2;k++){s.x+=s.vx/2;s.y+=s.vy/2;if(s.x<R){s.x=R;s.vx*=-1}if(s.x>W-R){s.x=W-R;s.vx*=-1}
+  if(s.y<cy(0)){G.shot=null;return snap(s)}
+  for(var r=0;r<G.g.length;r++)for(var c=0;c<cols(r);c++)if(get(r,c)!=null&&Math.hypot(cx(r,c)-s.x,cy(r)-s.y)<R*1.75){G.shot=null;return snap(s)}}}
+function ball(px,py,col,rad,txt){var g=x.createRadialGradient(px-rad*.35,py-rad*.4,rad*.1,px,py,rad);g.addColorStop(0,'#fff');g.addColorStop(.25,col);g.addColorStop(1,shade(col));x.fillStyle=g;x.beginPath();x.arc(px,py,rad-1,0,7);x.fill();
+  if(txt){x.fillStyle='#fff';x.font='700 '+Math.round(rad*.62)+'px Space Grotesk';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,px,py+1)}}
+function shade(h){var n=parseInt(h.slice(1),16),r=(n>>16)*.55,g=((n>>8)&255)*.55,b=(n&255)*.55;return 'rgb('+r+','+g+','+b+')'}
+function draw(){x.clearRect(0,0,W,H);var bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#16244a');bg.addColorStop(1,'#0c1530');x.fillStyle=bg;x.fillRect(0,0,W,H);
+  x.strokeStyle='rgba(255,90,90,.35)';x.setLineDash([8,8]);x.beginPath();x.moveTo(0,H-R*4.2);x.lineTo(W,H-R*4.2);x.stroke();x.setLineDash([]);
+  G.g.forEach(function(row,r){row.forEach(function(v,c){if(v!=null)ball(cx(r,c),cy(r),COL[v][2],R)})});
+  var sx=W/2,sy=H-R*2.2;x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=2;x.setLineDash([4,8]);x.beginPath();x.moveTo(sx,sy);var px=sx,py=sy,vx=Math.cos(G.ang),vy=Math.sin(G.ang);for(var i=0;i<60&&py>R;i++){px+=vx*14;py+=vy*14;if(px<R||px>W-R)vx*=-1;x.lineTo(px,py)}x.stroke();x.setLineDash([]);
+  if(!G.shot){x.fillStyle='#e8ecf5';x.beginPath();x.arc(sx,sy,R*1.15,0,7);x.fill();x.fillStyle='#1b2a52';x.font='700 '+Math.round(R*.62)+'px Space Grotesk';x.textAlign='center';x.textBaseline='middle';x.fillText(COL[G.next][0],sx,sy+1)}
+  if(G.shot)ball(G.shot.x,G.shot.y,COL[G.shot.c][2],R);
+  x.fillStyle='rgba(255,255,255,.6)';x.font='700 '+Math.round(R*.5)+'px Space Grotesk';x.textAlign='left';x.fillText('Berikutnya:',R,H-R*.8);x.fillStyle='#e8ecf5';x.fillText(COL[G.next2][0],R*5.4,H-R*.8);
+  G.parts=G.parts.filter(function(p){p.x+=p.vx;p.y+=p.vy;p.vy+=.2;x.globalAlpha=p.l/30;x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,3,0,7);x.fill();x.globalAlpha=1;return --p.l>0})}
+/* demo: bidik gelembung terbuka yang warnanya sesuai kata */
+var dt0=0;function demo(){if(G.shot||!G.run)return;if(++dt0<38)return;dt0=0;var cand=[];G.g.forEach(function(row,r){row.forEach(function(v,c){if(v===G.next&&nb(r,c).some(function(q){return get(q[0],q[1])==null&&q[0]>r-1}))cand.push([r,c])})});
+  var t=cand.sort(function(a,b){return b[0]-a[0]})[0];if(Math.random()<.12||!t)t=null;var ang;if(t){ang=Math.atan2(cy(t[0])+R*.9-(H-R*2.2),cx(t[0],t[1])-W/2)}else ang=-Math.PI/2+(Math.random()-.5)*1.4;
+  G.ang=Math.max(-Math.PI+.15,Math.min(-.15,ang));setTimeout(shoot,250)}
+function loop(){if(G.run){update();if(EDU.demo)demo()}if(G.g)draw();requestAnimationFrame(loop)}
+function aim(e){var r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,py=(e.clientY-r.top)*H/r.height;G.ang=Math.max(-Math.PI+.15,Math.min(-.15,Math.atan2(py-(H-R*2.2),px-W/2)))}
+cv.addEventListener('pointermove',aim);cv.addEventListener('pointerup',function(e){aim(e);shoot()});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')G.ang=Math.max(-Math.PI+.15,G.ang-.06);if(e.key==='ArrowRight')G.ang=Math.min(-.15,G.ang+.06);if(e.key===' '){e.preventDefault();shoot()}});
+requestAnimationFrame(loop);window.__G=function(){return G};
+EDU.title({key:'gelembung',title:'Gelembung Warna',mapel:'Bahasa Inggris · TK – SD Kelas 3',desc:'Peluru gelembung hanya bertuliskan NAMA WARNA dalam bahasa Inggris. Baca, lalu bidik warna yang sama!',how:['Arahkan dengan mouse/jari (atau panah), lepas/klik untuk menembak.','3 gelembung sewarna atau lebih = pecah.','Setiap 6 tembakan, barisan baru turun.']},start);
+</script></body></html>

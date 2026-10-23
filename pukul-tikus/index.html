@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Pukul Tikus Jawaban</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:radial-gradient(ellipse at 50% 20%,#9be46a,#4fae3c 60%,#2f7d2a);}
+#field{position:absolute;inset:70px 0 0;display:grid;place-items:center}
+#grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,3vw,34px);width:min(92vw,620px,calc((100vh - 110px)*1.15))}
+.hole{position:relative;aspect-ratio:1.25;cursor:pointer}
+.hole::before{content:'';position:absolute;left:6%;right:6%;bottom:6%;height:34%;border-radius:50%;background:radial-gradient(ellipse at 50% 35%,#2b1609,#4a2a12 70%);box-shadow:inset 0 8px 14px rgba(0,0,0,.6),0 3px 0 #7bd04f}
+.mole{position:absolute;left:18%;right:18%;bottom:20%;height:78%;transform:translateY(70%) scaleY(.2);transform-origin:bottom;visibility:hidden;transition:transform .16s cubic-bezier(.3,1.6,.5,1),visibility 0s .16s}
+.hole.up .mole,.hole.hit .mole,.hole.miss .mole{transform:none;visibility:visible;transition:transform .16s cubic-bezier(.3,1.6,.5,1),visibility 0s}
+.body{position:absolute;inset:0;border-radius:48% 48% 18% 18%;background:linear-gradient(#a8703f,#7a4a22);box-shadow:inset -8px -6px 0 rgba(0,0,0,.15)}
+.eye{position:absolute;top:24%;width:12%;height:14%;background:#1a0e06;border-radius:50%}.eye.l{left:28%}.eye.r{right:28%}
+.eye::after{content:'';position:absolute;left:25%;top:18%;width:35%;height:35%;background:#fff;border-radius:50%}
+.nose{position:absolute;top:40%;left:42%;width:16%;height:11%;background:#ff8fa3;border-radius:50%}
+.sign{position:absolute;left:50%;top:56%;transform:translateX(-50%);background:#fff8e6;border:3px solid #5a3415;border-radius:10px;padding:2px 10px;font:700 clamp(18px,3.6vw,30px) 'Space Mono',monospace;color:#2a1a10;white-space:nowrap}
+.hole.hit .body{background:linear-gradient(#7fd17a,#3e9a3a)}
+.hole.miss .body{background:linear-gradient(#ff8a7a,#c43a2a)}
+.hole.hit .eye,.hole.miss .eye{height:4%;top:28%}
+#hammer{position:fixed;width:70px;height:70px;pointer-events:none;z-index:60;font-size:60px;transform:translate(-30%,-70%) rotate(-30deg);transition:transform .07s;display:none}
+#hammer.down{transform:translate(-30%,-60%) rotate(20deg)}
+</style></head><body>
+<div id="field"><div id="grid"></div></div><div id="hammer">🔨</div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Pukul Tikus Jawaban: tiru mekanik Whack-a-Mole (he-is-talha/html-css-javascript-games, MIT). Kode ditulis ulang. */
+var G={score:0,lives:3,time:60,cur:null,holes:[],run:false,benar:0,salah:0,timers:[]};
+EDU.hud({title:'Pukul Tikus Jawaban',lives:true,timer:true,credit:'Terinspirasi Whack-a-Mole · he-is-talha (MIT)'});
+var grid=EDU.$('#grid');
+for(var i=0;i<9;i++){var h=document.createElement('div');h.className='hole';h.innerHTML='<div class="mole"><div class="body"></div><i class="eye l"></i><i class="eye r"></i><i class="nose"></i><span class="sign"></span></div>';h.dataset.i=i;grid.appendChild(h);G.holes.push({el:h,v:null,up:false})}
+function newQ(){G.cur=EDU.Q.kali();EDU.setQ(G.cur.q+' = ?')}
+function popOne(){
+  if(!G.run)return;
+  var free=G.holes.filter(function(h){return !h.up});if(!free.length)return;
+  var h=EDU.pick(free),upCorrect=G.holes.some(function(x){return x.up&&x.v===G.cur.a});
+  h.v=(!upCorrect&&Math.random()<.5)?G.cur.a:EDU.pick(EDU.Q.opsi(G.cur.a,4).filter(function(x){return x!==G.cur.a}));
+  h.el.querySelector('.sign').textContent=h.v;h.up=true;h.el.className='hole up';
+  var life=1400+Math.random()*900-Math.min(600,G.score*3);
+  h.t=setTimeout(function(){down(h)},life);
+}
+function down(h){h.up=false;h.el.className='hole'+(h.el.classList.contains('hit')?' hit':h.el.classList.contains('miss')?' miss':'');setTimeout(function(){if(!h.up)h.el.className='hole'},180)}
+function whack(h,x,y){
+  if(!G.run||!h.up)return;clearTimeout(h.t);
+  if(h.v===G.cur.a){G.score+=10;G.benar++;EDU.setScore(G.score);EDU.sfx('ok');EDU.floatText(x,y,'+10',true);h.el.classList.add('hit');newQ()}
+  else{G.lives--;G.salah++;EDU.setLives(G.lives);EDU.sfx('bad');EDU.floatText(x,y,G.cur.q+' = '+G.cur.a,false);h.el.classList.add('miss');if(G.lives<=0)return setTimeout(finish,400)}
+  h.up=false;setTimeout(function(){h.el.className='hole'},260);
+}
+grid.addEventListener('pointerdown',function(e){var el=e.target.closest('.hole');if(!el)return;hammer(e.clientX,e.clientY);whack(G.holes[+el.dataset.i],e.clientX,e.clientY)});
+var hm=EDU.$('#hammer');
+function hammer(x,y){hm.style.display='block';hm.style.left=x+'px';hm.style.top=y+'px';hm.classList.add('down');setTimeout(function(){hm.classList.remove('down')},90)}
+document.addEventListener('pointermove',function(e){if(e.pointerType==='mouse'){hm.style.display='block';hm.style.left=e.clientX+'px';hm.style.top=e.clientY+'px'}});
+function start(){
+  G.score=0;G.lives=3;G.time=60;G.benar=0;G.salah=0;G.run=true;EDU.setScore(0);EDU.setLives(3);EDU.setTime(60);newQ();
+  G.timers.forEach(clearInterval);G.timers=[setInterval(popOne,620),setInterval(function(){G.time--;EDU.setTime(G.time);if(G.time<=0)finish()},1000)];
+  if(EDU.demo)G.timers.push(setInterval(auto,330));
+}
+function finish(){if(!G.run)return;G.run=false;G.timers.forEach(clearInterval);G.holes.forEach(function(h){clearTimeout(h.t);h.up=false;h.el.className='hole'});
+  EDU.end({key:'tikus',score:G.score,benar:G.benar,salah:G.salah,max:200,head:G.lives>0?'Waktu habis!':'Nyawa habis'},start)}
+/* mode demo: pukul tikus yang benar (sesekali salah) */
+var miss=0;
+function auto(){var h=G.holes.find(function(h){return h.up&&h.v===G.cur.a});if(!h&&++miss%9===0)h=G.holes.find(function(h){return h.up});
+  if(h){var r=h.el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height*.45;hammer(x,y);whack(h,x,y)}}
+EDU.title({key:'tikus',title:'Pukul Tikus Jawaban',mapel:'Matematika · SD Kelas 2–4',desc:'Tikus keluar membawa angka. Pukul tikus yang membawa jawaban benar!',how:['Lihat soal perkalian di atas.','Klik/ketuk tikus dengan jawaban benar: +10.','Salah pukul = nyawa berkurang. Waktu 60 detik.']},start);
+</script></body></html>

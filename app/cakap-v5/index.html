@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Cakap · Versi 5 · Nomad</title>
+<meta name="description" content="Cakap — belajar Bahasa Inggris untuk anak SD Indonesia. Versi 5.">
+<meta name="theme-color" content="#FF6A3D">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23131313'/%3E%3Ccircle cx='50' cy='52' r='28' fill='%23FF6A3D'/%3E%3Ccircle cx='40' cy='47' r='4' fill='%23131313'/%3E%3Ccircle cx='60' cy='47' r='4' fill='%23131313'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@500;700&family=Material+Symbols+Rounded:opsz,wght,FILL@24,400,1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+.ik{font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;font-size:24px;line-height:1;width:1em;height:1em;overflow:hidden;display:inline-block;font-variation-settings:'FILL' 1,'opsz' 24;letter-spacing:normal;text-transform:none;white-space:nowrap;flex:none}
+.kol{display:flex;flex-direction:column}.baris{display:flex;align-items:center}
+.g6{gap:6px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g14{gap:14px}.g16{gap:16px}.g20{gap:20px}
+.f1{flex:1;min-width:0}.mt-auto{margin-top:auto}.tengah{text-align:center;justify-content:center;align-items:center}.hidden{display:none!important}
+.rw{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gulung-x{overflow-x:auto;scrollbar-width:none}.gulung-x::-webkit-scrollbar{display:none}
+.mas{position:relative;display:flex;align-items:center;justify-content:center;flex:none}
+.muka{display:flex;flex-direction:column;align-items:center}
+.mata{display:flex}.mata i{display:block;flex:none}
+.apung{animation:apung 4.5s ease-in-out infinite}
+.screen{display:none;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{display:flex;animation:masuk .28s cubic-bezier(.22,.9,.3,1)}
+.screens{flex:1;min-height:0;position:relative}
+.screens>.screen{position:absolute;inset:0}
+@keyframes masuk{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes apung{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes jatuh{to{transform:translateY(900px) rotate(720deg);opacity:0}}
+.kf{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:jatuh 1.5s ease-in forwards;z-index:50;pointer-events:none}
+.toast{position:absolute;top:62px;left:50%;transform:translate(-50%,-10px);padding:12px 20px;border-radius:100px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:opacity .28s ease,transform .28s ease;z-index:60;max-width:92%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.gel{display:flex;align-items:center;gap:5px;height:84px}
+.gel i{flex:1;border-radius:99px;opacity:.5;transition:height .12s}
+.gel.rek i{opacity:1}
+.suis{width:50px;height:30px;border-radius:100px;position:relative;transition:background .2s;flex:none}
+.suis i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s cubic-bezier(.22,.9,.3,1)}
+.suis.on i{transform:translateX(20px)}
+.seg{display:flex;border-radius:100px;padding:4px}
+.seg button{padding:8px 16px;border-radius:100px;font-weight:700;font-size:13px;min-height:36px}
+mark{padding:0 4px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+:root{--bk:#0B0B0B;--wh:#fff;--or:#FF6A3D;--bu:#2F6BFF;--li:#B9A4FF;--gn:#3FD07F;--pk:#FF9BC2;--gy:#E6E6E6;--ye:#FFE14A}
+body{font-family:'DM Sans',system-ui,sans-serif;font-weight:500;background:var(--gy);color:var(--bk)}
+.panggung{display:block;padding:0}
+.ponsel{position:relative;min-height:100dvh;width:100%}
+.top5{position:sticky;top:0;z-index:20;background:var(--bk);color:#fff;display:flex;align-items:center;gap:14px;padding:12px 16px;flex-wrap:wrap}
+.lg5{font:400 30px/1 'Anton';letter-spacing:.02em;color:#fff;display:flex;align-items:center;gap:8px}
+.nv5{display:flex;gap:6px;flex:1;overflow-x:auto;scrollbar-width:none}.nv5::-webkit-scrollbar{display:none}
+.nv5 button{font:700 13px 'DM Sans';text-transform:uppercase;letter-spacing:.06em;padding:9px 14px;border-radius:99px;color:#fff;border:2px solid #333;min-height:40px;white-space:nowrap}.nv5 button.on{background:var(--ye);color:var(--bk);border-color:var(--ye)}
+.screens{flex:none;position:static}
+.screens>.screen{position:static;padding:14px}
+.screen.active{display:block;animation:masuk .28s cubic-bezier(.22,.9,.3,1)}
+.grid5{columns:3 290px;column-gap:14px;max-width:1280px;margin:0 auto}
+.t5{break-inside:avoid;margin:0 0 14px;border-radius:26px;padding:20px;position:relative;overflow:hidden;display:block;width:100%;text-align:left}
+.t5.bk{background:var(--bk);color:#fff}.t5.wh{background:#fff}.t5.or{background:var(--or)}.t5.bu{background:var(--bu);color:#fff}.t5.li{background:var(--li)}.t5.gn{background:var(--gn)}.t5.pk{background:var(--pk)}.t5.ye{background:var(--ye)}
+.d5{font:400 clamp(44px,9vw,92px)/.92 'Anton';text-transform:uppercase;letter-spacing:.005em}
+.d5.m{font-size:clamp(34px,6vw,60px)}.d5.s{font-size:34px}
+.p5{font:500 15px/1.45 'DM Sans'}.l5{font:700 12px 'DM Sans';letter-spacing:.1em;text-transform:uppercase}
+.bt5{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 26px;border-radius:99px;background:var(--bk);color:#fff;font:800 16px 'DM Sans';text-transform:uppercase;letter-spacing:.04em;transition:transform .12s;border:3px solid var(--bk)}
+.bt5:active,.t5[data-do]:active,.t5[data-go]:active{transform:scale(.98)}
+.bt5.wh{background:#fff;color:var(--bk)}.bt5.ye{background:var(--ye);color:var(--bk)}.bt5.ol{background:transparent;color:inherit;border-color:currentColor}
+.bt5:disabled{opacity:.35}
+.bt5.w100{width:100%}
+.ch5{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:12px;font:700 14px 'DM Sans';border:2px solid var(--bk);background:#fff;color:var(--bk)}
+.ch5.gn{background:var(--gn)}.ch5.bu{background:var(--bu);color:#fff;border-color:var(--bu)}.ch5.or{background:var(--or)}.ch5.bk{background:var(--bk);color:#fff}.ch5.ye{background:var(--ye)}
+.sk5{width:34px;height:34px;background:var(--bk);color:#fff;display:grid;place-items:center;border-radius:6px;font:800 16px 'DM Sans';flex:none}
+.ob5{border:5px solid transparent}.ob5.on{border-color:var(--bk)}
+.pb5{height:16px;border-radius:99px;background:rgba(0,0,0,.15);overflow:hidden}.pb5 i{display:block;height:100%;background:var(--bk);border-radius:99px;transition:width .5s}
+.bt5.cr{font-size:18px}
+.gel i{background:var(--bk)}
+.mik{width:110px;height:110px;border-radius:50%;background:var(--bk);color:var(--ye);display:grid;place-items:center;margin:0 auto}.mik.rekam{background:var(--or);color:var(--bk)}
+.toast{position:fixed;background:var(--bk);color:var(--ye);top:70px}
+.suis{background:rgba(0,0,0,.2)}.suis.on{background:var(--bk)}
+.seg{background:#222}.seg button{color:#fff}.seg .on{background:var(--ye);color:var(--bk)}
+.t5 .seg{background:rgba(0,0,0,.12)}.t5 .seg button{color:inherit}.t5 .seg .on{background:var(--bk);color:#fff}
+mark{background:var(--ye);color:var(--bk)}
+.kf{position:fixed;z-index:80}
+.gf5{display:flex;align-items:flex-end;gap:8px;height:140px}.gf5 div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;height:100%;font:700 12px 'DM Sans'}.gf5 i{width:100%;border-radius:8px;background:#444;display:block}.gf5 .hi i{background:var(--ye)}
+.rk5{display:flex;align-items:center;gap:14px}
+.rk5 .n{font:400 64px/.9 'Anton';min-width:56px}
+@media (max-width:600px){.top5{padding:10px 12px}.screens>.screen{padding:12px}.lg5{font-size:26px}}
+
+</style>
+</head>
+<body>
+<div class="ponsel" id="ponsel">
+<header class="top5"><span class="lg5">CAKAP</span><nav class="nv5" aria-label="Menu" id="dock"><button data-go="s-home">Home</button><button data-go="s-path">Jalur</button><button data-go="s-papan">Peringkat</button><button data-go="s-kemajuan">Progres</button><button data-go="s-profil">Profil</button></nav><span id="jam" class="hidden"></span><div id="seg5"></div></header>
+<main class="screens"><section class="screen" id="s-onboarding"></section><section class="screen" id="s-level"></section><section class="screen" id="s-home"></section><section class="screen" id="s-path"></section><section class="screen" id="s-card"></section><section class="screen" id="s-quiz"></section><section class="screen" id="s-betul"></section><section class="screen" id="s-salah"></section><section class="screen" id="s-sebut"></section><section class="screen" id="s-papan"></section><section class="screen" id="s-kemajuan"></section><section class="screen" id="s-profil"></section></main>
+<div class="toast" id="toast" role="status"></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const AWAL={nama:'Aisyah Nabila',level:'A1',bahasa:'ID',xp:1940,beruntun:12,menit:184,xpMinggu:1240,kata:412,benar:0,jawab:0,selesai:{},hafal:{},simpan:[],suis:{ingat:true,luring:false},hariMenit:[40,62,30,78,52,84,22]};
+let S=JSON.parse(JSON.stringify(AWAL));
+try{Object.assign(S,JSON.parse(localStorage.getItem('cakap-id-v1')||'{}'))}catch(e){}
+const simpan=()=>{try{localStorage.setItem('cakap-id-v1',JSON.stringify(S))}catch(e){}};
+const T=(a,b)=>S.bahasa==='EN'?b:a;
+const fmt=n=>n.toLocaleString('id-ID');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let ses={les:null,kartu:0,soal:0,nyawa:3,betul:0,pilih:-1,solo:false,sx:0},lihat=null,perPapan=0,perKm=0,cur='s-onboarding',rek=null,obi=0;
+const V={render:{},show(){}};
+
+const hl=(s,w)=>{const t=w.replace(/[?!.…]+$/,''),i=s.toLowerCase().indexOf(t.toLowerCase());return i<0?s:s.slice(0,i)+'<mark>'+s.slice(i,i+t.length)+'</mark>'+s.slice(i+t.length)};
+const Q=(k,r)=>({prompt:r[0],audio:r[5]||'',opts:r[1],a:r[2],note:{title:r[3],body:r[4],chips:r[6]||k.slice(0,2).map(c=>c[0]+' · '+c[3].toLowerCase())},why:{rows:r[7]||[[k[0][3].toLowerCase(),k[0][0],true],[k[1][3].toLowerCase(),k[1][0],false]]}});
+const L=(id,en,idn,tipe,k,q,s)=>({id,en,idn,tipe,k,q:q.map(r=>Q(k,r)),s});
+const U=(id,w,ink,en,idn,l)=>{const u={id,w,ink,en,idn,lv:'A1',l};const all=l.flatMap(x=>x.k);u.l.push({id:id+'-ulangan',en:'Unit Review',idn:'Ulangan Unit',tipe:'Ulangan',k:[0,3,6,9].map(i=>all[i]),q:l.map(x=>x.q[0]),s:l[0].s});return u};
+const KURIKULUM=[
+U('u1','langit','ink-langit','Greetings','Sapaan & Perkenalan',[
+L('u1l1','Hello & Goodbye','Halo & Pamit','Kosa kata',[["Hello","/həˈloʊ/","sapaan","Halo","Hello, I am Rani.","Halo, saya Rani."],["Good morning","/ɡʊd ˈmɔːrnɪŋ/","sapaan","Selamat pagi","Good morning, teacher.","Selamat pagi, Bu Guru."],["Goodbye","/ɡʊdˈbaɪ/","sapaan","Selamat tinggal","Goodbye, see you tomorrow.","Selamat tinggal, sampai jumpa besok."],["Thank you","/ˈθæŋk juː/","ungkapan","Terima kasih","Thank you for the book.","Terima kasih untuk bukunya."]],[
+["“Good morning, teacher.”",["Selamat malam, Bu Guru","Selamat pagi, Bu Guru","Selamat tinggal, Bu Guru","Terima kasih, Bu Guru"],1,"“Good morning” = Selamat pagi","Kita memakai good morning sampai sekitar pukul 12 siang.","Good morning, teacher.",["good morning · pagi","good afternoon · siang"],[["pagi","good morning",true],["malam","good night",false]]],
+["Ibu guru memberimu buku. Apa yang kamu katakan?",["Goodbye!","Hello!","Thank you!","Good night!"],2,"“Thank you” = Terima kasih","Ucapkan thank you setiap kali menerima sesuatu."],
+["“Sampai jumpa besok!” dalam bahasa Inggris adalah…",["See you tomorrow!","See you yesterday!","Look you tomorrow!","Meet you morning!"],0,"“See you tomorrow”","Gunakan see you untuk berpisah dengan teman."]],
+["Good morning, teacher!","Selamat pagi, Bu Guru!","morning","/ˈmɔːrnɪŋ/"]),
+L('u1l2','How Are You?','Apa Kabar?','Ucapan',[["How are you?","/haʊ ɑːr juː/","pertanyaan","Apa kabar?","How are you? I am fine.","Apa kabar? Saya baik."],["I'm fine","/aɪm faɪn/","jawaban","Saya baik","I'm fine, thank you.","Saya baik, terima kasih."],["Nice to meet you","/naɪs tə miːt juː/","ungkapan","Senang bertemu denganmu","Nice to meet you, Rani.","Senang bertemu denganmu, Rani."],["See you","/siː juː/","ungkapan","Sampai jumpa","See you on Monday.","Sampai jumpa hari Senin."]],[
+["“How are you?”",["Siapa namamu?","Apa kabar?","Di mana kamu?","Kamu mau apa?"],1,"“How are you?” = Apa kabar?","Jawab dengan I'm fine, thank you.","How are you?"],
+["Temanmu bertanya “How are you?”. Jawaban yang tepat…",["I'm fine, thank you.","My name is Rani.","Goodbye!","It is a book."],0,"Jawab pertanyaan kabar","Gunakan I'm fine untuk menjawab How are you?."],
+["Saat berkenalan, kita berkata…",["See you!","Nice to meet you.","Thank you for the food.","Good night."],1,"“Nice to meet you”","Dipakai saat bertemu seseorang untuk pertama kali."]],
+["How are you today?","Apa kabar hari ini?","today","/təˈdeɪ/"]),
+L('u1l3','My Name Is…','Nama Saya…','Tata bahasa',[["name","/neɪm/","kata benda","nama","My name is Rani.","Namaku Rani."],["my","/maɪ/","kata ganti","milikku","This is my bag.","Ini tasku."],["I am","/aɪ æm/","kata kerja","saya adalah","I am ten years old.","Saya berumur sepuluh tahun."],["friend","/frend/","kata benda","teman","He is my friend.","Dia temanku."]],[
+["Lengkapi: “___ name is Rani.”",["Me","My","I","Mine"],1,"“My name is…”","my = milikku, dipakai sebelum kata benda."],
+["Lengkapi: “I ___ ten years old.”",["is","are","am","be"],2,"“I am…”","Setelah I, kita memakai am."],
+["“Dia temanku.” dalam bahasa Inggris…",["He is my friend.","He is me friend.","His my friend.","He are my friend."],0,"“He is my friend”","He memakai is, dan milikku = my."]],
+["My name is Aisyah.","Nama saya Aisyah.","name","/neɪm/"])]),
+U('u2','lavender','ink-lav','Numbers & Colours','Angka & Warna',[
+L('u2l1','Numbers 1–20','Angka 1–20','Kosa kata',[["five","/faɪv/","angka","lima","I have five books.","Saya punya lima buku."],["ten","/ten/","angka","sepuluh","Ten pencils, please.","Sepuluh pensil, ya."],["twelve","/twelv/","angka","dua belas","I have twelve pencils.","Saya punya dua belas pensil."],["twenty","/ˈtwenti/","angka","dua puluh","Twenty students are here.","Dua puluh siswa ada di sini."]],[
+["Angka 12 dalam bahasa Inggris adalah…",["twenty","twelve","two","twenty-one"],1,"“twelve” = 12","twelve (12) berbeda dari twenty (20). Dengarkan akhiran -ve dan -ty.","",["twelve · 12","twenty · 20"],[["dua belas","twelve",true],["dua puluh","twenty",false]]],
+["“Lima belas” dalam bahasa Inggris…",["fifteen","fifty","five","fourteen"],0,"“fifteen” = 15","-teen berarti belasan, -ty berarti puluhan."],
+["Satu tangan punya ___ jari. Pilih angka Inggris.",["five","four","six","ten"],0,"“five” = 5","Satu tangan punya lima jari."]],
+["I have twelve pencils.","Saya punya dua belas pensil.","twelve","/twelv/"]),
+L('u2l2','Colours','Warna','Ucapan',[["red","/red/","kata sifat","merah","The apple is red.","Apelnya merah."],["blue","/bluː/","kata sifat","biru","The sky is blue.","Langitnya biru."],["green","/ɡriːn/","kata sifat","hijau","The leaf is green.","Daunnya hijau."],["yellow","/ˈjeloʊ/","kata sifat","kuning","The sun is yellow.","Mataharinya kuning."]],[
+["“red”",["blue","red","green","pink"],1,"“red” = merah","Warna apel dan cabai.","red"],
+["Langit yang cerah berwarna…",["green","yellow","blue","black"],2,"“blue” = biru","Langit dan laut berwarna blue."],
+["Warna daun adalah ___.",["green","red","white","purple"],0,"“green” = hijau","Daun yang segar berwarna green."]],
+["The sky is blue.","Langit berwarna biru.","blue","/bluː/"]),
+L('u2l3','Shapes & Counting','Bentuk & Berhitung','Tata bahasa',[["circle","/ˈsɜːrkl/","kata benda","lingkaran","The ball is a circle.","Bola berbentuk lingkaran."],["square","/skwer/","kata benda","persegi","The book is a square.","Bukunya berbentuk persegi."],["triangle","/ˈtraɪæŋɡl/","kata benda","segitiga","A triangle has three sides.","Segitiga punya tiga sisi."],["count","/kaʊnt/","kata kerja","menghitung","Count to ten.","Hitung sampai sepuluh."]],[
+["Bentuk bola adalah…",["square","triangle","circle","star"],2,"“circle” = lingkaran","Bola dan matahari berbentuk circle."],
+["Lengkapi: “There ___ three squares.”",["is","are","am","be"],1,"“There are…”","Untuk jumlah banyak kita memakai there are."],
+["“Hitung sampai sepuluh.”",["Count to ten.","Cut to ten.","Come to ten.","Cook to ten."],0,"“Count to ten”","count = menghitung."]],
+["Count to ten, please.","Hitung sampai sepuluh, ya.","count","/kaʊnt/"])]),
+U('u3','kuning','ink-kuning','At the Canteen','Di Kantin',[
+L('u3l1','Food & Drink','Makanan & Minuman','Kosa kata',[["fried rice","/fraɪd raɪs/","kata benda","nasi goreng","This fried rice is delicious.","Nasi goreng ini enak."],["water","/ˈwɔːtər/","kata benda","air","Water, please.","Air, tolong."],["milk","/mɪlk/","kata benda","susu","I like milk.","Saya suka susu."],["banana","/bəˈnɑːnə/","kata benda","pisang","The banana is yellow.","Pisangnya kuning."]],[
+["“Nasi goreng ini enak.”",["This fried rice is delicious.","This fried rice is expensive.","This fried rice is hot.","This fried rice is small."],0,"“delicious” = enak","delicious dipakai untuk makanan yang lezat."],
+["Kamu haus. Kamu meminta…",["Water, please.","Chair, please.","Pencil, please.","Bag, please."],0,"“Water, please.”","Tambahkan please agar sopan."],
+["“pisang” dalam bahasa Inggris…",["banana","apple","bread","grape"],0,"“banana” = pisang","Pisang berwarna yellow."]],
+["This fried rice is delicious.","Nasi goreng ini enak.","delicious","/dɪˈlɪʃəs/"]),
+L('u3l2','How Much Is It?','Berapa Harganya?','Ucapan',[["How much is it?","/haʊ mʌtʃ ɪz ɪt/","pertanyaan","Berapa harganya?","How much is it? Five thousand.","Berapa harganya? Lima ribu."],["cheap","/tʃiːp/","kata sifat","murah","The milk is cheap.","Susunya murah."],["expensive","/ɪkˈspensɪv/","kata sifat","mahal","The bag is expensive.","Tasnya mahal."],["change","/tʃeɪndʒ/","kata benda","uang kembalian","Here is your change.","Ini uang kembalianmu."]],[
+["“How much is it?” artinya…",["Berapa harganya?","Berapa umurmu?","Siapa itu?","Apa ini?"],0,"“How much…?”","Dipakai untuk menanyakan harga.","How much is it?"],
+["Harga barang itu tinggi. Kata yang tepat…",["cheap","expensive","small","fast"],1,"“expensive” = mahal","Lawan kata expensive adalah cheap."],
+["Lengkapi: “How ___ is the milk?”",["many","much","long","old"],1,"“How much”","much untuk harga atau jumlah yang tak dapat dihitung."]],
+["How much is the banana?","Berapa harga pisangnya?","much","/mʌtʃ/"]),
+L('u3l3','Polite Requests','Permintaan Sopan','Tata bahasa',[["please","/pliːz/","kata seru","tolong","Water, please.","Air, tolong."],["sorry","/ˈsɑːri/","kata seru","maaf","Sorry, teacher.","Maaf, Bu Guru."],["excuse me","/ɪkˈskjuːz miː/","ungkapan","permisi","Excuse me, may I pass?","Permisi, boleh lewat?"],["may I","/meɪ aɪ/","ungkapan","bolehkah saya","May I have some water?","Bolehkah saya minta air?"]],[
+["Kamu ingin lewat. Kamu berkata…",["Excuse me.","Good night.","Thank you.","Goodbye."],0,"“Excuse me” = permisi","Dipakai untuk meminta jalan atau perhatian."],
+["Meminta dengan sopan:",["Give me water.","Water now!","May I have some water, please?","I want water."],2,"“May I… , please?”","May I + please membuat permintaan sopan."],
+["Kamu menabrak temanmu. Kamu berkata…",["Please.","Sorry.","Hello.","Welcome."],1,"“Sorry” = maaf","Ucapkan sorry saat berbuat salah."]],
+["May I have some water, please?","Boleh saya minta air, tolong?","please","/pliːz/"])]),
+U('u4','pink','ink-pink','My Family','Keluargaku',[
+L('u4l1','Family Members','Anggota Keluarga','Kosa kata',[["mother","/ˈmʌðər/","kata benda","ibu","My mother cooks rice.","Ibuku memasak nasi."],["father","/ˈfɑːðər/","kata benda","ayah","My father is tall.","Ayahku tinggi."],["brother","/ˈbrʌðər/","kata benda","saudara laki-laki","I have two brothers.","Saya punya dua saudara laki-laki."],["sister","/ˈsɪstər/","kata benda","saudara perempuan","My sister is Sinta.","Kakakku bernama Sinta."]],[
+["“Ayah” dalam bahasa Inggris…",["father","mother","brother","uncle"],0,"“father” = ayah","Ayah = father, ibu = mother."],
+["Lengkapi: “I ___ two brothers.”",["has","have","haves","having"],1,"“I have…”","Setelah I kita memakai have, bukan has."],
+["“Adik laki-lakiku” adalah…",["my little sister","my little brother","my mother","my father"],1,"“my little brother”","little brother = adik laki-laki."]],
+["I have two brothers.","Saya punya dua saudara laki-laki.","brothers","/ˈbrʌðərz/"]),
+L('u4l2','This Is My…','Ini Adalah…','Ucapan',[["grandmother","/ˈɡrænmʌðər/","kata benda","nenek","This is my grandmother.","Ini nenekku."],["grandfather","/ˈɡrænfɑːðər/","kata benda","kakek","My grandfather is kind.","Kakekku baik hati."],["uncle","/ˈʌŋkl/","kata benda","paman","This is my uncle.","Ini pamanku."],["aunt","/ænt/","kata benda","bibi","My aunt is a doctor.","Bibiku seorang dokter."]],[
+["“This is my grandmother.” artinya…",["Ini nenekku.","Itu kakekku.","Ini ibuku.","Ini bibiku."],0,"“This is my…”","This is dipakai untuk memperkenalkan satu orang."],
+["Lengkapi: “___ is my uncle.”",["This","These","Those","They"],0,"“This is…”","This untuk satu benda atau orang yang dekat."],
+["Menunjuk dua kakak: “These ___ my sisters.”",["is","am","are","be"],2,"“These are…”","Untuk jumlah banyak kita memakai are."]],
+["This is my grandmother.","Ini nenekku.","grandmother","/ˈɡrænmʌðər/"]),
+L('u4l3','Jobs','Pekerjaan','Tata bahasa',[["teacher","/ˈtiːtʃər/","kata benda","guru","My teacher is kind.","Guruku baik hati."],["doctor","/ˈdɑːktər/","kata benda","dokter","She is a doctor.","Dia seorang dokter."],["farmer","/ˈfɑːrmər/","kata benda","petani","My father is a farmer.","Ayahku seorang petani."],["driver","/ˈdraɪvər/","kata benda","sopir","He is a bus driver.","Dia sopir bus."]],[
+["Orang yang mengajar di kelas adalah…",["driver","teacher","farmer","doctor"],1,"“teacher” = guru","teacher mengajar di sekolah."],
+["Lengkapi: “She ___ a doctor.”",["am","are","is","be"],2,"“She is…”","She memakai is."],
+["“Ayahku seorang petani.”",["My father is a farmer.","My father is a driver.","My mother is a farmer.","My father are farmer."],0,"“a farmer”","Sebelum nama pekerjaan kita pakai a."]],
+["My father is a farmer.","Ayahku seorang petani.","farmer","/ˈfɑːrmər/"])]),
+U('u5','mint','ink-mint','Animals & Weather','Hewan & Cuaca',[
+L('u5l1','Farm Animals','Hewan Ternak','Kosa kata',[["cow","/kaʊ/","kata benda","sapi","The cow is big.","Sapinya besar."],["goat","/ɡoʊt/","kata benda","kambing","The goat eats grass.","Kambing makan rumput."],["chicken","/ˈtʃɪkɪn/","kata benda","ayam","The chicken is white.","Ayamnya putih."],["duck","/dʌk/","kata benda","bebek","The duck says quack.","Bebek berbunyi kwek."]],[
+["“sapi” adalah…",["goat","cow","duck","hen"],1,"“cow” = sapi","Sapi berbunyi moo."],
+["Hewan yang berbunyi “quack” adalah…",["duck","cow","goat","cat"],0,"“duck” = bebek","Bebek berbunyi quack."],
+["Lengkapi: “The goats ___ eating grass.”",["is","am","are","be"],2,"“goats are…”","Kata benda jamak memakai are."]],
+["The cow is big.","Sapi itu besar.","cow","/kaʊ/"]),
+L('u5l2','Wild Animals','Hewan Liar','Ucapan',[["elephant","/ˈelɪfənt/","kata benda","gajah","An elephant is big.","Gajah itu besar."],["tiger","/ˈtaɪɡər/","kata benda","harimau","The tiger is fast.","Harimau itu cepat."],["monkey","/ˈmʌŋki/","kata benda","monyet","The monkey eats a banana.","Monyet makan pisang."],["snake","/sneɪk/","kata benda","ular","The snake is long.","Ularnya panjang."]],[
+["Lengkapi: “An elephant is ___ than a goat.”",["big","bigger","biggest","more big"],1,"“bigger than” = lebih besar dari","Tambahkan -er pada kata sifat pendek untuk membandingkan.","",["bigger · lebih besar","biggest · paling besar"],[["lebih besar","bigger",true],["paling besar","biggest",false]]],
+["Hewan yang punya belalai adalah…",["tiger","elephant","snake","monkey"],1,"“elephant” = gajah","Gajah punya belalai (trunk)."],
+["Lengkapi: “The tiger is ___ than the monkey.”",["stronger","strongest","more strong","strong"],0,"“stronger than”","strong + er = stronger."]],
+["An elephant is bigger than a goat.","Gajah lebih besar daripada kambing.","bigger","/ˈbɪɡər/"]),
+L('u5l3','Weather','Cuaca','Tata bahasa',[["sunny","/ˈsʌni/","kata sifat","cerah","It is sunny today.","Hari ini cerah."],["rainy","/ˈreɪni/","kata sifat","hujan","It is rainy today.","Hari ini hujan."],["cloudy","/ˈklaʊdi/","kata sifat","berawan","It is cloudy.","Cuacanya berawan."],["windy","/ˈwɪndi/","kata sifat","berangin","It is windy today.","Hari ini berangin."]],[
+["“How is the weather?” artinya…",["Jam berapa sekarang?","Bagaimana cuacanya?","Siapa itu?","Berapa harganya?"],1,"“How is the weather?”","Dipakai untuk menanyakan cuaca."],
+["Kamu butuh payung. Cuacanya…",["sunny","rainy","windy","hot"],1,"“rainy” = hujan","Saat rainy, bawalah payung."],
+["Lengkapi: “It is ___ today. Let's fly a kite!”",["rainy","windy","cold","dark"],1,"“windy” = berangin","Layangan terbang saat windy."]],
+["It is sunny today.","Hari ini cerah.","sunny","/ˈsʌni/"])]),
+U('u6','coral','ink-coral','At School','Di Sekolah',[
+L('u6l1','Classroom Things','Benda di Kelas','Kosa kata',[["book","/bʊk/","kata benda","buku","Open your book.","Buka bukumu."],["pencil","/ˈpensl/","kata benda","pensil","This is my pencil.","Ini pensilku."],["ruler","/ˈruːlər/","kata benda","penggaris","I need a ruler.","Saya butuh penggaris."],["desk","/desk/","kata benda","meja","Put it on the desk.","Taruh di atas meja."]],[
+["Alat untuk mengukur garis adalah…",["pencil","ruler","desk","book"],1,"“ruler” = penggaris","ruler dipakai untuk mengukur dan membuat garis lurus."],
+["“Taruh bukumu di atas meja.”",["Put your book on the desk.","Put your desk on the book.","Pick your book in the desk.","Put you book under desk."],0,"“on the desk”","on = di atas."],
+["Lengkapi: “This ___ my pencil.”",["are","am","is","be"],2,"“This is…”","This memakai is."]],
+["Open your book, please.","Buka bukumu, ya.","open","/ˈoʊpən/"]),
+L('u6l2','My Timetable','Jadwal Pelajaran','Ucapan',[["Monday","/ˈmʌndeɪ/","kata benda","hari Senin","We have English on Monday.","Kami ada pelajaran Inggris hari Senin."],["Tuesday","/ˈtuːzdeɪ/","kata benda","hari Selasa","Maths is on Tuesday.","Matematika hari Selasa."],["timetable","/ˈtaɪmteɪbl/","kata benda","jadwal pelajaran","This is my timetable.","Ini jadwal pelajaranku."],["subject","/ˈsʌbdʒɪkt/","kata benda","mata pelajaran","English is my subject.","Bahasa Inggris adalah mata pelajaranku."]],[
+["Lengkapi: “We have English ___ Monday.”",["in","on","at","to"],1,"“on Monday”","Pakai on untuk hari, at untuk jam.","",["pada hari Senin · on Monday","pukul tujuh · at seven"],[["pada hari Senin","on Monday",true],["pada pukul tujuh","at seven",false]]],
+["“Hari Selasa” dalam bahasa Inggris…",["Tuesday","Thursday","Sunday","Saturday"],0,"“Tuesday” = Selasa","Tuesday mirip Thursday, hati-hati."],
+["Lengkapi: “School starts ___ seven o'clock.”",["on","at","in","to"],1,"“at seven”","Untuk jam kita memakai at."]],
+["We have English on Monday.","Kami ada pelajaran Inggris hari Senin.","Monday","/ˈmʌndeɪ/"]),
+L('u6l3','Asking for Help','Meminta Bantuan','Tata bahasa',[["help","/help/","kata kerja","membantu","Can you help me?","Bisakah kamu membantuku?"],["understand","/ˌʌndərˈstænd/","kata kerja","mengerti","I understand.","Saya mengerti."],["repeat","/rɪˈpiːt/","kata kerja","mengulang","Can you repeat, please?","Bisakah kamu mengulang?"],["question","/ˈkwestʃən/","kata benda","pertanyaan","I have a question.","Saya punya pertanyaan."]],[
+["Kamu tidak paham penjelasan guru. Kamu berkata…",["I don't understand.","I don't like you.","I am hungry.","I am fine."],0,"“I don't understand”","Ini cara sopan memberi tahu guru bahwa kamu belum paham."],
+["Kamu ingin guru mengulang. Kamu berkata…",["Stop it, please.","Can you repeat, please?","Give me a pencil.","Where is the door?"],1,"“Can you repeat?”","repeat = mengulang."],
+["“Bolehkah saya bertanya?”",["May I ask a question?","May I eat a question?","Can I ask a answer?","Do I ask question?"],0,"“May I ask…?”","May I untuk meminta izin dengan sopan."]],
+["Can you help me, please?","Bisakah kamu membantuku?","help","/help/"])])
+];
+const LANGKAH=[];KURIKULUM.forEach((u,ui)=>u.l.forEach(l=>LANGKAH.push(Object.assign({u:ui},l))));
+const PAPAN_KELAS=[['Nurul Izzati',2410],['Kumaran Raja',2180],['__SAYA__',1940],['Tan Wei Ling',1725],['Muhammad Firdaus',1510],['Siti Khadijah',1320]];
+const HARI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'],BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HARI_EN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],BULAN_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const langkahBerjalan=()=>LANGKAH.find(x=>!S.selesai[x.id])||LANGKAH[LANGKAH.length-1];
+const hariIdx=()=>(new Date().getDay()+6)%7;
+const peringkat=()=>PAPAN_KELAS.map(p=>p[0]==='__SAYA__'?{n:S.nama,xp:S.xp,saya:true}:{n:p[0],xp:p[1]}).sort((a,b)=>b.xp-a.xp);
+
+
+const beda=(b,s)=>{const w=new Set(s.toLowerCase().split(/\s+/));return b.split(/\s+/).map(x=>w.has(x.toLowerCase())?x:'<mark>'+x+'</mark>').join(' ')};
+const terkunci=x=>!S.selesai[x.id]&&LANGKAH.indexOf(x)>LANGKAH.indexOf(langkahBerjalan());
+const POLA=[30,60,85,45,100,70,35,55,25,65,40,20];
+const SHORT=[['Sapaan','Greetings'],['Angka','Numbers'],['Kantin','Canteen'],['Keluarga','Family'],['Hewan','Animals'],['Sekolah','School']];
+/* maskot geometris: o={w,bg,bentuk,mata:'bulat|garis|googly|besar',mulut,pipi,kontur,warnaKontur,lencana} */
+const RAD={bulat:k=>'50%',kotak:k=>26*k+'px',tetes:k=>`50% 50% ${26*k}px 50%`,tag:k=>`${22*k}px ${22*k}px ${22*k}px ${6*k}px`,daun:k=>`50% 50% 50% ${14*k}px`,kartu:k=>`${36*k}px ${36*k}px ${8*k}px ${36*k}px`,ekor:k=>`${30*k}px ${30*k}px ${30*k}px ${8*k}px`};
+function maskot(n,o){const w=o.w||64,k=w/64,m=o.m||{},t=o.tinta||'#131313';
+n.className='mas'+(o.cls?' '+o.cls:'');n.style.width=n.style.height=w+'px';n.style.background=o.bg||'#C3F0A8';n.style.borderRadius=RAD[o.bentuk||'bulat'](k);if(o.kontur){n.style.border=`${o.kontur}px solid ${t}`;n.style.boxSizing='border-box'}
+let ey;if(o.mata==='googly'){const e=`<i style="width:${15*k}px;height:${15*k}px;border-radius:50%;background:#fff;border:${1.5*k}px solid ${t};display:grid;place-items:center"><b style="width:${6*k}px;height:${6*k}px;border-radius:50%;background:${t};transform:translate(${1.5*k}px,${1.5*k}px)"></b></i>`;ey=e+e}
+else{const e=o.mata==='garis'?`<i style="width:${m.mw||12*k}px;height:${m.mh||4*k}px;border-radius:99px;background:${t}"></i>`:o.mata==='besar'?`<i style="width:${12*k}px;height:${14*k}px;border-radius:50%;background:#fff;border:${2*k}px solid ${t};display:grid;place-items:end center"><b style="width:${6*k}px;height:${6*k}px;border-radius:50%;background:${t}"></b></i>`:`<i style="width:${m.mw||9*k}px;height:${m.mh||9*k}px;border-radius:50%;background:${t}"></i>`;ey=e+e}
+const bw=m.bw||3*k,uw=m.uw||24*k,uh=m.uh||12*k;let mu;
+switch(o.mulut||'senyum'){
+case 'sedih':mu=`<i style="width:${uw}px;height:${uh}px;border:${bw}px solid ${t};border-bottom:0;border-radius:${uw}px ${uw}px 0 0"></i>`;break;
+case 'garis':mu=`<i style="width:${uw}px;height:${bw*1.3}px;background:${t};border-radius:99px"></i>`;break;
+case 'bulat':mu=`<i style="width:${uh*1.1}px;height:${uh*1.1}px;border:${bw}px solid ${t};border-radius:50%"></i>`;break;
+case 'lebar':mu=`<i style="width:${uw*1.2}px;height:${uh*1.1}px;background:${t};border-radius:0 0 ${uw}px ${uw}px"></i>`;break;
+default:mu=`<i style="width:${uw}px;height:${uh}px;border:${bw}px solid ${t};border-top:0;border-radius:0 0 ${uw}px ${uw}px;background:${m.fill||'none'}"></i>`}
+const pp=o.pipi?`<i style="position:absolute;width:${13*k}px;height:${13*k}px;border-radius:50%;background:${o.pipi};left:${w*.12}px;top:${w*.52}px"></i><i style="position:absolute;width:${13*k}px;height:${13*k}px;border-radius:50%;background:${o.pipi};right:${w*.12}px;top:${w*.52}px"></i>`:'';
+const dn=o.daun?`<i style="position:absolute;width:${w*.3}px;height:${w*.3}px;border-radius:100% 0 100% 0;background:${o.daun};left:${w*.5}px;top:${-w*.2}px"></i>`:'';
+n.innerHTML=pp+dn+`<div class="muka" style="gap:${m.mg||8*k}px"><div class="mata" style="gap:${m.gap||12*k}px">${ey}</div>${mu}</div>`+(o.lencana?`<span class="lenc" style="width:${w*.3}px;height:${w*.3}px;background:#FFDD57;border:3px solid ${t};border-radius:50%;position:absolute;top:-4px;right:-4px;display:grid;place-items:center;font-size:${w*.18}px;font-weight:900">✓</span>`:'');
+return n}
+const mh=o=>maskot(document.createElement('div'),o).outerHTML;
+/* util */
+let tt;
+function toast(s){const e=$('#toast');if(!e)return;e.textContent=s;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1900)}
+function konfeti(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const w=V.konf||['#C3F0A8','#FFDD57','#FF9270','#DCCBF7','#A5DAF7','#FFB3C9'];for(let i=0;i<34;i++){const d=document.createElement('i');d.className='kf';d.style.left=Math.random()*100+'%';d.style.background=w[Math.floor(Math.random()*w.length)];d.style.animationDelay=Math.random()*.4+'s';$('#ponsel').appendChild(d);setTimeout(()=>d.remove(),2100)}}
+function ucap(teks,pelan){try{const s=speechSynthesis;s.cancel();const u=new SpeechSynthesisUtterance(teks);u.lang='en-GB';u.rate=pelan?.55:.92;u.pitch=1.05;const v=s.getVoices(),p=v.find(x=>/en-GB/i.test(x.lang)&&/female|kate|serena|libby|sonia/i.test(x.name))||v.find(x=>/en-(GB|US)/i.test(x.lang));if(p)u.voice=p;s.speak(u)}catch(e){toast(T('Suara tidak tersedia','Audio unavailable'))}}
+const jam=()=>{const e=$('#jam');if(!e)return;const d=new Date();e.textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')};
+const SEG=cls=>`<div class="seg ${cls||''}" role="group">${['ID','EN'].map(b=>`<button class="${S.bahasa===b?'on':''}" data-do="bahasa" data-arg="${b}">${b}</button>`).join('')}</div>`;
+const SUIS=k=>`<button class="suis${S.suis[k]?' on':''}" role="switch" aria-checked="${!!S.suis[k]}" data-do="suis" data-arg="${k}" aria-label="${k}"><i></i></button>`;
+const ik=(n,c)=>`<span class="ik${c?' '+c:''}">${n}</span>`;
+/* data per layar */
+const D={};
+D.home=()=>{const l=langkahBerjalan(),u=KURIKULUM[l.u],st=LANGKAH.filter(x=>x.u===l.u),dn=st.filter(x=>S.selesai[x.id]).length,d=new Date(),h=d.getHours(),wm=160+(S.menit-184);return{l,u,st,dn,pct:Math.round(dn/st.length*100),nm:esc(S.nama.split(' ')[0]),nama:esc(S.nama),nx:LANGKAH.filter(x=>!S.selesai[x.id]).slice(0,4),pr:peringkat().findIndex(x=>x.saya)+1,sal:h<11?T('Selamat pagi','Good morning'):h<15?T('Selamat siang','Good afternoon'):h<18?T('Selamat sore','Good evening'):T('Selamat malam','Good night'),tgl:S.bahasa==='EN'?`${HARI_EN[d.getDay()]}, ${d.getDate()} ${BULAN_EN[d.getMonth()]} ${d.getFullYear()}`:`${HARI[d.getDay()]}, ${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`,wm:Math.floor(wm/60)+T('j','h')+' '+wm%60+'m',xp:S.xp,xpw:S.xpMinggu,str:S.beruntun}};
+D.path=()=>{const cl=langkahBerjalan(),ci=LANGKAH.indexOf(cl),ui=lihat==null?cl.u:lihat,u=KURIKULUM[ui],st=LANGKAH.filter(x=>x.u===ui).map(x=>{const sl=!!S.selesai[x.id],gi=LANGKAH.indexOf(x);return{x,sl,kini:gi===ci&&!sl,kunci:!sl&&gi>ci}}),dn=st.filter(s=>s.sl).length;return{cl,ui,u,st,dn,pct:Math.round(dn/st.length*100),hf:Object.keys(S.hafal).length}};
+D.card=()=>{const l=ses.les;return{l,k:l.k[ses.kartu],i:ses.kartu,n:l.k.length}};
+D.quiz=()=>{const l=ses.les,q=l.q[ses.soal];return{l,q,i:ses.soal,n:l.q.length,nyawa:ses.nyawa,pilih:ses.pilih,sub:q.audio?T('Pilih terjemahan yang benar','Choose the correct translation'):T('Pilih jawaban yang tepat','Choose the right answer')}};
+D.betul=()=>({q:ses.les.q[ses.soal],ak:S.jawab?Math.round(S.benar/S.jawab*100):92,n:ses.les.q.length,i:ses.soal});
+D.salah=()=>{const q=ses.les.q[ses.soal],bn=q.opts[q.a],js=q.opts[ses.pilih]||'';return{q,bn,js,df:beda(bn,js),nyawa:ses.nyawa}};
+D.sebut=()=>{if(!ses.les)ses.les=langkahBerjalan();const s=ses.les.s;return{s,ws:s[0].split(' ').map(w=>({w:w.replace(/[!?.,]/g,''),f:w.toLowerCase().replace(/[^a-z']/g,'')===s[2].toLowerCase()}))}};
+D.papan=()=>{const pr=peringkat(),mu=perPapan?4:1;return{mu,per:perPapan?T('Bulanan','Monthly'):T('Mingguan','Weekly'),pr:pr.map((r,i)=>({n:r.saya?T('Kamu','You'):r.n,saya:!!r.saya,i,xp:r.xp*mu,naik:r.saya&&i>0?fmt(pr[i-1].xp-r.xp+1):null}))}};
+D.km=()=>{const hm=S.hariMenit,mx=Math.max(...hm),DD=['Sen','Sel','Rab','Kam','Jum','Sab','Min'],DE=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],pn=[[T('Minggu','Week'),T('minggu ini','this week')],[T('Bulan','Month'),T('bulan ini','this month')],[T('Tahun','Year'),T('tahun ini','this year')]];return{hm,mx,hi:hariIdx(),hari:S.bahasa==='EN'?DE:DD,sum:perKm===0?S.menit:perKm===1?S.menit*4:S.menit*48,pn,pk:perKm,ak:S.jawab?Math.round(S.benar/S.jawab*100):88,kata:S.kata,str:S.beruntun,skill:[[T('Kosa kata','Vocabulary'),82],[T('Ucapan','Speaking'),64],[T('Tata bahasa','Grammar'),71]]}};
+D.profil=()=>({nama:esc(S.nama),level:S.level,xp:fmt(S.xp),kode:'5MLT-26',simpan:S.simpan.length});
+D.level=()=>[['A1','Pemula · Beginner',T('Kelas 1–2 · Kata sehari-hari & kalimat pendek.','Grades 1–2 · Everyday words & short sentences.')],['A2',T('Menengah','Intermediate'),T('Kelas 3–4 · Sudah bisa sedikit, ingin lebih berani.','Grades 3–4 · Know a little, want to be bolder.')],['B1',T('Mahir','Advanced'),T('Kelas 5–6 · Tata bahasa & menulis kalimat sendiri.','Grades 5–6 · Grammar & writing your own sentences.')]];
+D.tab=T;
+/* navigasi */
+const TABS={};
+function pergi(id){if(id==='s-path'&&cur!=='s-path')lihat=null;$$('.screen').forEach(s=>s.classList.remove('active'));const e=$('#'+id);e.classList.add('active');e.scrollTop=0;cur=id;document.documentElement.lang=S.bahasa==='EN'?'en':'id';V.show(id,e);V.render[id]&&V.render[id](e)}
+const ulang=()=>V.render[cur]&&V.render[cur]($('#'+cur));
+const baru=o=>ses=Object.assign({les:langkahBerjalan(),kartu:0,soal:0,nyawa:3,betul:0,pilih:-1,solo:false,sx:0},o||{});
+function mulai(id){const l=LANGKAH.find(x=>x.id===id);if(terkunci(l)){toast(T('Selesaikan pelajaran sebelumnya dulu ya','Finish the previous lesson first'));return}baru({les:l});pergi('s-card')}
+function selesaiPelajaran(){const l=ses.les;S.selesai[l.id]=true;S.menit+=8;S.hariMenit[hariIdx()]+=8;S.xp+=20;S.xpMinggu+=20;simpan();konfeti();toast(T(`Pelajaran “${l.idn}” selesai! +${20+ses.sx} XP`,`Lesson “${l.en}” complete! +${20+ses.sx} XP`));setTimeout(()=>pergi('s-path'),900)}
+function mulaiRek(){if(rek)return;const g=$('#gel');if(!g)return;g.classList.add('rek');const m=$('#mik');m&&m.classList.add('rekam');rek={t:Date.now(),iv:setInterval(()=>[...g.children].forEach(b=>{const h=15+Math.random()*70;b.style.height=h+'%';b.classList.toggle('kuat',h>78)}),120),to:setTimeout(hentiRek,5000)}}
+function hentiRek(){if(!rek)return;clearInterval(rek.iv);clearTimeout(rek.to);const d=Date.now()-rek.t;rek=null;const g=$('#gel');if(g){g.classList.remove('rek');[...g.children].forEach((b,i)=>{b.style.height=POLA[i]+'%';b.classList.remove('kuat')})}const m=$('#mik');m&&m.classList.remove('rekam');if(d<400){toast(T('Tahan sedikit lebih lama ya','Hold a little longer'));return}
+const sk=78+Math.floor(Math.random()*21);S.xp+=10;S.xpMinggu+=10;ses.sx+=10;simpan();toast(T(`Ucapanmu ${sk}%! +10 XP`,`Your speaking: ${sk}%! +10 XP`));setTimeout(()=>ses.solo?pergi('s-home'):selesaiPelajaran(),800)}
+const wave=()=>`<div class="gel" id="gel">${POLA.map(p=>`<i style="height:${p}%"></i>`).join('')}</div>`;
+const AKSI={
+bahasa:a=>{S.bahasa=a;simpan();ulang()},
+suis:a=>{S.suis[a]=!S.suis[a];simpan();ulang()},
+toast:a=>toast(a),
+level:a=>{S.level=a;simpan();ulang()},
+ob:a=>{obi=+a;ulang()},
+mulai:a=>mulai(a),
+mulaiKosa:()=>mulai(langkahBerjalan().id),
+mulaiUcap:()=>{baru({solo:true});pergi('s-sebut')},
+mulaiTata:()=>{baru({solo:true});pergi('s-quiz')},
+ganti:()=>{const cl=langkahBerjalan();lihat=((lihat==null?cl.u:lihat)+1)%KURIKULUM.length;ulang()},
+ucap:a=>ucap(a),
+pelan:()=>{if(!ses.les)ses.les=langkahBerjalan();ucap(ses.les.s[0],true)},
+kartu:a=>{const l=ses.les;if(a==='1'){S.hafal[l.k[ses.kartu][0]]=true;S.kata=412+Object.keys(S.hafal).length;simpan()}ses.kartu++;if(ses.kartu>=l.k.length){ses.soal=0;ses.pilih=-1;pergi('s-quiz')}else ulang()},
+pilih:a=>{ses.pilih=+a;ulang()},
+periksa:()=>{const q=ses.les.q[ses.soal];S.jawab++;if(ses.pilih===q.a){S.benar++;ses.betul++;S.xp+=15;S.xpMinggu+=15;simpan();konfeti();pergi('s-betul')}else{ses.nyawa--;simpan();pergi('s-salah')}},
+lanjut:()=>{ses.soal++;ses.pilih=-1;if(ses.soal>=ses.les.q.length){ses.soal=0;ses.solo?pergi('s-home'):pergi('s-sebut')}else pergi('s-quiz')},
+bookmark:()=>{const q=ses.les.q[ses.soal];if(!S.simpan.includes(q.prompt))S.simpan.push(q.prompt);simpan();toast(T('Disimpan ke ulangan','Saved for review'))},
+coba:()=>{if(ses.nyawa<=0){ses.nyawa=3;ses.soal=0;toast(T('Nyawa habis — ulang dari soal 1','Out of lives — back to question 1'))}ses.pilih=-1;pergi('s-quiz')},
+simpanUlang:()=>{AKSI.bookmark();AKSI.coba()},
+lewati:()=>{if(ses.solo||!ses.les)pergi('s-home');else selesaiPelajaran()},
+periode:()=>{perPapan=perPapan?0:1;ulang()},
+perKm:a=>{perKm=+a;ulang()},
+ajak:()=>{try{navigator.clipboard.writeText('5MLT-26')}catch(e){}toast(T('Kode kelas 5MLT-26 disalin','Class code 5MLT-26 copied'))},
+nama:()=>{const n=prompt(T('Nama kamu:','Your name:'),S.nama);if(n&&n.trim()){S.nama=n.trim().slice(0,24);simpan();ulang()}},
+reset:()=>{if(confirm(T('Mulai ulang semua kemajuan?','Reset all progress?'))){S=JSON.parse(JSON.stringify(AWAL));simpan();baru();obi=0;pergi('s-onboarding')}}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-go],[data-do]');if(!el)return;if(el.dataset.go)pergi(el.dataset.go);else{const f=AKSI[el.dataset.do];f&&f(el.dataset.arg,el)}});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-go][role=button],[data-do][role=button]')){e.preventDefault();e.target.click()}});
+document.addEventListener('pointerdown',e=>{if(e.target.closest('#mik')){e.preventDefault();mulaiRek()}});
+['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,hentiRek));
+window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.id==='mik'&&!rek){e.preventDefault();mulaiRek()}});
+window.addEventListener('keyup',e=>{if(e.code==='Space'&&e.target.id==='mik')hentiRek()});
+const boot=()=>{$$('[data-go]:not(button):not(a),[data-do]:not(button):not(a)').forEach(e=>{if(!e.hasAttribute('role')){e.setAttribute('role','button');e.tabIndex=0}});jam();setInterval(jam,20000);try{speechSynthesis.getVoices()}catch(e){}pergi('s-onboarding')};
+
+const MB=['bulat','kotak','tetes','tag','daun','kartu','ekor'];
+/* V5 · Nomad: kolase poster, huruf Anton, mata googly */
+const BK5='#0B0B0B',C5=['#FF6A3D','#2F6BFF','#B9A4FF','#3FD07F','#FF9BC2','#FFE14A'];
+const mk5=(i,w,o)=>mh(Object.assign({w,bg:C5[i%6],bentuk:MB[i%7],tinta:BK5,mata:'googly',kontur:3,mulut:['senyum','bulat','garis','lebar'][i%4]},o||{}));
+V.konf=['#FF6A3D','#2F6BFF','#B9A4FF','#3FD07F','#FFE14A','#0B0B0B'];
+const X5=`<span class="sk5" aria-hidden="true">✕</span>`;
+V.show=(id,e)=>{scrollTo(0,0);$$('#dock button').forEach(b=>b.classList.toggle('on',b.dataset.go===({'s-card':'s-path','s-quiz':'s-path','s-betul':'s-path','s-salah':'s-path','s-sebut':'s-path','s-level':'s-home','s-onboarding':'s-home'}[id]||id)));$('#seg5').innerHTML=SEG()};
+AKSI.unit=a=>{lihat=+a;ulang()};
+const G=h=>`<div class="grid5">${h}</div>`;
+const tile=(c,h,at)=>at?`<button class="t5 ${c}" ${at}>${h}</button>`:`<div class="t5 ${c}">${h}</div>`;
+V.render['s-onboarding']=e=>{e.innerHTML=G(
+tile('bk',`<h1 class="d5">${T('Belajar<br>Inggris<br><span style="color:#FF6A3D">tanpa</span><br>drama.','Learn<br>English<br><span style="color:#FF6A3D">without</span><br>drama.')}</h1><p class="p5" style="margin-top:14px;color:#ccc">${T('Belajar 10 menit sehari, dengan cara kita. Bahasa Indonesia memandu, Bahasa Inggris melatih.','Learn 10 minutes a day, our way. Indonesian guides, English trains.')}</p><div class="baris g8" style="margin-top:14px">${X5}${X5}</div>`)+
+tile('or',`<div class="rw" style="align-items:flex-start"><span class="d5 m">10<br>${T('menit<br>sehari','min<br>a day')}</span><span class="apung">${mk5(1,120,{bg:'#fff',bentuk:'bulat'})}</span></div>`)+
+tile('wh',`<div class="baris g8" style="flex-wrap:wrap"><span class="ch5 gn">${T('Kosa kata','Vocabulary')}</span><span class="ch5 bu">${T('Ucapan','Speaking')}</span><span class="ch5 or">${T('Tata bahasa','Grammar')}</span><span class="ch5">${T('Kuis','Quiz')}</span><span class="ch5 ye">${T('Peringkat kelas','Class ranking')}</span></div><div class="d5 m" style="margin-top:14px">${T('Semua<br>dalam<br>satu app','All in<br>one app')}</div>`)+
+tile('li',`<span class="l5">${T('Dengar · Ucap · Hafal','Listen · Speak · Learn')}</span><div class="baris g12" style="margin-top:10px"><span class="apung">${mk5(2,96,{bentuk:'kotak'})}</span><span class="apung" style="animation-delay:.6s">${mk5(4,70,{bentuk:'ekor'})}</span></div>`)+
+tile('bu',`<span class="d5">${T('Yuk!','Go!')}</span><span class="bt5 ye" style="margin-top:12px">${T('Mulai','Start')} ${ik('arrow_forward')}</span>`,'data-go="s-level"'))};
+V.render['s-level']=e=>{const L=D.level();e.innerHTML=G(
+tile('wh',`<span class="l5">${T('Langkah 2/3','Step 2/3')}</span><h2 class="d5 m" style="margin-top:6px">${T('Kelasmu<br>yang mana?','Which<br>level?')}</h2>`)+
+L.map((l,i)=>tile(['gn','bu','or'][i]+' ob5'+(S.level===l[0]?' on':''),`<div class="rw" style="align-items:flex-start"><span class="d5" style="font-size:90px">${l[0]}</span>${S.level===l[0]?`<span class="ch5 bk">✓ ${T('DIPILIH','PICKED')}</span>`:''}</div><b style="font:800 18px 'DM Sans'">${l[1]}</b><p class="p5">${l[2]}</p>`,`data-do="level" data-arg="${l[0]}"`)).join('')+
+tile('wh',`<div class="rw"><b>${T('Bahasa antarmuka','Interface language')}</b>${SEG()}</div>`)+
+tile('bk',`<span class="d5 m">${T('Lanjut','Continue')} →</span>`,'data-go="s-home"'))};
+V.render['s-home']=e=>{const d=D.home(),l=d.l;e.innerHTML=G(
+tile('bk',`<span class="l5" style="color:#aaa">${d.sal}, ${d.nm}</span><div class="d5" style="font-size:clamp(90px,16vw,140px);color:#FFE14A">${d.pct}%</div><p class="p5" style="color:#ccc">${T('Unit '+(l.u+1)+' selesai · '+d.u.en,'Unit '+(l.u+1)+' done · '+d.u.en)}</p><div class="pb5" style="background:#333;margin-top:12px"><i style="width:${d.pct}%;background:#FFE14A"></i></div>`)+
+tile('or',`<div class="rw" style="align-items:flex-start"><div><span class="l5">${T('Lanjut belajar','Continue')}</span><h2 class="d5 m" style="margin-top:6px">${l.en}</h2><p class="p5" style="margin-top:6px">${l.idn}</p></div><span class="apung">${mk5(0,90,{bg:'#fff'})}</span></div><span class="bt5" style="margin-top:14px">${T('Mulai','Start')} ${ik('arrow_forward')}</span>`,`data-do="mulai" data-arg="${l.id}"`)+
+tile('li',`<div class="d5" style="font-size:96px">${d.str}</div><b style="font:800 18px 'DM Sans';text-transform:uppercase">${T('hari berturut','day streak')}</b>`,'data-go="s-kemajuan"')+
+tile('wh',`<div class="baris g8" style="flex-wrap:wrap"><button class="ch5 gn cr" data-do="mulaiKosa">${ik('menu_book')}${T('Kosa kata','Vocabulary')}</button><button class="ch5 bu" data-do="mulaiUcap">${ik('mic')}${T('Ucapan','Speaking')}</button><button class="ch5 or" data-do="mulaiTata">${ik('spellcheck')}${T('Tata bahasa','Grammar')}</button></div>`)+
+tile('gn',`<div class="d5" style="font-size:64px">${fmt(d.xp)}</div><b style="font:800 16px 'DM Sans';text-transform:uppercase">XP ${T('total','total')}</b>`)+
+tile('pk',`<span class="l5">${T('Peringkat kelas','Class rank')}</span><div class="d5" style="font-size:96px">#${d.pr}</div><span class="bt5" style="margin-top:8px">${T('Lihat papan','See board')} →</span>`,'data-go="s-papan"')+
+tile('bu',`<div class="d5 m">${T('Ucapkan<br>kata baru','Say a<br>new word')}</div><div class="rw" style="margin-top:10px"><span class="apung">${mk5(3,80,{bg:'#fff'})}</span><span class="bt5 ye">${ik('mic')}</span></div>`,'data-do="mulaiUcap"'))};
+V.render['s-path']=e=>{const d=D.path();e.innerHTML=G(
+tile('wh',`<div class="rw"><h2 class="d5 m">${T('Jalur<br>belajar','Learning<br>path')}</h2><button class="bt5" data-do="ganti" aria-label="${T('Ganti unit','Change unit')}">${ik('swap_horiz')}</button></div><div class="baris g8" style="flex-wrap:wrap;margin-top:12px">${KURIKULUM.map((u,i)=>`<button class="ch5${i===d.ui?' bk':''}" data-do="unit" data-arg="${i}">${i+1}. ${SHORT[i][S.bahasa==='EN'?1:0]}</button>`).join('')}</div>`)+
+tile('bk',`<span class="l5" style="color:#aaa">Unit ${d.ui+1}</span><h2 class="d5 m" style="color:#FFE14A;margin-top:4px">${d.u.en}</h2><p class="p5" style="color:#ccc">${d.u.idn}</p><div class="pb5" style="background:#333;margin-top:10px"><i style="width:${d.pct}%;background:#FFE14A"></i></div>`)+
+d.st.map((s,i)=>tile(s.sl?'gn':s.kini?'or':'wh',`<div class="rw" style="align-items:flex-start"><span class="d5" style="font-size:80px">0${i+1}</span>${ik(s.sl?'check_circle':s.kini?'play_circle':'lock').replace('class="ik"','class="ik" style="font-size:40px"')}</div><b style="font:800 20px 'DM Sans';text-transform:uppercase">${s.x.en}</b><p class="p5">${s.x.idn} · ${s.x.tipe}</p>`,`data-do="mulai" data-arg="${s.x.id}"`).replace('class="t5 wh"',s.kunci?'class="t5 wh" style="opacity:.55"':'class="t5 wh"')).join(''))};
+V.render['s-card']=e=>{const d=D.card(),k=d.k;e.innerHTML=G(
+tile('bk',`<div class="rw"><button class="bt5 wh" data-go="s-path" aria-label="${T('Tutup','Close')}">${ik('close')}</button><span class="ch5 ye">${d.i+1}/${d.n}</span></div><span class="l5" style="color:#aaa;display:block;margin-top:14px">${k[2]}</span><h2 class="d5" style="font-size:clamp(60px,14vw,110px);word-break:break-word;color:#fff">${k[0]}</h2><button class="ch5 ye" style="margin-top:10px" data-do="ucap" data-arg="${esc(k[0])}">${ik('volume_up')}${k[1]}</button>`)+
+tile('li',`<span class="l5">${T('Artinya dalam Bahasa Indonesia','Meaning in Indonesian')}</span><div class="d5" style="font-size:64px;margin-top:6px">${k[3]}</div><div style="margin-top:8px" class="apung">${mk5(d.i+2,84)}</div>`)+
+tile('wh',`<span class="l5">${T('Contoh','Example')}</span><p class="p5" style="font-size:18px;margin-top:6px">${hl(k[4],k[0])}</p><p class="p5" style="color:#777">${k[5]}</p><button class="ch5" style="margin-top:12px" data-do="pelan">${ik('slow_motion_video')}${T('Dengar pelan','Slow audio')}</button>`)+
+tile('wh',`<div class="baris g10"><button class="bt5 ol f1" data-do="kartu" data-arg="0">${T('Belum','Not yet')}</button><button class="bt5 f1" style="background:#3FD07F;color:#0b0b0b;border-color:#0b0b0b" data-do="kartu" data-arg="1">${T('Hafal','Got it')}</button></div>`))};
+V.render['s-quiz']=e=>{const d=D.quiz(),q=d.q;e.innerHTML=G(
+tile('bk',`<div class="rw"><button class="bt5 wh" data-go="s-path" aria-label="${T('Tutup','Close')}">${ik('close')}</button><span class="ch5 ye">${ik('favorite')}${d.nyawa}</span></div><span class="l5" style="color:#aaa;display:block;margin-top:12px">${T('Soal '+(d.i+1)+' dari '+d.n,'Question '+(d.i+1)+' of '+d.n)} · ${d.sub}</span><h2 class="d5 m" style="font-size:${q.prompt.length>34?36:48}px;margin-top:6px;text-transform:none;line-height:1">${q.prompt}</h2>${q.audio?`<button class="ch5 ye" style="margin-top:12px" data-do="ucap" data-arg="${esc(q.audio)}">${ik('volume_up')}${T('Dengarkan','Listen')}</button>`:''}`)+
+q.opts.map((o,i)=>tile(['bu','or','li','gn'][i]+' ob5'+(d.pilih===i?' on':''),`<div class="rw" style="align-items:flex-start"><span class="d5" style="font-size:64px">${'ABCD'[i]}</span>${d.pilih===i?`<span class="ch5 bk">✓</span>`:''}</div><b style="font:800 18px/1.2 'DM Sans'">${o}</b>`,`data-do="pilih" data-arg="${i}"`)).join('')+
+tile('wh',`<button class="bt5 w100" ${d.pilih<0?'disabled':''} data-do="periksa">${T('Periksa jawaban','Check answer')} →</button>`))};
+V.render['s-betul']=e=>{const d=D.betul(),q=d.q;e.innerHTML=G(
+tile('gn',`<h1 class="d5" style="font-size:clamp(56px,11vw,104px)">${T('Benar!','Correct!')}</h1><div class="rw"><span class="apung">${mk5(0,110,{bg:'#fff',mulut:'lebar'})}</span><span class="d5 m">+15 XP</span></div><p class="p5" style="margin-top:8px;font-weight:700">That's correct — well done.</p>`)+
+tile('wh',`<span class="l5">${T('Catatan','Note')}</span><h3 class="d5 s" style="margin-top:6px;text-transform:none">${q.note.title}</h3><p class="p5" style="margin-top:6px">${q.note.body}</p><div class="baris g6" style="flex-wrap:wrap;margin-top:10px">${q.note.chips.map(c=>`<span class="ch5">${c}</span>`).join('')}</div>`)+
+tile('bk',`<span class="l5" style="color:#aaa">${T('Ketepatan','Accuracy')}</span><div class="d5" style="font-size:96px;color:#FFE14A">${d.ak}%</div>`)+
+tile('bu',`<div class="baris g10"><button class="bt5 ye f1" data-do="lanjut">${T('Lanjutkan','Continue')} →</button><button class="bt5 wh" data-do="bookmark" aria-label="${T('Simpan','Save')}">${ik('bookmark')}</button></div>`))};
+V.render['s-salah']=e=>{const d=D.salah(),q=d.q;e.innerHTML=G(
+tile('or',`<div class="rw"><span class="ch5 bk">${ik('favorite')}${d.nyawa}</span><button class="bt5 wh" data-go="s-path" aria-label="${T('Tutup','Close')}">${ik('close')}</button></div><h1 class="d5" style="font-size:clamp(56px,11vw,104px);margin-top:10px">${T('Ups!','Oops!')}</h1><div class="rw"><span class="p5" style="font-weight:700">${T('Belum tepat — coba lagi.','Not quite — try again.')}</span><span class="apung">${mk5(1,90,{bg:'#fff',mulut:'sedih'})}</span></div>`)+
+tile('wh',`<span class="l5">${T('Jawabanmu','Your answer')}</span><p class="p5" style="font-size:19px;text-decoration:line-through;color:#888">${d.js}</p>`)+
+tile('gn',`<span class="l5">${T('Jawaban benar','Correct answer')}</span><p class="p5" style="font-size:19px;font-weight:700">${d.df}</p>`)+
+tile('bk',`<span class="l5" style="color:#aaa">${T('Kenapa?','Why?')}</span><p class="p5" style="color:#eee;margin-top:6px">${q.note.body}</p>`)+
+tile('wh',`<div class="kol g10"><button class="bt5 w100" data-do="coba">${T('Coba lagi','Try again')}</button><button class="bt5 ol w100" data-do="simpanUlang">${T('Simpan ke ulangan','Save for review')}</button></div>`))};
+V.render['s-sebut']=e=>{const d=D.sebut();e.innerHTML=G(
+tile('li',`<div class="rw"><button class="bt5" data-go="s-path" aria-label="${T('Kembali','Back')}">${ik('arrow_back')}</button><span class="l5">${T('Latihan ucapan','Speaking')}</span></div><span class="l5" style="display:block;margin-top:14px">${T('Ucapkan setelah saya','Repeat after me')}</span><h2 class="d5 m" style="text-transform:none;margin-top:4px">${d.s[0]}</h2><p class="p5" style="margin-top:6px">${d.s[1]}</p>${wave()}`)+
+tile('bk',`<div class="kol tengah g12"><button class="mik" id="mik" aria-label="${T('Rekam','Record')}">${ik('mic').replace('class="ik"','class="ik" style="font-size:52px"')}</button><span class="l5" style="color:#aaa">${T('Tekan dan tahan untuk merekam','Press and hold to record')}</span></div>`)+
+tile('wh',`<span class="l5">${T('Kata yang perlu diperbaiki','Words to improve')}</span><div class="baris g8" style="flex-wrap:wrap;margin-top:8px">${d.ws.map(w=>w.f?`<span class="ch5 ye">${w.w} ${d.s[3]}</span>`:`<span class="ch5 gn">${w.w} ✓</span>`).join('')}</div>`)+
+tile('or',`<div class="baris g10"><button class="bt5 wh f1" data-do="pelan">${ik('slow_motion_video')}${T('Pelan','Slow')}</button><button class="bt5 f1" data-do="lewati">${ik('skip_next')}${T('Lewati','Skip')}</button></div>`))};
+V.render['s-papan']=e=>{const d=D.papan(),C=['ye','li','or'];e.innerHTML=G(
+tile('bk',`<div class="rw"><h2 class="d5 m" style="color:#fff">${T('Papan<br>peringkat','Leader<br>board')}</h2><button class="ch5 ye" data-do="periode">${d.per} ⌄</button></div><p class="p5" style="color:#ccc;margin-top:8px">${T('Kelas 5 Melati · 3 hari lagi sebelum minggu berakhir','Class 5 Melati · 3 days left this week')}</p>`)+
+d.pr.map(r=>tile(r.saya?'gn':r.i<3?C[r.i]:'wh',`<div class="rk5"><span class="n">${r.i+1}</span><span class="apung" style="animation-duration:6s">${mk5(r.i+1,50)}</span><span class="f1 kol"><b style="font:800 18px 'DM Sans'">${r.n}</b>${r.naik?`<span class="l5">${r.naik} XP ${T('lagi untuk naik','to move up')}</span>`:''}</span><b style="font:400 30px 'Anton'">${fmt(r.xp)}</b></div>`)).join('')+
+tile('bu',`<span class="d5 m">${T('Ajak teman<br>sekelas','Invite<br>classmates')}</span><span class="bt5 ye" style="margin-top:10px">${ik('group_add')}</span>`,'data-do="ajak"'))};
+V.render['s-kemajuan']=e=>{const d=D.km();e.innerHTML=G(
+tile('bk',`<div class="rw"><span class="l5" style="color:#aaa">${T('Menit belajar '+d.pn[d.pk][1],'Study minutes '+d.pn[d.pk][1])}</span><span class="ch5 gn">+22%</span></div><div class="d5" style="font-size:96px;color:#FFE14A">${d.sum}</div><div class="gf5">${d.hm.map((v,i)=>`<div class="${i===d.hi?'hi':''}" style="color:#aaa"><i style="height:${Math.max(8,v/d.mx*100)}%"></i>${d.hari[i]}</div>`).join('')}</div><div class="baris g8" style="margin-top:14px">${d.pn.map((p,i)=>`<button class="ch5${d.pk===i?' ye':''}" data-do="perKm" data-arg="${i}">${p[0]}</button>`).join('')}</div>`)+
+tile('or',`<div class="d5" style="font-size:96px">${d.ak}%</div><b style="font:800 16px 'DM Sans';text-transform:uppercase">${T('ketepatan kuis','quiz accuracy')}</b>`)+
+tile('li',`<div class="d5" style="font-size:96px">${d.kata}</div><b style="font:800 16px 'DM Sans';text-transform:uppercase">${T('kata dipelajari','words learned')}</b>`)+
+tile('wh',`<div class="kol g14">${d.skill.map(s=>`<div class="kol g6"><div class="rw"><b>${s[0]}</b><b>${s[1]}%</b></div><div class="pb5"><i style="width:${s[1]}%"></i></div></div>`).join('')}</div>`)+
+tile('gn',`<div class="d5 m">${d.str} ${T('hari<br>berturut','day<br>streak')}</div><span class="bt5" style="margin-top:10px">${T('Peringkat','Ranking')} →</span>`,'data-go="s-papan"'))};
+V.render['s-profil']=e=>{const d=D.profil();e.innerHTML=G(
+tile('pk',`<div class="rw" style="align-items:flex-start"><span class="apung">${mk5(0,110,{bg:'#fff'})}</span><button class="bt5" data-do="nama" aria-label="${T('Ubah nama','Edit name')}">${ik('edit')}</button></div><h2 class="d5 m" style="margin-top:10px">${d.nama}</h2><p class="p5">SDN 03 Menteng · 5 Melati</p><div class="baris g8" style="margin-top:10px"><span class="ch5 bk">${T('Tingkat','Level')} ${d.level}</span><span class="ch5 ye">${d.xp} XP</span></div>`)+
+tile('wh',`<div class="kol g14"><div class="rw"><b>${T('Bahasa antarmuka','Interface language')}</b>${SEG()}</div><div class="rw"><span class="kol"><b>${T('Pengingat harian','Daily reminder')}</b><span class="l5" style="color:#777">${T('Setiap hari, pukul 19.00','Every day at 7 PM')}</span></span>${SUIS('ingat')}</div><div class="rw"><span class="kol"><b>${T('Pelajaran luring','Offline lessons')}</b><span class="l5" style="color:#777">${T('Bisa dipakai tanpa kuota','Works without data')}</span></span>${SUIS('luring')}</div><div class="rw"><b>${T('Kode kelas guru','Teacher code')}</b><b>${d.kode}</b></div></div>`)+
+tile('bu',`<span class="d5 m">${T('Lihat<br>kemajuan','View<br>progress')}</span><span class="bt5 ye" style="margin-top:10px">→</span>`,'data-go="s-kemajuan"')+
+tile('bk',`<span class="d5 s" style="color:#FF6A3D">${T('Mulai ulang kemajuan','Reset progress')}</span>`,'data-do="reset"'))};
+
+boot();
+</script>
+</body>
+</html>

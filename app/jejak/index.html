@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>jejak. Sejarah Malaysia</title>
+<meta name="description" content="App Sejarah Malaysia dalam Bahasa Melayu: enam era, 18 pelajaran ringkas, 30 soalan kuiz, garis masa dan tokoh. Boleh dipasang sebagai PWA.">
+<meta name="theme-color" content="#141414">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="jejak.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/ikon.svg">
+<link rel="apple-touch-icon" href="icons/ikon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="pentas">
+  <aside class="sisi" id="sisi"></aside>
+  <div class="telefon" id="telefon"></div>
+  <section id="papan">
+    <div class="papan-atas"><div class="mod-tukar"><button onclick="tukarMod('app')">App</button><button class="aktif">Papan semua skrin</button></div></div>
+    <h1 class="papan-tajuk">sejarah Malaysia, kini dalam bentuk… <span class="lencana-t">.jejak</span><span class="seru">!</span></h1>
+    <div class="papan-grid" id="papan-grid"></div>
+    <div class="papan-kaki"><button onclick="tukarMod('app')">Cuba app secara interaktif →</button></div>
+  </section>
+</div>
+<script src="data.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

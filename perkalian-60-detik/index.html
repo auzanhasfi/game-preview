@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Perkalian 60 Detik</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+html,body{overflow:auto}
+body{background:#ffd23f;background:linear-gradient(160deg,#ffe27a,#ffb627);color:#2b2118;display:grid;place-items:center;min-height:100%}
+.box{width:min(520px,92vw);margin:74px 0 20px;background:#fff;border-radius:26px;padding:22px;box-shadow:0 10px 0 #d48a00,0 24px 50px rgba(120,70,0,.3);text-align:center}
+.q{font:700 clamp(48px,11vw,84px) 'Space Mono';margin:6px 0 16px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opts button{border:0;border-radius:18px;padding:18px 0;font:700 32px 'Space Mono';background:#f3efe6;color:#2b2118;box-shadow:0 5px 0 #d9d1bf;cursor:pointer}
+.opts button.ok{background:#3ecf8e;color:#fff;box-shadow:0 5px 0 #1f8a5a}.opts button.no{background:#ff5a4a;color:#fff;box-shadow:0 5px 0 #b0281c}
+.name{display:flex;gap:8px;margin-top:14px}.name input{flex:1;border:3px solid #eadfca;border-radius:12px;padding:10px;font:700 16px 'Space Grotesk'}
+#card{display:none;width:100%;border-radius:18px;margin-top:12px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.dl{display:none;margin-top:10px}
+</style></head><body>
+<div class="box"><div class="q" id="q">6 × 7</div><div class="opts" id="opts"></div>
+<div class="name"><input id="nm" placeholder="Nama kamu (untuk kartu skor)" maxlength="18"></div>
+<img id="card" alt="Kartu skor"><a class="edu-btn dl" id="dl" download="kartu-skor-perkalian.png" style="text-decoration:none;display:none">⬇ Simpan kartu skor</a></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Perkalian 60 Detik: remake THE-MATH-GAME (Amey-Thakur, MIT). Kode ditulis ulang; kartu skor digambar di canvas (tanpa html2canvas). */
+var G={q:null,score:0,time:60,run:false,benar:0,salah:0,iv:null,lock:false};
+EDU.hud({title:'Perkalian 60 Detik',timer:true,credit:'Remake The Math Game · Amey Thakur (MIT)'});EDU.$('.edu-credit').classList.add('dark');
+if(EDU.demo)EDU.$('#nm').value='Rani';
+function next(){G.q=EDU.Q.kali();EDU.$('#q').textContent=G.q.q;EDU.setQ('Pilih jawabannya!');var o=EDU.Q.opsi(G.q.a,4);
+  EDU.$('#opts').innerHTML=o.map(function(v){return '<button data-v="'+v+'">'+v+'</button>'}).join('');G.lock=false}
+EDU.$('#opts').onclick=function(e){var b=e.target.closest('button');if(!b||G.lock||!G.run)return;G.lock=true;var ok=+b.dataset.v===G.q.a;b.classList.add(ok?'ok':'no');
+  if(ok){G.benar++;G.score+=10;EDU.sfx('ok')}else{G.salah++;G.score=Math.max(0,G.score-5);EDU.sfx('bad');EDU.$('#opts [data-v="'+G.q.a+'"]').classList.add('ok')}EDU.setScore(G.score);setTimeout(next,ok?350:900)};
+function start(){G.score=0;G.time=60;G.benar=0;G.salah=0;G.run=true;EDU.setScore(0);EDU.$('#card').style.display='none';EDU.$('#dl').style.display='none';next();clearInterval(G.iv);
+  G.iv=setInterval(function(){G.time--;EDU.setTime(G.time);if(G.time<=0)finish()},EDU.demo?160:1000);if(EDU.demo)setTimeout(auto,600)}
+function card(){var c=document.createElement('canvas');c.width=1080;c.height=1080;var x=c.getContext('2d');
+  var g=x.createLinearGradient(0,0,1080,1080);g.addColorStop(0,'#ffe27a');g.addColorStop(1,'#FD5E2B');x.fillStyle=g;x.fillRect(0,0,1080,1080);
+  x.fillStyle='rgba(255,255,255,.18)';for(var i=0;i<12;i++){x.font='700 120px Space Mono';x.fillText('×',(i*230)%1080,(i*170)%1080+100)}
+  x.fillStyle='#fff';x.beginPath();x.roundRect(90,150,900,780,60);x.fill();
+  x.fillStyle='#FD5E2B';x.font='700 44px Space Grotesk';x.textAlign='center';x.fillText('KARTU SKOR · PERKALIAN 60 DETIK',540,250);
+  x.fillStyle='#2b2118';x.font='700 76px Space Grotesk';x.fillText(EDU.$('#nm').value||'Juara Matematika',540,370);
+  x.font='700 260px Space Mono';x.fillText(G.score,540,630);x.font='700 40px Space Grotesk';x.fillStyle='#7a6452';x.fillText('poin',540,690);
+  var acc=Math.round(G.benar/Math.max(1,G.benar+G.salah)*100);x.fillStyle='#2b2118';x.font='700 46px Space Grotesk';x.fillText('✔ '+G.benar+' benar   ✘ '+G.salah+' salah   🎯 '+acc+'%',540,790);
+  x.fillStyle='#FFB020';x.font='90px serif';x.fillText(G.score>=150?'★★★':G.score>=80?'★★☆':'★☆☆',540,890);
+  x.fillStyle='#fff';x.font='700 34px Space Grotesk';x.fillText(new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}),540,1010);
+  return c.toDataURL('image/png')}
+function finish(){if(!G.run)return;G.run=false;clearInterval(G.iv);var url=card();var im=EDU.$('#card');im.src=url;im.style.display='block';var dl=EDU.$('#dl');dl.href=url;dl.style.display='block';
+  EDU.end({key:'kali60',score:G.score,benar:G.benar,salah:G.salah,max:200,head:'Waktu habis!',note:'<img src="'+url+'" alt="Kartu skor" style="width:62%;border-radius:14px;margin:0 auto 10px;display:block;box-shadow:0 6px 18px rgba(0,0,0,.2)"><a href="'+url+'" download="kartu-skor-perkalian.png" style="display:block;margin-bottom:10px;font-weight:700;color:#FD5E2B">⬇ Simpan kartu skor</a>'},start)}
+function auto(){if(!G.run)return;if(!G.lock){var bs=[].slice.call(document.querySelectorAll('#opts button')),b=Math.random()<.88?EDU.$('#opts [data-v="'+G.q.a+'"]'):EDU.pick(bs);if(b)b.click()}setTimeout(auto,700+Math.random()*400)}
+EDU.title({key:'kali60',title:'Perkalian 60 Detik',mapel:'Matematika · SD Kelas 2–5',desc:'Jawab perkalian sebanyak mungkin dalam 60 detik, lalu simpan kartu skormu.',how:['Klik jawaban yang benar dari 4 pilihan (+10).','Salah = −5 dan jawaban benar ditunjukkan.','Tulis namamu: di akhir, kartu skor bisa disimpan dan dibagikan.']},start);
+</script></body></html>

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tangkap Huruf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Geist:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="../../kit/ink.css">
+</head><body>
+<script src="../../kit/ink.js"></script>
+<script>
+/* Tangkap Huruf — huruf kertas berjatuhan dari buku tulis. Tangkap huruf berikutnya untuk mengeja kata bahasa Inggris. */
+(function () {
+  'use strict';
+  var I = INK, C = I.C, W = I.W, H = I.H, GROUND = 248, CATCH = GROUND - 46;
+  var BANK = {
+    mudah: [['kucing', 'CAT'], ['anjing', 'DOG'], ['matahari', 'SUN'], ['merah', 'RED'], ['pena', 'PEN'], ['cangkir', 'CUP'], ['tas', 'BAG'], ['telur', 'EGG'], ['topi', 'HAT'], ['bus', 'BUS'], ['kotak', 'BOX'], ['rubah', 'FOX'], ['semut', 'ANT'], ['lebah', 'BEE'], ['sapi', 'COW'], ['babi', 'PIG']],
+    sedang: [['ikan', 'FISH'], ['burung', 'BIRD'], ['buku', 'BOOK'], ['susu', 'MILK'], ['katak', 'FROG'], ['bebek', 'DUCK'], ['bintang', 'STAR'], ['pohon', 'TREE'], ['apel', 'APPLE'], ['rumah', 'HOUSE'], ['air', 'WATER'], ['hijau', 'GREEN'], ['kuda', 'HORSE'], ['roti', 'BREAD'], ['kursi', 'CHAIR']],
+    sulit: [['sekolah', 'SCHOOL'], ['kelinci', 'RABBIT'], ['jeruk', 'ORANGE'], ['bunga', 'FLOWER'], ['jendela', 'WINDOW'], ['kuning', 'YELLOW'], ['pisang', 'BANANA'], ['monyet', 'MONKEY'], ['pensil', 'PENCIL'], ['guru', 'TEACHER'], ['ayam', 'CHICKEN'], ['dapur', 'KITCHEN']]
+  };
+  var ABC = 'ABCDEFGHIJKLMNOPRSTUWY';
+  var P = { x: 240, vx: 0, t: 0, face: 1, sq: 0 }, items = [], cur = null, idx = 0, spawnT = 0, needT = 0, pX = null, used = [], inBag = [];
+
+  function need() { return cur.w.charAt(idx); }
+  function showQ(pop) {
+    var s = cur.w.split('').map(function (ch, i) { return i < idx ? ch : '_'; }).join(' ');
+    I.setQ(cur.id + ' → <span class="slot">' + s + '</span>', !pop);
+  }
+  function stage() {
+    var bank = BANK[I.S.diff], pool = bank.filter(function (w) { return used.indexOf(w[1]) < 0; });
+    if (!pool.length) { used = []; pool = bank; }
+    var w = I.pick(pool); used.push(w[1]);
+    cur = { id: w[0], w: w[1] }; idx = 0; inBag = [];
+    items.forEach(function (it) { I.scraps(it.x, it.y, 4); }); items = [];
+    spawnT = 0.3; needT = 0; showQ(true);
+  }
+  function spawn(force) {
+    var lvl = I.S.diff === 'mudah' ? 0 : I.S.diff === 'sedang' ? 1 : 2;
+    var kind = 'letter', ch;
+    if (force || Math.random() < 0.5) ch = need();
+    else if ((I.S.q >= 1 || lvl > 0) && Math.random() < 0.18) kind = 'ink';
+    else { do { ch = ABC.charAt(I.ri(0, ABC.length - 1)); } while (ch === need()); }
+    var x, tries = 0;
+    do { x = I.ri(24, W - 24); tries++; } while (tries < 12 && items.some(function (o) { return o.y < 40 && Math.abs(o.x - x) < 40; }));
+    items.push({ x: x, y: -16, vy: I.rf(62, 86) + lvl * 10 + I.S.q * 2, ch: ch, kind: kind, rot: I.rf(-0.3, 0.3), vr: I.rf(-1, 1), u: I.ri(1, 90), t: 0 });
+    if (kind === 'letter' && ch === need()) needT = 0;
+  }
+  function update(dt) {
+    P.t += dt; P.sq = I.approach(P.sq, 0, 2 * dt);
+    var dir = I.state === 'play' ? (I.key.R ? 1 : 0) - (I.key.L ? 1 : 0) : 0;
+    if (pX !== null && !I.demo && I.state === 'play') dir = Math.abs(pX - P.x) > 5 ? (pX > P.x ? 1 : -1) : 0;
+    P.vx = I.approach(P.vx, dir * 195, 1500 * dt);
+    if (dir) P.face = dir;
+    P.x = I.clamp(P.x + P.vx * dt, 22, W - 22);
+    inBag.forEach(function (b) { b.t += dt; });
+    if (I.state !== 'play') { items.forEach(function (it) { it.y += it.vy * dt; }); return; }
+    spawnT -= dt; needT += dt;
+    if (spawnT <= 0) { spawnT = (I.S.diff === 'mudah' ? 0.8 : I.S.diff === 'sedang' ? 0.68 : 0.58); spawn(needT > 1.3); }
+    for (var i = items.length - 1; i >= 0; i--) {
+      var it = items[i]; it.t += dt; it.y += it.vy * dt; it.rot += it.vr * dt;
+      if (it.y >= CATCH - 6 && it.y <= CATCH + 8 && Math.abs(it.x - P.x) < 23) {
+        items.splice(i, 1); P.sq = 0.12;
+        if (it.kind === 'ink') { I.splat(P.x, GROUND, 11); if (!I.bad(P.x, CATCH, { word: 'SPLAT!', sound: 'hurt' })) return; continue; }
+        if (it.ch === need()) {
+          inBag.push({ ch: it.ch, t: 0, dx: I.rf(-8, 8) }); idx++;
+          I.rays(P.x, CATCH, 8, C.org, 7, 60); I.sfx('coin'); I.addScore(2, P.x, CATCH - 12);
+          if (idx >= cur.w.length) { showQ(false); I.good(P.x, CATCH - 10, { word: cur.w + '!' }); items.forEach(function (o) { I.scraps(o.x, o.y, 3); }); items = []; return; }
+          showQ(false);
+        } else {
+          I.bad(P.x, CATCH, { word: it.ch + '? bukan!' });
+          if (I.S.hearts <= 0) return;
+        }
+        continue;
+      }
+      if (it.y > GROUND - 8) {
+        items.splice(i, 1);
+        if (it.kind === 'ink') { I.splat(it.x, GROUND, 8); I.drops(it.x, GROUND - 4, 5, 70); }
+        else I.rings(it.x, GROUND, 2);
+      }
+    }
+  }
+  /* demo: kejar huruf yang dibutuhkan yang paling dulu sampai, menghindar dari huruf salah & tetes tinta */
+  function demo() {
+    I.key.L = I.key.R = false;
+    var tx = null, bestT = 1e9, SP = 195;
+    items.forEach(function (it) {
+      if (it.kind !== 'letter' || it.ch !== need()) return;
+      var t = (CATCH - it.y) / it.vy; if (t < 0) return;
+      if (Math.abs(it.x - P.x) / SP < t + 0.05 && t < bestT) { bestT = t; tx = it.x; }
+    });
+    var bad = items.filter(function (it) { return (it.kind === 'ink' || it.ch !== need()) && it.y < CATCH + 8; });
+    function safe(dest) {
+      return bad.every(function (b) {
+        var t = (CATCH - b.y) / b.vy; if (t > 1.6 || t > bestT + 0.05) return true;
+        var pos = P.x + I.clamp(dest - P.x, -SP * Math.max(0, t), SP * Math.max(0, t));
+        return Math.abs(pos - b.x) > 30;
+      });
+    }
+    var goal = tx === null ? P.x : tx, cands = [goal];
+    for (var x = 24; x <= W - 24; x += 12) cands.push(x);
+    cands.sort(function (a, b) { return Math.abs(a - goal) - Math.abs(b - goal); });
+    var dest = cands.find(safe); if (dest === undefined) dest = goal;
+    if (dest > P.x + 4) I.key.R = true; else if (dest < P.x - 4) I.key.L = true;
+  }
+  function draw() {
+    var c = I.ctx();
+    I.paper(0.02);
+    c.globalAlpha = 0.18;
+    for (var y = 52; y < GROUND; y += 20) I.line(0, y, W, y, y, 0.4, 0.9);
+    c.globalAlpha = 0.5; I.line(44, 30, 44, GROUND, 7, 0.6, 1.2, C.org); c.globalAlpha = 1;
+    [80, 160, 240].forEach(function (yy, k) { I.circle(14, yy, 5, k + 3, 0.5, 1.2, C.ink, C.paper); });
+    /* papan ejaan */
+    var n = cur ? cur.w.length : 0, tw = 20;
+    for (var i = 0; i < n; i++) {
+      var x = 58 + i * (tw + 4), got = i < idx;
+      I.card(x, 48, tw, 24, i + 40, { fill: got ? C.org : C.paper2, text: got ? cur.w.charAt(i) : '', size: 14, col: '#fff', amp: 0.5, lw: 1.4 });
+      if (!got) I.line(x + 5, 66, x + tw - 5, 66, i + 70, 0.3, 1.4, C.muted);
+      if (i === idx && I.state === 'play') I.line(x + 4, 76, x + tw - 4, 76, i + 90, 0.4, 2.2, C.org);
+    }
+    if (cur) I.text(cur.id, 58 + n * (tw + 4) + 8, 61, { font: 'hand', size: 18, col: C.orgD, align: 'left' });
+    I.line(0, GROUND, W, GROUND, 3, 1, 1.7);
+    I.drawSplats();
+    items.forEach(function (it) {
+      c.save(); c.translate(it.x, it.y); c.rotate(it.rot);
+      if (it.kind === 'ink') {
+        I.trace([[0, -12], [7, 2], [5, 8], [0, 10], [-5, 8], [-7, 2], [0, -12]]); c.fillStyle = C.ink; c.fill(); I.stroke(1.2);
+        c.fillStyle = 'rgba(244,242,238,0.5)'; c.beginPath(); c.ellipse(-2, 2, 1.6, 3, 0.3, 0, 6.3); c.fill();
+      } else {
+        I.card(-11, -12, 22, 24, it.u, { text: it.ch, size: 15, mark: true, amp: 0.6, lw: 1.5 });
+      }
+      c.restore();
+    });
+    /* Si Bulat + keranjang kertas */
+    var bx = P.x, by = CATCH + 2;
+    I.line(bx - 9, GROUND - 22, bx - 15, by + 12, 51, 0.4, 1.6); I.line(bx + 9, GROUND - 22, bx + 15, by + 12, 52, 0.4, 1.6);
+    I.bulat(bx, GROUND, { r: 12, face: P.face, run: Math.abs(P.vx) > 20, t: P.t, sq: P.sq, mood: I.S.hearts <= 0 ? 'hurt' : 'happy' });
+    inBag.slice(-3).forEach(function (b, k) { I.text(b.ch, bx + b.dx, by + 2 - Math.min(1, b.t * 4) * 4, { size: 11, col: C.orgD }); });
+    I.trace([[bx - 22, by], [bx + 22, by], [bx + 16, by + 14], [bx - 16, by + 14], [bx - 22, by]]); c.fillStyle = C.paper2; c.fill(); I.stroke(1.7);
+    I.hatch(bx - 16, by + 3, 32, 11, 4, C.ink, 0.7, 0.4);
+    I.line(bx - 22, by, bx + 22, by, 55, 0.3, 2.4, C.org);
+  }
+  function mini(t) {
+    var c = I.ctx();
+    I.line(4, 88, 146, 88, 5, 0.8, 1.4);
+    ['C', 'A', 'T'].forEach(function (ch, k) {
+      var y = ((t * 30 + k * 34) % 90) - 10, x = 40 + k * 34;
+      c.save(); c.translate(x, y); c.rotate(Math.sin(t + k) * 0.3); I.card(-8, -9, 16, 18, k, { text: ch, size: 11, amp: 0.4, lw: 1.2 }); c.restore();
+    });
+    var bx = 75 + Math.sin(t * 1.6) * 30;
+    I.bulat(bx, 88, { r: 9, run: true, t: t });
+    I.trace([[bx - 15, 62], [bx + 15, 62], [bx + 11, 72], [bx - 11, 72], [bx - 15, 62]]); c.fillStyle = C.paper2; c.fill(); I.stroke(1.4);
+  }
+
+  I.game({
+    id: 'tangkap-huruf', title: 'Tangkap Huruf', tag: 'Tangkap · Bahasa Inggris',
+    desc: 'Huruf kertas berjatuhan dari buku tulis. Tangkap huruf yang tepat secara berurutan untuk mengeja kata bahasa Inggris. Jangan tangkap tetes tinta!',
+    levels: [{ d: 'mudah', b: 'Mudah', s: 'Kata 3 huruf (cat, dog, sun)' }, { d: 'sedang', b: 'Sedang', s: 'Kata 4–5 huruf (fish, apple)' }, { d: 'sulit', b: 'Sulit', s: 'Kata 6–7 huruf (school, kitchen)' }],
+    note: '8 kata, 3 nyawa. Huruf yang jatuh ke tanah akan muncul lagi.', tip: 'tangkap huruf berikutnya dengan keranjang', unit: 'Kata', total: 8,
+    pad: [{ k: 'L', label: '◀', aria: 'Kiri', wide: 1 }, { k: 'R', label: '▶', aria: 'Kanan', wide: 1 }],
+    keyHelp: 'Keyboard: <kbd>←</kbd> <kbd>→</kbd> geser · atau seret di arena',
+    winTitle: 'Semua kata terangkai',
+    start: function () { P.x = 240; P.vx = 0; items = []; used = []; pX = null; },
+    stage: stage, update: update, draw: draw, demo: demo, mini: mini,
+    pointer: function (type, x) { pX = type === 'up' ? null : x; },
+    answer: function () { return cur ? cur.id + ' = ' + cur.w : ''; }
+  });
+})();
+</script>
+</body></html>

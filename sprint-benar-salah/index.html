@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Sprint Benar Salah</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#1d1452;background:linear-gradient(135deg,#2a1b7a,#120c3a);color:#fff;display:grid;place-items:center}
+.wrap{width:min(520px,92vw);margin-top:50px;text-align:center}
+.deck{position:relative;height:clamp(200px,34vh,280px);margin-bottom:22px}
+.cardq{position:absolute;inset:0;background:#fff;color:#1d1452;border-radius:26px;display:grid;place-items:center;font:700 clamp(40px,9vw,66px) 'Space Mono';box-shadow:0 18px 40px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.3,1.2,.5,1),opacity .35s}
+.cardq.b1{transform:translateY(14px) scale(.94);opacity:.7;z-index:-1}.cardq.b2{transform:translateY(28px) scale(.88);opacity:.4;z-index:-2}
+.cardq.outL{transform:translateX(-140%) rotate(-18deg);opacity:0}.cardq.outR{transform:translateX(140%) rotate(18deg);opacity:0}
+.cardq.ok{box-shadow:0 0 0 8px #3ecf8e,0 18px 40px rgba(0,0,0,.35)}.cardq.no{box-shadow:0 0 0 8px #ff5a4a,0 18px 40px rgba(0,0,0,.35)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btns button{border:0;border-radius:20px;padding:20px 0;font:700 24px 'Space Grotesk';color:#fff;cursor:pointer}
+.btns .s{background:#ff5a4a;box-shadow:0 6px 0 #b0281c}.btns .b{background:#3ecf8e;box-shadow:0 6px 0 #1f8a5a}
+.btns button.pr{transform:translateY(4px);box-shadow:none}
+.bar{height:12px;background:rgba(255,255,255,.15);border-radius:8px;margin-top:20px;overflow:hidden}.bar div{height:100%;background:#ffcf3d;transition:width .1s linear}
+.tip{margin-top:10px;color:#b7aef0;font-size:14px}
+</style></head><body>
+<div class="wrap"><div class="deck" id="deck"></div><div class="btns"><button class="s" id="bS">✘ Salah <small>←</small></button><button class="b" id="bB">✔ Benar <small>→</small></button></div>
+<div class="bar"><div id="bar" style="width:100%"></div></div><div class="tip">Apakah persamaan di kartu itu benar?</div></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Sprint Benar Salah: remake MATH-SPRINT-GAME (Amey-Thakur, MIT). Kode ditulis ulang: kartu benar/salah 60 detik. */
+var G={q:[],score:0,time:60,run:false,benar:0,salah:0,iv:null,combo:0};
+EDU.hud({title:'Sprint Benar Salah',timer:true,credit:'Remake Math Sprint Game · Amey Thakur (MIT)'});
+function mk(){var o=EDU.Q.campur(),tr=Math.random()<.5,shown=tr?o.a:o.a+EDU.pick([-2,-1,1,2,10]);if(shown<0)shown=o.a+1,tr=false;return {t:o.q+' = '+shown,tr:shown===o.a,real:o.a,q:o.q}}
+function render(){var d=EDU.$('#deck');d.innerHTML='';G.q.slice(0,3).reverse().forEach(function(q,i,arr){var c=document.createElement('div');c.className='cardq'+(arr.length-1-i===1?' b1':arr.length-1-i===2?' b2':'');c.textContent=q.t;d.appendChild(c)})}
+function answer(v){if(!G.run)return;var q=G.q[0],ok=q.tr===v,top=EDU.$('#deck').lastChild;EDU.$(v?'#bB':'#bS').classList.add('pr');setTimeout(function(){EDU.$('#bB').classList.remove('pr');EDU.$('#bS').classList.remove('pr')},120);
+  top.classList.add(ok?'ok':'no');
+  if(ok){G.combo++;G.benar++;G.score+=10+Math.min(10,G.combo);EDU.sfx('ok')}else{G.combo=0;G.salah++;G.time=Math.max(0,G.time-3);EDU.sfx('bad');EDU.toast(q.q+' = '+q.real+' · −3 detik',false)}
+  EDU.setScore(G.score);EDU.setQ(G.combo>2?'🔥 Kombo '+G.combo:'Benar atau salah?');
+  setTimeout(function(){top.classList.add(v?'outR':'outL')},120);G.q.shift();G.q.push(mk());setTimeout(render,330)}
+EDU.$('#bB').onclick=function(){answer(true)};EDU.$('#bS').onclick=function(){answer(false)};
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')answer(true);if(e.key==='ArrowLeft')answer(false)});
+function start(){G.q=[mk(),mk(),mk()];G.score=0;G.time=60;G.benar=0;G.salah=0;G.combo=0;G.run=true;EDU.setScore(0);render();EDU.setQ('Benar atau salah?');clearInterval(G.iv);
+  G.iv=setInterval(function(){G.time-=.1;EDU.setTime(Math.ceil(G.time));EDU.$('#bar').style.width=(G.time/60*100)+'%';if(G.time<=0)finish()},100);if(EDU.demo)setTimeout(auto,800)}
+function finish(){G.run=false;clearInterval(G.iv);EDU.end({key:'sprint',score:G.score,benar:G.benar,salah:G.salah,max:500,head:'Waktu habis!',note:'<p>Akurasi '+Math.round(G.benar/Math.max(1,G.benar+G.salah)*100)+'%</p>'},start)}
+function auto(){if(!G.run)return;var q=G.q[0];answer(Math.random()<.9?q.tr:!q.tr);setTimeout(auto,900+Math.random()*500)}
+EDU.title({key:'sprint',title:'Sprint Benar Salah',mapel:'Matematika · SD Kelas 2–6',desc:'60 detik. Tentukan apakah persamaan di kartu benar atau salah.',how:['Tekan ✔ Benar (→) atau ✘ Salah (←).','Jawaban benar beruntun = kombo, skor makin besar.','Salah = waktu berkurang 3 detik.']},start);
+</script></body></html>

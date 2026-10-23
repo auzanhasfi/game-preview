@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Gerbang Jawaban</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>body{background:#4ec0ca}#cv{position:fixed;inset:0;width:100%;height:100%}</style></head><body>
+<canvas id="cv"></canvas>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Gerbang Jawaban: terinspirasi floppybird (nebez, kode Apache-2.0). Semua gambar digambar ulang dengan kode (aset Flappy Bird asli tidak dipakai). */
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),Wd,Ht,GY;
+var G={b:null,pipes:[],score:0,lives:3,run:false,benar:0,salah:0,dist:0,next:0,q:null};
+EDU.hud({title:'Gerbang Jawaban',lives:true,credit:'Terinspirasi floppybird · Nebez Briefkani (Apache-2.0) · gambar baru'});
+function size(){Wd=cv.width=innerWidth;Ht=cv.height=innerHeight;GY=Ht-Math.max(70,Ht*.13)}size();addEventListener('resize',size);
+function start(){G.b={x:Wd*.25,y:Ht*.45,vy:0,inv:0,a:0};G.pipes=[];G.score=0;G.lives=3;G.benar=0;G.salah=0;G.dist=0;G.next=40;G.run=true;EDU.setScore(0);EDU.setLives(3)}
+function flap(){if(G.run){G.b.vy=-7.6;EDU.sfx('pop')}}
+function spawn(){var q=EDU.Q.campur(),o=EDU.Q.opsi(q.a,2),top=80,usable=GY-top,gap=Math.min(150,usable*.26);
+  var c1=top+usable*.27,c2=top+usable*.73;G.pipes.push({x:Wd+40,w:Math.max(80,Wd*.07),gaps:[{c:c1,h:gap,v:o[0]},{c:c2,h:gap,v:o[1]}],q:q,done:false});G.next=Math.round(Wd*.55/3.2)}
+function cur(){return G.pipes.find(function(p){return !p.done})}
+function update(){
+  if(!G.run)return;var b=G.b;G.dist+=3.2;if(EDU.demo)demo();
+  b.vy+=.42;b.y+=b.vy;b.a=Math.max(-.5,Math.min(1.2,b.vy*.08));b.inv--;
+  if(--G.next<=0)spawn();var c=cur();if(c)EDU.setQ(c.q.q+' = ?');
+  G.pipes.forEach(function(p){p.x-=3.2;
+    if(!p.done&&b.x>p.x+p.w/2){p.done=true;var g=p.gaps.find(function(g){return Math.abs(b.y-g.c)<g.h/2});
+      if(g&&g.v===p.q.a){G.score+=10;G.benar++;EDU.setScore(G.score);EDU.sfx('ok');EDU.floatText(b.x,b.y-30,p.q.q+' = '+p.q.a,true)}
+      else if(g){G.salah++;hurt(p.q.q+' = '+p.q.a)}}
+    if(b.inv<=0&&b.x+16>p.x&&b.x-16<p.x+p.w){var inGap=p.gaps.some(function(g){return b.y-14>g.c-g.h/2&&b.y+14<g.c+g.h/2});if(!inGap){b.inv=70;hurt('Tabrak pipa!');b.vy=-5}}});
+  G.pipes=G.pipes.filter(function(p){return p.x>-p.w-10});
+  if(b.y>GY-14){b.y=GY-14;b.vy=-8;if(b.inv<=0){b.inv=70;hurt('Jatuh!')}}if(b.y<70){b.y=70;b.vy=0}
+}
+function hurt(m){G.lives--;EDU.setLives(G.lives);EDU.sfx('bad');EDU.toast(m,false);if(G.lives<=0){G.run=false;setTimeout(function(){EDU.end({key:'gerbang',score:G.score,benar:G.benar,salah:G.salah,max:150,head:'Burung lelah!'},start)},400)}}
+function demo(){var b=G.b,p=cur();var ty=GY*.5;if(p){var g=p.gaps.find(function(g){return g.v===p.q.a});ty=g.c+10}if(b.y>ty&&b.vy>-1)flap()}
+function bird(bx,by,a){x.save();x.translate(bx,by);x.rotate(a);
+  x.fillStyle='#FD5E2B';x.beginPath();x.ellipse(0,0,20,17,0,0,7);x.fill();x.strokeStyle='#5E1B08';x.lineWidth=3;x.stroke();
+  var w=Math.sin(G.dist*.25)*6;x.fillStyle='#ffd0a8';x.beginPath();x.ellipse(-6,2+w*.4,10,6+Math.abs(w)*.4,-.3,0,7);x.fill();x.stroke();
+  x.fillStyle='#fff';x.beginPath();x.arc(8,-5,6,0,7);x.fill();x.stroke();x.fillStyle='#5E1B08';x.beginPath();x.arc(10,-5,2.5,0,7);x.fill();
+  x.fillStyle='#ffc93c';x.beginPath();x.moveTo(17,1);x.lineTo(28,4);x.lineTo(17,8);x.closePath();x.fill();x.stroke();x.restore()}
+function draw(){
+  var g=x.createLinearGradient(0,0,0,GY);g.addColorStop(0,'#4ec0ca');g.addColorStop(1,'#a8e6ea');x.fillStyle=g;x.fillRect(0,0,Wd,GY);
+  x.fillStyle='#e8fbfb';for(var i=0;i<7;i++){var cx=((i*240)-G.dist*.3)%(Wd+300);if(cx<-200)cx+=Wd+400;x.beginPath();x.arc(cx,GY-40,60,0,7);x.arc(cx+60,GY-60,70,0,7);x.arc(cx+120,GY-35,50,0,7);x.fill()}
+  x.fillStyle='#7fd16b';for(i=0;i<12;i++){var bx=((i*150)-G.dist*.6)%(Wd+200);if(bx<-150)bx+=Wd+300;x.fillRect(bx,GY-50,60,50);x.fillRect(bx+70,GY-30,40,30)}
+  G.pipes.forEach(function(p){var segs=[[80,p.gaps[0].c-p.gaps[0].h/2],[p.gaps[0].c+p.gaps[0].h/2,p.gaps[1].c-p.gaps[1].h/2],[p.gaps[1].c+p.gaps[1].h/2,GY]];
+    segs.forEach(function(s){x.fillStyle='#73bf2e';x.fillRect(p.x,s[0],p.w,s[1]-s[0]);x.fillStyle='rgba(255,255,255,.25)';x.fillRect(p.x+6,s[0],8,s[1]-s[0]);x.fillStyle='#558022';x.fillRect(p.x+p.w-10,s[0],10,s[1]-s[0]);
+      x.fillStyle='#73bf2e';x.strokeStyle='#3d6a14';x.lineWidth=3;if(s[0]>80){x.fillRect(p.x-6,s[0],p.w+12,22);x.strokeRect(p.x-6,s[0],p.w+12,22)}if(s[1]<GY){x.fillRect(p.x-6,s[1]-22,p.w+12,22);x.strokeRect(p.x-6,s[1]-22,p.w+12,22)}});
+    p.gaps.forEach(function(gp){x.font='700 30px Space Mono';x.textAlign='center';x.textBaseline='middle';var tw=x.measureText(gp.v).width+22;x.fillStyle=p.done?'rgba(255,255,255,.4)':'rgba(255,250,240,.95)';x.beginPath();x.roundRect(p.x+p.w/2-tw/2,gp.c-22,tw,44,12);x.fill();x.fillStyle='#2a1a10';x.fillText(gp.v,p.x+p.w/2,gp.c+1)})});
+  x.fillStyle='#ded895';x.fillRect(0,GY,Wd,Ht-GY);x.fillStyle='#73bf2e';x.fillRect(0,GY,Wd,12);x.fillStyle='#5aa023';for(i=0;i<Wd/24+2;i++){var sx=(i*24-G.dist)%(Wd+24);if(sx<-24)sx+=Wd+48;x.beginPath();x.moveTo(sx,GY+12);x.lineTo(sx+12,GY);x.lineTo(sx+24,GY+12);x.fill()}
+  if(G.b&&!(G.b.inv>0&&Math.floor(G.b.inv/5)%2))bird(G.b.x,G.b.y,G.b.a);
+}
+function loop(){update();draw();requestAnimationFrame(loop)}
+addEventListener('keydown',function(e){if(e.key===' '||e.key==='ArrowUp'){e.preventDefault();flap()}});cv.addEventListener('pointerdown',flap);
+requestAnimationFrame(loop);
+EDU.title({key:'gerbang',title:'Gerbang Jawaban',mapel:'Matematika · SD Kelas 2–5',desc:'Terbangkan Si Bulat melewati celah pipa yang berisi jawaban benar.',how:['Spasi / klik / ketuk = kepak sayap.','Setiap pipa punya 2 celah. Pilih celah dengan jawaban benar (+10).','Celah salah, tabrak pipa, atau jatuh = nyawa berkurang.']},start);
+</script></body></html>

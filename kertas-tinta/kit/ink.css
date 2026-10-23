@@ -1,0 +1,88 @@
+/* Kit bersama 5 game Kertas & Tinta. Kertas putih hangat, tinta tipis, satu aksen oranye. */
+:root {
+  color-scheme: light;
+  --paper: #f4f2ee;
+  --paper-2: #fbfaf7;
+  --ink: #2b2a28;
+  --muted: #6d695f;
+  --line: #d9d4c9;
+  --accent: #d97757;
+  --accent-dark: #b85c3a;
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-hand: 'Caveat', 'Segoe Print', cursive;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.55 var(--font-ui); padding-inline: 16px; padding-block: 22px 44px; }
+main { max-width: 860px; margin-inline: auto; display: flex; flex-direction: column; gap: 16px; }
+h1 { margin: 0; font: 700 clamp(30px, 7vw, 46px)/1.05 var(--font-serif); letter-spacing: -0.01em; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--accent-dark); }
+.muted { color: var(--muted); }
+.note { font: 600 21px/1.2 var(--font-hand); color: var(--accent-dark); }
+[hidden] { display: none !important; }
+
+.card { background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.back { align-self: flex-start; font: 500 12px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; text-decoration: none; color: var(--muted); }
+.back:hover { color: var(--accent-dark); }
+.brand { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+#heroPrev { width: 150px; height: 100px; flex: none; border: 1px dashed var(--line); border-radius: 8px; }
+.brand > div { flex: 1 1 15rem; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.tag { font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+.levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 560px) { .levels { grid-template-columns: 1fr; } }
+button { font: 600 16px/1.25 var(--font-ui); color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink); border-radius: 8px; padding: 12px 14px; cursor: pointer; text-align: left; transition: background .15s, transform .08s; }
+button:hover { background: #fff; }
+button:active { transform: translateY(2px); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button small { display: block; font-weight: 400; font-size: 13px; color: var(--muted); margin-top: 4px; }
+.lv b { display: block; font: 700 20px/1.2 var(--font-serif); }
+.lv .best { display: block; margin-top: 8px; font: 500 11px var(--font-mono); color: var(--accent-dark); min-height: 1em; }
+.primary { background: var(--accent); color: #fff; border-color: var(--ink); }
+.primary:hover { background: var(--accent-dark); }
+
+.hud { display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: center; justify-content: space-between; font: 500 12px/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.hud span { white-space: nowrap; }
+.hearts { letter-spacing: 3px; font-size: 18px; }
+.hearts .on { color: var(--accent); } .hearts .off { color: var(--line); }
+#question { position: relative; align-self: center; font: 700 clamp(30px, 8vw, 56px)/1.1 var(--font-serif); text-align: center; padding-bottom: 14px; min-height: 1.3em; text-wrap: balance; }
+#question::after { content: ''; position: absolute; left: 4%; right: 4%; bottom: 0; height: 10px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 6 C 30 2, 60 9, 100 5 S 170 3, 198 6' fill='none' stroke='%23d97757' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+#question .slot { color: var(--accent-dark); }
+#question.pop { animation: qpop .4s ease-out; }
+@keyframes qpop { 0% { transform: scale(.8) rotate(-2deg); opacity: 0; } 70% { transform: scale(1.05) rotate(1deg); } 100% { transform: none; opacity: 1; } }
+.tip { text-align: center; }
+
+.stage { border: 1.5px solid var(--ink); border-radius: 8px; overflow: hidden; background: var(--paper); line-height: 0; }
+canvas#cv { width: 100%; height: auto; aspect-ratio: 16 / 9; display: block; touch-action: none; }
+
+.pad { display: grid; gap: 10px; align-items: stretch; }
+.pad button { user-select: none; -webkit-user-select: none; touch-action: none; text-align: center; font-size: 22px; min-height: 66px; padding-inline: 20px; }
+.pad .main { background: var(--accent); color: #fff; font: 700 20px var(--font-serif); letter-spacing: .04em; }
+.pad button.on { transform: translateY(2px); background: #fff; }
+.pad .main.on { background: var(--accent-dark); }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; font-size: 14px; }
+.tools button { font-size: 14px; padding: 8px 12px; }
+kbd { font: 500 12px var(--font-mono); background: var(--paper); border: 1px solid var(--ink); border-radius: 4px; padding: 1px 6px; }
+
+#end h2 { margin: 0; font: 700 clamp(26px, 6vw, 36px)/1.1 var(--font-serif); }
+.stars { font-size: 40px; letter-spacing: 8px; color: var(--accent); line-height: 1; }
+.stars .off { color: var(--line); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stats div { border: 1px dashed var(--ink); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 2px; }
+.stats b { font: 700 26px/1.1 var(--font-serif); }
+.stats span { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+.row button { flex: 1 1 10rem; text-align: center; }
+@media (prefers-reduced-motion: reduce) { #question.pop { animation: none; } }
+
+/* Mode pratinjau (?preview=1): hanya arena + soal kecil, dipakai galeri sebagai animasi bergerak */
+body.preview { padding: 0; overflow: hidden; background: var(--paper); }
+body.preview main { max-width: none; gap: 0; }
+body.preview #game .card { padding: 0; border: 0; border-radius: 0; gap: 0; background: var(--paper); }
+body.preview .hud, body.preview .tip, body.preview .pad, body.preview .tools { display: none !important; }
+body.preview .stage { border: 0; border-radius: 0; }
+body.preview #question { position: absolute; z-index: 2; top: 2.4%; left: 50%; transform: translateX(-50%); font-size: 4.3vw; padding: .08em .55em .12em; background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 8px; white-space: nowrap; min-height: 0; animation: none; }
+body.preview #question::after { display: none; }
+body.preview canvas#cv { pointer-events: none; }

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Tetris Hitung</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#1b1b2f;background:radial-gradient(circle at 50% 30%,#2b2b4f,#141428);display:grid;place-items:center;color:#fff}
+#cv{margin-top:56px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#quiz{position:fixed;inset:0;display:none;place-items:center;z-index:70;background:rgba(10,10,30,.55)}
+#quiz.on{display:grid}
+#quiz .c{background:#F9F3E5;color:#2a1a10;border-radius:22px;padding:20px 22px;text-align:center;width:min(360px,90vw);animation:eduIn .3s}
+#quiz small{color:#FD5E2B;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px}
+#quiz h3{font:700 40px 'Space Mono',monospace;margin:6px 0 14px}
+#quiz .o{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#quiz button{border:0;border-radius:14px;padding:14px 0;font:700 24px 'Space Mono',monospace;background:#fff;box-shadow:0 4px 0 #e2d4bb;cursor:pointer}
+#quiz button.ok{background:#3ecf8e;color:#fff}#quiz button.no{background:#ff6b5b;color:#fff}
+</style></head><body>
+<canvas id="cv"></canvas>
+<div id="quiz"><div class="c"><small id="qh">Baris hilang! Jawab untuk bonus</small><h3 id="qq"></h3><div class="o" id="qo"></div></div></div>
+<div class="edu-pad touch" style="left:14px"><button data-k="L">◀</button><button data-k="R">▶</button></div>
+<div class="edu-pad touch" style="right:14px"><button data-k="U">⟳</button><button data-k="D">▼</button></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Tetris Hitung: remake javascript-tetris (jakesgordon, MIT). Logika ditulis ulang + soal setiap baris hilang. */
+var W=10,H=20,cv=EDU.$('#cv'),x=cv.getContext('2d'),CS;
+var P={I:[[1,1,1,1]],J:[[1,0,0],[1,1,1]],L:[[0,0,1],[1,1,1]],O:[[1,1],[1,1]],S:[[0,1,1],[1,1,0]],T:[[0,1,0],[1,1,1]],Z:[[1,1,0],[0,1,1]]};
+var COL={I:'#3ec7f0',J:'#3b6cf0',L:'#f5a23a',O:'#f5d93a',S:'#4fd66b',T:'#b05cf0',Z:'#f0504f'};
+var G={b:null,p:null,nx:null,score:0,lines:0,lvl:1,drop:0,dt:800,run:false,pause:false,benar:0,salah:0,tgt:null};
+EDU.hud({title:'Tetris Hitung',credit:'Remake javascript-tetris · Jake Gordon (MIT)'});
+function size(){CS=Math.max(14,Math.floor(Math.min((innerHeight-90)/H,(innerWidth-30)/(W+6))));cv.width=CS*(W+6);cv.height=CS*H}
+size();addEventListener('resize',size);
+function rot(m){return m[0].map(function(_,i){return m.map(function(r){return r[i]}).reverse()})}
+function newP(){var k=G.nx||EDU.pick(Object.keys(P));G.nx=EDU.pick(Object.keys(P));return {k:k,m:P[k],x:3,y:0}}
+function fits(m,px,py){for(var r=0;r<m.length;r++)for(var c=0;c<m[r].length;c++)if(m[r][c]){var X=px+c,Y=py+r;if(X<0||X>=W||Y>=H||(Y>=0&&G.b[Y][X]))return false}return true}
+function lock(){var p=G.p;p.m.forEach(function(r,i){r.forEach(function(v,j){if(v&&p.y+i>=0)G.b[p.y+i][p.x+j]=p.k})});
+  var cl=0;for(var y=H-1;y>=0;y--){if(G.b[y].every(Boolean)){G.b.splice(y,1);G.b.unshift(Array(W).fill(0));cl++;y++}}
+  if(cl){G.lines+=cl;G.score+=[0,10,30,60,100][cl];EDU.setScore(G.score);EDU.sfx('pop');ask(cl)}
+  G.p=newP();G.tgt=null;if(!fits(G.p.m,G.p.x,G.p.y))over();
+}
+function ask(cl){G.pause=true;var q=EDU.Q.kali(EDU.rand(3,9),EDU.rand(3,9)),o=EDU.Q.opsi(q.a,3);EDU.$('#qq').textContent=q.q+' = ?';EDU.$('#qh').textContent=cl+' baris hilang! Jawab untuk bonus';EDU.setQ(q.q+' = ?');
+  EDU.$('#qo').innerHTML=o.map(function(v){return '<button data-v="'+v+'">'+v+'</button>'}).join('');EDU.$('#quiz').classList.add('on');G.q=q;
+  if(EDU.demo)setTimeout(function(){var v=Math.random()<.85?q.a:o.find(function(z){return z!==q.a});EDU.$('#qo [data-v="'+v+'"]').click()},1100)}
+EDU.$('#qo').addEventListener('click',function(e){var b=e.target.closest('button');if(!b||!G.pause)return;var ok=+b.dataset.v===G.q.a;
+  b.classList.add(ok?'ok':'no');if(ok){G.score+=50;G.benar++;G.dt=Math.min(900,G.dt+60);EDU.sfx('ok');EDU.toast('Benar! +50 & kecepatan turun',true)}
+  else{G.salah++;G.dt=Math.max(120,G.dt-80);EDU.sfx('bad');EDU.toast(G.q.q+' = '+G.q.a+' · kecepatan naik',false);EDU.$('#qo [data-v="'+G.q.a+'"]').classList.add('ok')}
+  EDU.setScore(G.score);G.pause=null;setTimeout(function(){EDU.$('#quiz').classList.remove('on');G.pause=false},650)});
+function act(k){if(!G.run||G.pause)return;var p=G.p;
+  if(k==='L'&&fits(p.m,p.x-1,p.y))p.x--;if(k==='R'&&fits(p.m,p.x+1,p.y))p.x++;
+  if(k==='U'){var m=rot(p.m);if(fits(m,p.x,p.y))p.m=m;else if(fits(m,p.x-1,p.y)){p.m=m;p.x--}else if(fits(m,p.x+1,p.y)){p.m=m;p.x++}}
+  if(k==='D'){if(fits(p.m,p.x,p.y+1))p.y++;else lock()}
+  if(k==='S'){while(fits(p.m,p.x,p.y+1))p.y++;lock()}}
+document.addEventListener('keydown',function(e){var k={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D',' ':'S'}[e.key];if(k){e.preventDefault();act(k)}});
+document.querySelectorAll('.edu-pad button').forEach(function(b){b.addEventListener('pointerdown',function(e){e.preventDefault();act(b.dataset.k)})});
+function cell(cx,cy,c,s){s=s||CS;x.fillStyle=c;x.fillRect(cx+1,cy+1,s-2,s-2);x.fillStyle='rgba(255,255,255,.35)';x.fillRect(cx+1,cy+1,s-2,s*.18);x.fillStyle='rgba(0,0,0,.2)';x.fillRect(cx+1,cy+s*.8,s-2,s*.2-1)}
+function draw(){
+  x.fillStyle='#0f0f22';x.fillRect(0,0,cv.width,cv.height);
+  x.strokeStyle='rgba(255,255,255,.05)';for(var i=1;i<W;i++){x.beginPath();x.moveTo(i*CS,0);x.lineTo(i*CS,H*CS);x.stroke()}
+  for(var y=0;y<H;y++)for(var c=0;c<W;c++)if(G.b[y][c])cell(c*CS,y*CS,COL[G.b[y][c]]);
+  if(G.p){var p=G.p,gy=p.y;while(fits(p.m,p.x,gy+1))gy++;
+    p.m.forEach(function(r,i){r.forEach(function(v,j){if(v){x.strokeStyle=COL[p.k];x.globalAlpha=.35;x.strokeRect((p.x+j)*CS+2,(gy+i)*CS+2,CS-4,CS-4);x.globalAlpha=1;if(p.y+i>=0)cell((p.x+j)*CS,(p.y+i)*CS,COL[p.k])}})})}
+  var sx=W*CS;x.fillStyle='#1d1d3a';x.fillRect(sx,0,6*CS,cv.height);x.fillStyle='#FD5E2B';x.font='700 '+Math.round(CS*.6)+'px Space Grotesk';x.fillText('BERIKUTNYA',sx+CS*.6,CS*1.2);
+  P[G.nx].forEach(function(r,i){r.forEach(function(v,j){if(v)cell(sx+CS*(1+j),CS*(2+i),COL[G.nx])})});
+  x.fillStyle='#c9c9ff';x.font='700 '+Math.round(CS*.55)+'px Space Grotesk';
+  [['BARIS',G.lines],['SKOR',G.score],['SOAL BENAR',G.benar]].forEach(function(s,i){x.fillStyle='#8a8ac0';x.fillText(s[0],sx+CS*.6,CS*(6+i*2.6));x.fillStyle='#fff';x.font='700 '+Math.round(CS*1)+'px Space Mono';x.fillText(s[1],sx+CS*.6,CS*(7.2+i*2.6));x.font='700 '+Math.round(CS*.55)+'px Space Grotesk'});
+  x.fillStyle='#8a8ac0';x.fillText('Baris hilang =',sx+CS*.6,CS*15);x.fillText('soal perkalian',sx+CS*.6,CS*15.8);
+}
+var last=0;
+function loop(t){var dt=t-last;last=t;if(G.run&&!G.pause){G.drop+=dt;if(EDU.demo)demo();if(G.drop>(EDU.demo&&G.tgt&&G.tgt.done?40:G.dt)){G.drop=0;act('D')}}if(G.b)draw();requestAnimationFrame(loop)}
+function start(){G.b=[];for(var i=0;i<H;i++)G.b.push(Array(W).fill(0));G.score=0;G.lines=0;G.benar=0;G.salah=0;G.dt=700;G.nx=null;G.p=newP();G.run=true;G.pause=false;EDU.setScore(0);EDU.setQ('Hilangkan baris → jawab soal')}
+function over(){G.run=false;EDU.end({key:'tetris',score:G.score,benar:G.benar,salah:G.salah,max:600,head:'Papan penuh!'},start)}
+/* demo: cari posisi terbaik (tinggi, lubang, kerataan) lalu geser ke sana */
+function evalB(b){var hs=[],holes=0;for(var c=0;c<W;c++){var h=0;for(var y=0;y<H;y++)if(b[y][c]){h=H-y;break}hs.push(h);var seen=false;for(y=0;y<H;y++){if(b[y][c])seen=true;else if(seen)holes++}}
+  var lines=b.filter(function(r){return r.every(Boolean)}).length,bump=0;for(c=0;c<W-1;c++)bump+=Math.abs(hs[c]-hs[c+1]);return -0.51*hs.reduce(function(a,b){return a+b},0)+0.76*lines-0.36*holes*2-0.18*bump}
+function plan(){var p=G.p,best=-1e9,t=null,m=p.m;for(var r=0;r<4;r++){for(var px=-2;px<W;px++){if(!fits(m,px,0)&&!fits(m,px,p.y))continue;var py=p.y;if(!fits(m,px,py))continue;while(fits(m,px,py+1))py++;
+  var b=G.b.map(function(row){return row.slice()});m.forEach(function(rr,i){rr.forEach(function(v,j){if(v&&py+i>=0)b[py+i][px+j]=1})});var s=evalB(b);if(s>best){best=s;t={r:r,x:px}}}m=rot(m)}return t||{r:0,x:p.x}}
+var dk=0;function demo(){if(!G.tgt){G.tgt=plan();G.tgt.rd=0}if(++dk%5)return;var t=G.tgt;if(t.rd<t.r){act('U');t.rd++}else if(G.p.x<t.x)act('R');else if(G.p.x>t.x)act('L');else t.done=true}
+requestAnimationFrame(loop);
+EDU.title({key:'tetris',title:'Tetris Hitung',mapel:'Matematika · SD Kelas 3–6',desc:'Susun balok sampai satu baris penuh. Setiap baris hilang, jawab soal perkalian!',how:['Panah kiri/kanan: geser · Panah atas: putar · Spasi: jatuhkan.','Baris penuh hilang lalu muncul soal.','Benar: +50 dan balok melambat. Salah: balok makin cepat.']},start);
+</script></body></html>

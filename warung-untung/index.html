@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Warung Untung — game uang kembalian</title>
+<meta name="description" content="Game edukasi matematika: kelola warung atap 3D, hitung total belanja dan uang kembalian pelanggan.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Warung Untung: kode asli, gaya terinspirasi game manajemen restoran isometrik (cozy, krem + teal + terakota). */
+:root{--cream:#fbf3e4;--ink:#22343c;--teal:#1f5f5b;--terra:#d9734e;--gold:#f2b84b;--green:#4f9d69;--line:#e6d7bd}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#f6d8b8;font-family:Nunito,system-ui,sans-serif;color:var(--ink)}
+canvas{display:block}
+.top{position:fixed;left:16px;right:16px;top:14px;display:flex;gap:10px;align-items:center;pointer-events:none}
+.brand{display:flex;align-items:center;gap:10px;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:8px 14px 8px 8px;box-shadow:0 8px 20px -12px rgba(0,0,0,.4)}
+.brand i{width:34px;height:34px;border-radius:10px;background:var(--teal);display:grid;place-items:center;color:#fff;font-style:normal;font-size:18px}
+.brand b{font-family:Fredoka;font-size:19px;display:block;line-height:1}.brand small{font-size:11px;letter-spacing:.12em;color:#7a6a58;text-transform:uppercase}
+.sp{flex:1}
+.stat{background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:6px 12px;font-family:Fredoka;font-weight:600;font-size:17px;box-shadow:0 8px 20px -12px rgba(0,0,0,.4)}
+.stat small{display:block;font-family:Nunito;font-size:10px;letter-spacing:.12em;color:#7a6a58;text-transform:uppercase}
+.goal{position:fixed;left:16px;top:84px;width:230px;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 8px 20px -12px rgba(0,0,0,.4)}
+.goal small{font-size:10px;letter-spacing:.12em;color:#7a6a58;text-transform:uppercase}.goal b{display:block;font-family:Fredoka;font-size:17px;margin:2px 0 8px}
+.bar{height:8px;border-radius:9px;background:#efe2c9;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .4s}
+.order{position:fixed;right:16px;top:84px;width:min(340px,calc(100vw - 32px));background:var(--cream);border:1.5px solid var(--line);border-radius:18px;box-shadow:0 16px 36px -16px rgba(0,0,0,.5);overflow:hidden;transform:translateX(120%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.order.on{transform:none}
+.order .hd{background:var(--teal);color:#fff;padding:10px 14px;font-family:Fredoka;font-size:16px;display:flex;justify-content:space-between}
+.order .bd{padding:12px 14px}
+.order table{width:100%;border-collapse:collapse;font-size:14px}.order td{padding:3px 0}.order td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.order .tot td{border-top:1.5px dashed var(--line);padding-top:6px;font-weight:800}
+.order .pay{margin:8px 0;background:#fff;border-radius:12px;padding:8px 10px;font-size:14px;display:flex;justify-content:space-between}
+.order .q{font-family:Fredoka;font-size:17px;margin:8px 0}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.opts button{font:700 15px Nunito;padding:10px 4px;border-radius:12px;border:2px solid var(--ink);background:#fff;cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+.opts button:hover:not(:disabled){background:#fff3d6}.opts button.ok{background:#bfe6c8}.opts button.no{background:#f6c3b4}
+.fb{min-height:20px;margin-top:8px;font-size:13px;font-weight:700}
+.dock{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:6px;background:var(--cream);border:1.5px solid var(--line);border-radius:18px;padding:6px;box-shadow:0 8px 20px -12px rgba(0,0,0,.4)}
+.dock span{padding:8px 12px;border-radius:12px;font-weight:800;font-size:13px}.dock span.on{background:var(--teal);color:#fff}
+.tag{position:fixed;pointer-events:none;transform:translate(-50%,-100%);background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:3px 8px;font:700 12px Nunito;white-space:nowrap;box-shadow:0 3px 0 var(--ink)}
+.coin{position:fixed;pointer-events:none;transform:translate(-50%,-100%);font:700 18px Fredoka;color:#1f7a45;text-shadow:0 2px 0 #fff;animation:up 1.4s ease-out forwards}
+@keyframes up{to{transform:translate(-50%,-260%);opacity:0}}
+.intro{position:fixed;inset:0;display:grid;place-items:center;background:rgba(34,52,60,.35)}
+.intro .card{background:var(--cream);border-radius:22px;padding:22px;width:min(420px,90vw);text-align:center;border:1.5px solid var(--line);box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+.intro h1{font-family:Fredoka;margin:0 0 6px;font-size:30px}.intro p{margin:0 0 14px;color:#5a4a3a;line-height:1.5}
+.intro button{font:700 17px Fredoka;background:var(--terra);color:#fff;border:0;border-radius:14px;padding:12px 26px;cursor:pointer;box-shadow:0 4px 0 #a54f30}
+@media (max-width:640px){.goal{display:none}.order{top:auto;bottom:76px}.stat{font-size:14px}.brand small{display:none}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"}}</script>
+</head>
+<body>
+<div class="top"><div class="brand"><i>🍜</i><div><small>Matematika · uang</small><b>Warung Untung</b></div></div><span class="sp"></span>
+  <div class="stat"><small>Hari</small><span id="hari">1</span></div><div class="stat"><small>Kas</small><span id="kas">Rp0</span></div><div class="stat"><small>Rating</small><span id="rating">★ 3,0</span></div></div>
+<div class="goal"><small>Target hari ini</small><b>Layani 6 pelanggan</b><div class="bar"><i id="goalbar"></i></div><div style="font-size:12px;margin-top:6px;color:#7a6a58"><span id="served">0</span>/6 dilayani · <span id="benar">0</span> jawaban benar</div></div>
+<div class="order" id="order"><div class="hd"><span id="ohd">Meja 1 bayar</span><span>🧾</span></div><div class="bd" id="obd"></div></div>
+<div class="dock"><span class="on">🏗️ Bangun</span><span>👩‍🍳 Tim</span><span>📋 Menu</span><span>📒 Buku kas</span></div>
+<div id="tags"></div>
+<div class="intro" id="intro"><div class="card"><h1>Warung Untung</h1><p>Pelanggan datang, makan, lalu membayar. Hitung total dan uang kembaliannya dengan benar supaya kas bertambah dan rating naik.</p><button id="go">Buka warung</button></div></div>
+<script type="module">
+import * as THREE from 'three';
+const MENU=[['Nasi goreng',12000],['Mi ayam',10000],['Soto',11000],['Es teh',4000],['Jus jeruk',7000],['Kerupuk',2000]];
+const rp=n=>'Rp'+n.toLocaleString('id-ID');
+const demo=/demo/.test(location.search);
+// ---------- scene ----------
+const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));R.setSize(innerWidth,innerHeight);R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(R.domElement);
+const S=new THREE.Scene();S.background=new THREE.Color(0xf6d8b8);S.fog=new THREE.Fog(0xf6d8b8,60,120);
+const cam=new THREE.OrthographicCamera(-1,1,1,-1,1,300);
+function fit(){const a=innerWidth/innerHeight,z=innerWidth<640?16:11.5;cam.left=-z*a;cam.right=z*a;cam.top=z;cam.bottom=-z;cam.updateProjectionMatrix();R.setSize(innerWidth,innerHeight)}fit();addEventListener('resize',fit);
+cam.position.set(40,42,40);cam.lookAt(0,0,0);
+S.add(new THREE.HemisphereLight(0xfff1dc,0x8a7a6a,1.6));
+const sun=new THREE.DirectionalLight(0xffd7a8,2.2);sun.position.set(-20,40,14);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-40,right:40,top:40,bottom:-40});S.add(sun);
+const M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.85});
+function box(w,h,d,c,x,y,z,p=S){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c));m.position.set(x,y+h/2,z);m.castShadow=m.receiveShadow=true;p.add(m);return m}
+function cyl(r,h,c,x,y,z,p=S,s=12){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,s),M(c));m.position.set(x,y+h/2,z);m.castShadow=m.receiveShadow=true;p.add(m);return m}
+// tanah, jalan, trotoar
+box(140,.2,140,0xe9d6b6,0,-.2,0);
+box(140,.05,8,0x5d6066,0,0,-17);box(8,.05,140,0x5d6066,-17,0,0);
+for(let i=-60;i<60;i+=6){box(3,.06,.4,0xf3e6c7,i,0,-17);box(.4,.06,3,0xf3e6c7,-17,0,i)}
+box(26,.25,26,0xd8c7a6,1,0,1);
+// lantai warung (kayu)
+const deck=box(20,.6,20,0xc9844f,1,.25,1);
+for(let i=-8;i<=10;i+=2) box(.08,.02,20,0xa96a3b,i,.86,1);
+// pagar tanaman
+for(let i=-8;i<=10;i+=2){box(1.6,.9,1.2,0x5f9a5c,i,.85,-9.4);box(1.6,.9,1.2,0x5f9a5c,i,.85,11.4)}
+for(let i=-6;i<=10;i+=2){box(1.2,.9,1.6,0x5f9a5c,11.4,.85,i)}
+// dapur & konter
+box(8,2.2,3,0xf4ead6,6,.85,-7);box(8,.3,3.4,0x1f5f5b,6,3.05,-7);box(6,1.2,1.4,0x1f5f5b,6,.85,-4.6);
+cyl(.5,.6,0x444,4,3.3,-7);cyl(.5,.6,0x444,6,3.3,-7);
+// papan nama
+const sign=new THREE.Mesh(new THREE.PlaneGeometry(7,1.6),new THREE.MeshBasicMaterial({map:labelTex('WARUNG UNTUNG','#1f5f5b','#fbf3e4',64)}));sign.position.set(6,5.2,-5.4);sign.rotation.y=Math.PI/4;S.add(sign);
+// meja & kursi
+const TABLES=[[-4,-2],[-4,5],[2,5],[-4,9.5],[3,9.5]].slice(0,4);
+TABLES.forEach(([x,z])=>{cyl(1.1,.12,0xf4ead6,x,1.95,z,S,20);cyl(.15,1.1,0x6b4a2e,x,.85,z);cyl(.5,.1,0xd9734e,x-1.6,1.35,z,S,14);cyl(.5,.1,0xd9734e,x+1.6,1.35,z,S,14);cyl(.1,.5,0x6b4a2e,x-1.6,.85,z);cyl(.1,.5,0x6b4a2e,x+1.6,.85,z);
+  const um=new THREE.Mesh(new THREE.ConeGeometry(1.5,.7,8),M(0xf2b84b));um.position.set(x,4.9,z);um.castShadow=true;S.add(um);cyl(.06,2.9,0xeeeeee,x,2,z)});
+// lampu tali
+for(let i=0;i<10;i++){const b=new THREE.Mesh(new THREE.SphereGeometry(.14,8,8),new THREE.MeshBasicMaterial({color:0xffe08a}));b.position.set(-8+i*2,4.6+Math.sin(i)*.15,-1);S.add(b)}
+// kota sekitar
+const BC=[0xe7a477,0xe9c99d,0x8fb4a8,0xd88f74,0xf1dcb6,0x9fb0c4];
+function gedung(x,z,w,d,h,c){const g=box(w,h,d,c,x,0,z);for(let y=1.5;y<h-1;y+=2.2)for(let k=-w/2+1;k<w/2-.5;k+=1.6){const win=new THREE.Mesh(new THREE.PlaneGeometry(.8,1),new THREE.MeshStandardMaterial({color:0x6f8fa3,emissive:0x2a3a44,emissiveIntensity:.3}));win.position.set(x+k,y,z+d/2+.01);S.add(win)}box(w+.4,.4,d+.4,0x7a5a48,x,h,z);return g}
+[[-30,-30,10,10,12],[-30,-6,9,10,8],[-30,16,10,9,14],[-30,34,9,9,7],[-6,-30,10,9,9],[16,-30,10,10,13],[34,-30,9,10,8],[30,24,10,10,6],[26,-6,8,8,5]].forEach((b,i)=>gedung(...b,BC[i%BC.length]));
+function pohon(x,z){cyl(.25,1.4,0x7a5236,x,0,z);const t=new THREE.Mesh(new THREE.IcosahedronGeometry(1.4,0),M(0x6fae6a));t.position.set(x,2.6,z);t.castShadow=true;S.add(t)}
+[[-22,-12],[-22,0],[-22,12],[-12,-22],[0,-22],[12,-22],[22,-12],[24,8],[-12,22],[14,20]].forEach(p=>pohon(...p));
+// mobil
+const cars=[];[0xf2b84b,0xffffff,0xd9734e,0x1f5f5b,0xf2b84b].forEach((c,i)=>{const g=new THREE.Group();box(3.2,1,1.6,c,0,.3,0,g);box(1.8,.8,1.4,0xdfe8ec,-.2,1.3,0,g);[[-1,.8],[1,.8],[-1,-.8],[1,-.8]].forEach(([a,b])=>cyl(.35,.3,0x222,a,.0,b,g));g.children.slice(-4).forEach(w=>w.rotation.x=Math.PI/2);const alongX=i%2===0;g.userData={alongX,t:i*28,sp:6+i,lane:alongX?-15.5-(i%4===0?3:0):-15.5};if(!alongX)g.rotation.y=Math.PI/2;S.add(g);cars.push(g)});
+// ---------- pelanggan ----------
+const SHIRT=[0xd9734e,0x4f9d69,0x5b7fbf,0xf2b84b,0x9a6fb0,0x1f5f5b];
+function orang(c){const g=new THREE.Group();const body=new THREE.Mesh(new THREE.CapsuleGeometry(.45,.8,4,10),M(c));body.position.y=1.1;body.castShadow=true;g.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.42,14,12),M(0xf1c9a0));head.position.y=2.15;head.castShadow=true;g.add(head);
+  const ear=new THREE.Mesh(new THREE.SphereGeometry(.16,8,8),M(0x6b4a2e));ear.position.set(-.28,2.5,0);g.add(ear);const ear2=ear.clone();ear2.position.x=.28;g.add(ear2);return g}
+const PINTU=new THREE.Vector3(-8,0,13);
+const tamu=[];
+function spawn(){const meja=TABLES.findIndex((t,i)=>!tamu.some(g=>g.meja===i));if(meja<0)return;const g=orang(SHIRT[(Math.random()*SHIRT.length)|0]);g.position.set(-18,0,13);S.add(g);
+  const pesanan=[];const n=1+((Math.random()*3)|0);for(let i=0;i<n;i++){const m=MENU[(Math.random()*MENU.length)|0];const ex=pesanan.find(p=>p[0]===m[0]);ex?ex[2]++:pesanan.push([m[0],m[1],1])}
+  tamu.push({g,meja,state:'datang',t:0,pesanan,path:[PINTU.clone(),new THREE.Vector3(TABLES[meja][0]-1.6,0,TABLES[meja][1])]})}
+// ---------- label HTML ----------
+const tags=document.getElementById('tags');
+function proj(v){const p=v.clone().project(cam);return [(p.x*.5+.5)*innerWidth,(-p.y*.5+.5)*innerHeight]}
+function labelTex(t,bg,fg,size){const c=document.createElement('canvas');c.width=512;c.height=120;const x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,512,120);x.fillStyle=fg;x.font='700 '+size+'px Fredoka, sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(t,256,64);const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;return tx}
+// ---------- permainan ----------
+let kas=0,rating=3,served=0,benar=0,hari=1,aktif=null,mulai=false;
+const $=id=>document.getElementById(id);
+function hud(){$('kas').textContent=rp(kas);$('rating').textContent='★ '+rating.toFixed(1).replace('.',',');$('served').textContent=served;$('benar').textContent=benar;$('goalbar').style.width=Math.min(100,served/6*100)+'%';$('hari').textContent=hari}
+function tanya(t){aktif=t;const total=t.pesanan.reduce((a,p)=>a+p[1]*p[2],0);const uang=[20000,50000,100000].find(u=>u>total)||100000;const kembali=uang-total;
+  const salah=new Set([kembali]);while(salah.size<3){const d=kembali+((Math.random()<.5?-1:1)*[1000,2000,5000,10000][(Math.random()*4)|0]);if(d>=0)salah.add(d)}
+  const opts=[...salah].sort(()=>Math.random()-.5);
+  $('ohd').textContent='Meja '+(t.meja+1)+' mau bayar';
+  $('obd').innerHTML='<table>'+t.pesanan.map(p=>'<tr><td>'+p[2]+'× '+p[0]+'</td><td>'+rp(p[1]*p[2])+'</td></tr>').join('')+'<tr class="tot"><td>Total</td><td>'+rp(total)+'</td></tr></table><div class="pay"><span>Uang pelanggan</span><b>'+rp(uang)+'</b></div><div class="q">Berapa uang kembaliannya?</div><div class="opts">'+opts.map(o=>'<button data-v="'+o+'">'+rp(o)+'</button>').join('')+'</div><div class="fb" id="fb"></div>';
+  $('order').classList.add('on');
+  $('obd').querySelectorAll('button').forEach(b=>b.onclick=()=>jawab(b,+b.dataset.v===kembali,kembali,total));
+  if(demo)setTimeout(()=>{const b=[...$('obd').querySelectorAll('button')].find(x=>+x.dataset.v===kembali);b&&b.click()},1700)}
+function jawab(btn,ok,kembali,total){$('obd').querySelectorAll('button').forEach(b=>{b.disabled=true;if(+b.dataset.v===kembali)b.classList.add('ok')});if(!ok)btn.classList.add('no');
+  $('fb').textContent=ok?'Benar! Kembalian '+rp(kembali)+'.':'Belum tepat. Kembalian yang benar '+rp(kembali)+'.';
+  const t=aktif;if(ok){kas+=total;benar++;rating=Math.min(5,rating+.3);coin(t.g.position,'+'+rp(total))}else{kas+=total-2000;rating=Math.max(1,rating-.4);coin(t.g.position,'−Rp2.000','#b5452c')}
+  served++;hud();setTimeout(()=>{$('order').classList.remove('on');t.state='pulang';t.path=[PINTU.clone(),new THREE.Vector3(-18,0,13)];aktif=null;if(served%6===0){hari++;hud()}},1500)}
+function coin(pos,txt,col){const [x,y]=proj(pos.clone().add(new THREE.Vector3(0,3,0)));const d=document.createElement('div');d.className='coin';d.textContent=txt;if(col)d.style.color=col;d.style.left=x+'px';d.style.top=y+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1500)}
+$('go').onclick=()=>{$('intro').remove();mulai=true;spawn()};
+if(demo){$('intro').remove();mulai=true;spawn();setTimeout(spawn,900)}
+// ---------- loop ----------
+const clock=new THREE.Clock();let spawnT=0;
+R.setAnimationLoop(()=>{const dt=Math.min(.05,clock.getDelta()),T=clock.elapsedTime;
+  cars.forEach(c=>{const u=c.userData;u.t=(u.t+u.sp*dt)%140;if(u.alongX)c.position.set(-70+u.t,0,u.lane);else c.position.set(u.lane,0,-70+u.t)});
+  if(mulai){spawnT+=dt;if(spawnT>(demo?3:5)&&tamu.filter(t=>t.state!=='pulang').length<3){spawnT=0;spawn()}}
+  let html='';
+  for(const t of [...tamu]){const g=t.g;
+    if(t.path.length){const tgt=t.path[0];const d=tgt.clone().sub(g.position);d.y=0;const L=d.length();if(L<.15){t.path.shift();if(!t.path.length){if(t.state==='datang'){t.state='makan';t.t=0;g.position.y=.35}else if(t.state==='pulang'){S.remove(g);tamu.splice(tamu.indexOf(t),1);continue}}}
+      else{d.normalize();g.position.addScaledVector(d,dt*(demo?7:5));g.rotation.y=Math.atan2(d.x,d.z);g.position.y=Math.abs(Math.sin(T*10))*.15}}
+    if(t.state==='makan'){t.t+=dt;g.rotation.y=Math.PI/2;if(t.t>(demo?2.2:4)&&!aktif){t.state='bayar';tanya(t)}}
+    const [x,y]=proj(g.position.clone().add(new THREE.Vector3(0,3.1,0)));
+    const lab=t.state==='makan'?'🍽️ '+t.pesanan[0][0]:t.state==='bayar'?'💳 Bayar':t.state==='datang'?'👋':'';
+    if(lab)html+='<div class="tag" style="left:'+x+'px;top:'+y+'px">'+lab+'</div>'}
+  tags.innerHTML=html;
+  cam.position.set(40+Math.sin(T*.08)*1.5,42,40+Math.cos(T*.08)*1.5);cam.lookAt(1,0,2);
+  R.render(S,cam)});
+hud();
+</script>
+</body>
+</html>

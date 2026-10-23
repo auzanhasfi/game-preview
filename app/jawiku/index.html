@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JawiKu Belajar Jawi</title>
+<meta name="description" content="App belajar tulisan Jawi (Bahasa Melayu & English): 37 huruf dengan 4 bentuk, suku kata, kamus perkataan, kuiz, surih huruf dan Cikgu Jawi.">
+<meta name="theme-color" content="#1E9BF0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="JawiKu">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/ikon.svg">
+<link rel="apple-touch-icon" href="icons/ikon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="pentas">
+  <aside class="sisi" id="sisi"></aside>
+  <div class="telefon" id="telefon"></div>
+  <section id="papan">
+    <div class="papan-kepala"><div class="logo-p"><span style="--i:0">J</span><span style="--i:1">a</span><span style="--i:2">w</span><span style="--i:3">i</span><span style="--i:4">K</span><span style="--i:5">u</span></div><p>Belajar Jawi · Learn Jawi — 26 skrin</p></div>
+    <div class="papan-grid" id="papan-grid"></div>
+    <div class="papan-kaki"><button onclick="tukarMod('app')">Cuba app secara interaktif →</button></div>
+  </section>
+</div>
+<script src="data.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Mahjong Tarian Daerah</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#3b2414;background:radial-gradient(circle at 50% 30%,#6b4424,#2e1a0d);display:grid;place-items:center}
+.felt{position:relative;margin-top:56px;background:radial-gradient(ellipse at center,#2f7a4f,#1f5536);border-radius:26px;box-shadow:inset 0 0 40px rgba(0,0,0,.4),0 20px 50px rgba(0,0,0,.4);padding:22px}
+#board{position:relative}
+.t{position:absolute;border-radius:10px;background:linear-gradient(160deg,#fffdf4,#efe6cf);box-shadow:4px 5px 0 #c9b98f,5px 7px 0 #8a7a55,0 10px 14px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:transform .15s,opacity .35s,filter .2s;padding:4px;line-height:1.1}
+.t i{font-style:normal;font-size:1.3em}.t b{font-size:.78em;color:#7a1f1f}.t.p b{color:#14532d}
+.t.blk{filter:brightness(.72)}.t.sel{transform:translateY(-6px);box-shadow:4px 5px 0 #c9b98f,5px 7px 0 #8a7a55,0 0 0 4px #FD5E2B}
+.t.gone{opacity:0;transform:scale(.6) translateY(-30px);pointer-events:none}.t.shk{animation:sh .35s}@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.t.hint{box-shadow:4px 5px 0 #c9b98f,5px 7px 0 #8a7a55,0 0 0 4px #ffd60a}
+.bar{display:flex;gap:10px;justify-content:center;margin-top:14px}.bar button{border:0;border-radius:12px;padding:8px 16px;font:700 14px 'Space Grotesk';background:#fff4dc;color:#3b2414;cursor:pointer}
+</style></head><body>
+<div class="felt"><div id="board"></div><div class="bar"><button id="hint">💡 Petunjuk</button><button id="mix">🔀 Acak ulang</button></div></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Mahjong Tarian Daerah: terinspirasi Mahjong Solitaire (he-is-talha/html-css-javascript-games, MIT). Kode ditulis ulang. */
+var PAIRS=[['Aceh','Saman'],['Bali','Kecak'],['Jawa Barat','Jaipong'],['Sumatera Barat','Tari Piring'],['Sulawesi Selatan','Pakarena'],['Papua','Yospan'],['Jawa Tengah','Gambyong'],['Riau','Zapin'],['Jawa Timur','Reog'],['Kalimantan Timur','Hudoq'],['Maluku','Cakalele'],['NTT','Caci']];
+var LAY=[];(function(){for(var r=0;r<3;r++)for(var c=0;c<6;c++)LAY.push({l:0,r:r*2,c:c*2});for(var r2=0;r2<2;r2++)for(var c2=0;c2<3;c2++)LAY.push({l:1,r:1+r2*2,c:3+c2*2})})();
+var TW,TH,G={};
+EDU.hud({title:'Mahjong Tarian Daerah',credit:'Terinspirasi Mahjong Solitaire · he-is-talha (MIT)'});
+function size(){TW=Math.floor(Math.min((innerWidth-80)/6.4,150));TH=Math.floor(Math.min(TW*1.2,(innerHeight-230)/3.3));var b=EDU.$('#board');b.style.width=(TW*6+12)+'px';b.style.height=(TH*3+12)+'px'}
+function free(t,list){if(t.gone)return false;var on=list.some(function(o){return !o.gone&&o.l===t.l+1&&Math.abs(o.r-t.r)<2&&Math.abs(o.c-t.c)<2});if(on)return false;
+  var L=list.some(function(o){return !o.gone&&o.l===t.l&&o.r===t.r&&o.c===t.c-2}),Rr=list.some(function(o){return !o.gone&&o.l===t.l&&o.r===t.r&&o.c===t.c+2});return !(L&&Rr)}
+function deal(){var tiles=LAY.map(function(p,i){return {l:p.l,r:p.r,c:p.c,i:i,gone:false}});var pairs=EDU.shuffle(PAIRS.map(function(p,k){return k}));var tmp=tiles.map(function(t){return Object.assign({},t)});var k=0;
+  while(tmp.some(function(t){return !t.gone})){var fr=EDU.shuffle(tmp.filter(function(t){return free(t,tmp)}));if(fr.length<2)return deal();var a=fr[0],b=fr[1],id=pairs[k++];
+    tiles[a.i].id=id;tiles[a.i].side=0;tiles[b.i].id=id;tiles[b.i].side=1;a.gone=b.gone=true}
+  return tiles}
+function render(){var b=EDU.$('#board');b.innerHTML='';G.tiles.forEach(function(t){var d=document.createElement('div');d.className='t'+(t.side?' p':'');d.style.width=(TW-8)+'px';d.style.height=(TH-8)+'px';
+  d.style.left=(t.c/2*TW-t.l*6+6)+'px';d.style.top=(t.r/2*TH-t.l*8+6)+'px';d.style.zIndex=t.l*10+t.r;d.style.fontSize=Math.max(11,TW*.13)+'px';
+  d.innerHTML='<i>'+(t.side?'💃':'🗺️')+'</i><b>'+PAIRS[t.id][t.side]+'</b>';d.onclick=function(){pick(t)};t.el=d;b.appendChild(d)});state()}
+function state(){G.tiles.forEach(function(t){t.el.classList.toggle('blk',!t.gone&&!free(t,G.tiles));t.el.classList.toggle('gone',t.gone)})}
+function pick(t){if(t.gone||!free(t,G.tiles)||G.lock)return;if(G.sel===t){G.sel=null;t.el.classList.remove('sel');return}
+  if(!G.sel){G.sel=t;t.el.classList.add('sel');EDU.sfx('tick');return}
+  var a=G.sel;G.sel=null;a.el.classList.remove('sel');
+  if(a.id===t.id&&a.side!==t.side){a.gone=t.gone=true;G.score+=20;G.benar++;EDU.setScore(G.score);EDU.sfx('ok');var p=PAIRS[t.id];EDU.toast('💃 Tari '+p[1].replace('Tari ','')+' dari '+p[0],true);state();
+    if(G.tiles.every(function(x){return x.gone}))setTimeout(function(){EDU.end({key:'mahjong',score:G.score,benar:G.benar,salah:G.salah,max:260,head:'Papan bersih!'},start)},700);else if(!moves().length)setTimeout(mix,500)}
+  else{G.salah++;G.score=Math.max(0,G.score-5);EDU.setScore(G.score);EDU.sfx('bad');a.el.classList.add('shk');t.el.classList.add('shk');setTimeout(function(){a.el.classList.remove('shk');t.el.classList.remove('shk')},400);
+    var A=a.side?PAIRS[a.id][1]+' bukan dari '+PAIRS[t.id][0]:PAIRS[t.id][1]+' bukan dari '+PAIRS[a.id][0];EDU.toast(a.side===t.side?'Pasangkan provinsi dengan tarian':A,false)}}
+function moves(){var fr=G.tiles.filter(function(t){return free(t,G.tiles)}),m=[];fr.forEach(function(a){fr.forEach(function(b){if(a!==b&&a.id===b.id&&a.side===0&&b.side===1)m.push([a,b])})});return m}
+function mix(){var left=G.tiles.filter(function(t){return !t.gone}),ids=EDU.shuffle(left.map(function(t){return [t.id,t.side]}));left.forEach(function(t,k){t.id=ids[k][0];t.side=ids[k][1]});render();EDU.toast('Diacak ulang')}
+EDU.$('#hint').onclick=function(){var m=moves()[0];if(m){m[0].el.classList.add('hint');m[1].el.classList.add('hint');setTimeout(function(){m[0].el.classList.remove('hint');m[1].el.classList.remove('hint')},1200);G.score=Math.max(0,G.score-3);EDU.setScore(G.score)}};
+EDU.$('#mix').onclick=mix;
+function start(){size();G={tiles:deal(),sel:null,score:0,benar:0,salah:0};render();EDU.setScore(0);EDU.setQ('Pasangkan provinsi 🗺️ dengan tariannya 💃');if(EDU.demo)setTimeout(auto,700)}
+function auto(){if(document.querySelector('.edu-ov'))return;var m=moves();if(!m.length)return;var p=EDU.pick(m);
+  if(Math.random()<.15){var fr=G.tiles.filter(function(t){return free(t,G.tiles)&&t!==p[0]&&t.id!==p[0].id});if(fr.length){pick(p[0]);setTimeout(function(){pick(fr[0]);setTimeout(auto,700)},450);return}}
+  pick(p[0]);setTimeout(function(){pick(p[1]);setTimeout(auto,650)},450)}
+addEventListener('resize',function(){if(G.tiles){size();render()}});
+EDU.title({key:'mahjong',title:'Mahjong Tarian Daerah',mapel:'IPS / Seni Budaya · SD Kelas 4 – SMP',desc:'Pasangkan kartu provinsi dengan tarian daerahnya sampai papan bersih.',how:['Klik dua kartu yang bebas (tidak tertutup & salah satu sisinya kosong).','Provinsi + tarian yang benar = hilang (+20).','Bingung? Tekan 💡 Petunjuk.']},start);
+</script></body></html>

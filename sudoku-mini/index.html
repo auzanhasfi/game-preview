@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Sudoku Mini</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+html,body{overflow:auto}
+body{background:#f4efe6;color:#2a2420;display:grid;place-items:center;min-height:100%}
+.wrap{margin:70px 0 20px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center}
+#g{display:grid;width:min(90vw,calc(100vh - 150px),460px);aspect-ratio:1;background:#2a2420;border:4px solid #2a2420;border-radius:12px;overflow:hidden;gap:1px}
+.c{background:#fffdf8;display:grid;place-items:center;font:700 clamp(18px,5vw,40px) 'Space Mono';cursor:pointer;color:#3b6cf0;transition:background .15s}
+.c.giv{color:#2a2420;cursor:default}.c.sel{background:#ffe2b8}.c.hl{background:#fff3e0}.c.bad{color:#e03a2a;background:#ffe3df}.c.pop{animation:eduFlash .3s}
+.c.br{border-right:3px solid #2a2420}.c.bb{border-bottom:3px solid #2a2420}
+.side{width:240px;max-width:90vw}
+.lv{display:flex;gap:8px;margin-bottom:14px}.lv button{flex:1;border:2px solid #d9cdb8;background:#fff;border-radius:12px;padding:8px 0;font:700 14px 'Space Grotesk';cursor:pointer}.lv button.on{background:#FD5E2B;border-color:#FD5E2B;color:#fff}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pad button{border:0;border-radius:12px;padding:12px 0;font:700 24px 'Space Mono';background:#fff;box-shadow:0 4px 0 #d9cdb8;cursor:pointer}
+.pad button.pr{transform:translateY(3px);box-shadow:none}
+.side p{font-size:14px;color:#6a5e52}
+</style></head><body>
+<div class="wrap"><div id="g"></div><div class="side"><div class="lv"><button data-n="4" class="on">4×4 SD</button><button data-n="6">6×6</button><button data-n="9">9×9 SMP</button></div>
+<div class="pad" id="pad"></div><p>Setiap baris, kolom, dan kotak tebal harus berisi angka 1 sampai <b id="nmax">4</b> tanpa ada yang sama.</p></div></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Sudoku Mini: terinspirasi sudoku.js (robatron, MIT): pembuat sudoku dengan tingkat kesulitan. Generator ditulis ulang untuk 4×4, 6×6, 9×9. */
+var G={n:4,bh:2,bw:2,sol:[],cur:[],giv:[],sel:-1,score:0,err:0,t0:0};
+EDU.hud({title:'Sudoku Mini',timer:true,credit:'Terinspirasi sudoku.js · Rob McGuire-Dale (MIT)'});EDU.$('.edu-credit').classList.add('dark');
+function make(n){G.n=n;G.bh=n===9?3:2;G.bw=n===4?2:3;var bh=G.bh,bw=G.bw;
+  var nums=EDU.shuffle(Array.from({length:n},function(_,i){return i+1}));
+  var rows=[],cols=[];EDU.shuffle(Array.from({length:n/bh},function(_,i){return i})).forEach(function(b){EDU.shuffle(Array.from({length:bh},function(_,i){return i})).forEach(function(r){rows.push(b*bh+r)})});
+  EDU.shuffle(Array.from({length:n/bw},function(_,i){return i})).forEach(function(b){EDU.shuffle(Array.from({length:bw},function(_,i){return i})).forEach(function(c){cols.push(b*bw+c)})});
+  G.sol=[];for(var r=0;r<n;r++)for(var c=0;c<n;c++){var R=rows[r],C=cols[c];G.sol.push(nums[(bw*(R%bh)+Math.floor(R/bh)+C)%n])}
+  var holes=Math.round(n*n*(n===4?.5:n===6?.5:.55));G.giv=G.sol.map(function(){return true});EDU.shuffle(G.sol.map(function(_,i){return i})).slice(0,holes).forEach(function(i){G.giv[i]=false});
+  G.cur=G.sol.map(function(v,i){return G.giv[i]?v:0});G.sel=G.giv.indexOf(false);G.err=0;G.t0=Date.now();EDU.$('#nmax').textContent=n;
+  EDU.$('#pad').innerHTML=Array.from({length:n},function(_,i){return '<button data-v="'+(i+1)+'">'+(i+1)+'</button>'}).join('')+'<button data-v="0">⌫</button>';
+  EDU.$('#g').style.gridTemplateColumns='repeat('+n+',1fr)';EDU.setQ('Isi '+holes+' kotak kosong');draw()}
+function bad(i){var v=G.cur[i];if(!v)return false;var n=G.n,r=Math.floor(i/n),c=i%n;for(var k=0;k<n*n;k++){if(k===i||G.cur[k]!==v)continue;var r2=Math.floor(k/n),c2=k%n;
+  if(r2===r||c2===c||(Math.floor(r2/G.bh)===Math.floor(r/G.bh)&&Math.floor(c2/G.bw)===Math.floor(c/G.bw)))return true}return false}
+function draw(){var n=G.n,sr=Math.floor(G.sel/n),sc=G.sel%n;EDU.$('#g').innerHTML=G.cur.map(function(v,i){var r=Math.floor(i/n),c=i%n;
+  var cls='c'+(G.giv[i]?' giv':'')+(i===G.sel?' sel':(r===sr||c===sc)?' hl':'')+(bad(i)?' bad':'')+((c+1)%G.bw===0&&c<n-1?' br':'')+((r+1)%G.bh===0&&r<n-1?' bb':'');
+  return '<div class="'+cls+'" data-i="'+i+'">'+(v||'')+'</div>'}).join('')}
+EDU.$('#g').onclick=function(e){var c=e.target.closest('.c');if(!c||c.classList.contains('giv'))return;G.sel=+c.dataset.i;draw()};
+function put(v){if(G.sel<0||G.giv[G.sel])return;var b=EDU.$('#pad [data-v="'+v+'"]');if(b){b.classList.add('pr');setTimeout(function(){b.classList.remove('pr')},120)}
+  G.cur[G.sel]=v;if(v&&bad(G.sel)){G.err++;EDU.sfx('bad')}else if(v){EDU.sfx('pop')}draw();var el=EDU.$('#g [data-i="'+G.sel+'"]');if(el)el.classList.add('pop');
+  if(G.cur.every(function(x,i){return x===G.sol[i]})||G.cur.every(function(x,i){return x&&!bad(i)}))win()}
+EDU.$('#pad').onclick=function(e){var b=e.target.closest('[data-v]');if(b)put(+b.dataset.v)};
+document.addEventListener('keydown',function(e){if(/^[0-9]$/.test(e.key)&&+e.key<=G.n)put(+e.key);if(e.key==='Backspace')put(0);var n=G.n,m={ArrowLeft:-1,ArrowRight:1,ArrowUp:-n,ArrowDown:n}[e.key];if(m){e.preventDefault();G.sel=Math.max(0,Math.min(n*n-1,G.sel+m));draw()}});
+document.querySelectorAll('.lv button').forEach(function(b){b.onclick=function(){document.querySelectorAll('.lv button').forEach(function(x){x.classList.toggle('on',x===b)});make(+b.dataset.n)}});
+setInterval(function(){if(G.t0)EDU.setTime(Math.floor((Date.now()-G.t0)/1000)+'s')},500);
+function win(){var s=Math.max(10,G.n*25-G.err*5);G.score+=s;EDU.setScore(G.score);EDU.end({key:'sudoku'+G.n,score:G.score,max:G.n*25,head:'Sudoku '+G.n+'×'+G.n+' selesai!',note:'<p>'+Math.floor((Date.now()-G.t0)/1000)+' detik · '+G.err+' kesalahan</p>'},function(){if(EDU.demo){var nx=G.n===4?6:4;document.querySelector('.lv [data-n="'+nx+'"]').click();setTimeout(auto,600)}else make(G.n)});G.t0=0}
+function start(){G.score=0;EDU.setScore(0);make(4);if(EDU.demo)setTimeout(auto,600)}
+/* demo: isi kotak kosong satu per satu, sesekali salah lalu dibetulkan */
+function auto(){var i=G.cur.findIndex(function(v,k){return !G.giv[k]&&v!==G.sol[k]});if(i<0||document.querySelector('.edu-ov'))return;G.sel=i;draw();
+  setTimeout(function(){if(G.cur[i]===0&&Math.random()<.15){var w=(G.sol[i]%G.n)+1;put(w);setTimeout(function(){put(G.sol[i]);setTimeout(auto,350)},500)}else{put(G.sol[i]);setTimeout(auto,330)}},220)}
+EDU.title({key:'sudoku4',title:'Sudoku Mini',mapel:'Matematika / Logika · SD – SMP',desc:'Isi kotak kosong supaya setiap baris, kolom, dan kotak tebal berisi angka berbeda.',how:['Klik kotak kosong, lalu klik angka (atau ketik).','Angka merah = bentrok dengan angka lain.','Mulai dari 4×4, naik ke 6×6 dan 9×9.']},start);
+</script></body></html>

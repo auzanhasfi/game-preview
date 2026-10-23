@@ -1,0 +1,7 @@
+# captures, contact sheets and rendered demo frames from the dev tools
+shots/
+
+node_modules/
+*.log
+.DS_Store
+Thumbs.db

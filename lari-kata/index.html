@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Lari Kata Benda</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>body{background:#f7f7f7}#cv{position:fixed;left:0;top:0;width:100%;height:100%}
+#rule{position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:30;font-weight:700;color:#535353;font-size:18px;text-align:center}#rule b{color:#FD5E2B}</style></head><body>
+<canvas id="cv"></canvas><div id="rule">Lompat ambil <b>KATA BENDA</b> · jangan ambil kata kerja · lompati kaktus</div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Lari Kata Benda: terinspirasi t-rex-runner (wayou, BSD-3 dari Chromium). Kode & karakter digambar ulang sendiri (bukan sprite Google). */
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),Wd,Ht,GY;
+var G={p:null,obs:[],words:[],clouds:[],sp:6,dist:0,score:0,lives:3,run:false,benar:0,salah:0,next:0,t:0};
+EDU.hud({title:'Lari Kata Benda',lives:true,credit:'Terinspirasi T-Rex Runner (Chromium, BSD-3) · karakter digambar ulang'});EDU.$('.edu-credit').classList.add('dark');
+function size(){Wd=cv.width=innerWidth;Ht=cv.height=innerHeight;GY=Math.round(Ht*.68)}size();addEventListener('resize',size);
+function start(){G.p={x:Math.max(80,Wd*.12),y:0,vy:0,on:true,inv:0};G.obs=[];G.words=[];G.sp=6;G.dist=0;G.score=0;G.lives=3;G.benar=0;G.salah=0;G.next=60;G.run=true;EDU.setScore(0);EDU.setLives(3);EDU.setQ('Ambil: KATA BENDA')}
+function jump(){if(G.run&&G.p.on){G.p.vy=-15.5;G.p.on=false;EDU.sfx('pop')}}
+function spawn(){
+  if(Math.random()<.45)G.obs.push({x:Wd+20,w:18+EDU.rand(0,2)*12,h:38+EDU.rand(0,2)*12});
+  else{var b=Math.random()<.55;G.words.push({x:Wd+20,t:b?EDU.pick(EDU.BENDA):EDU.pick(EDU.KERJA),b:b,y:GY-150})}
+  G.next=EDU.rand(55,95)*6/G.sp;
+}
+function update(){
+  if(!G.run)return;var p=G.p;G.t++;G.sp=Math.min(12,6+G.dist/3000);G.dist+=G.sp;
+  if(EDU.demo)demo();
+  p.vy+=.8;p.y+=p.vy;if(p.y>=0){p.y=0;p.vy=0;p.on=true}p.inv--;
+  if(--G.next<=0)spawn();
+  G.obs.forEach(function(o){o.x-=G.sp});G.words.forEach(function(w){w.x-=G.sp});
+  G.obs=G.obs.filter(function(o){return o.x>-60});G.words=G.words.filter(function(w){return w.x>-120&&!w.got});
+  var px=p.x,py=GY+p.y;
+  G.obs.forEach(function(o){if(p.inv<=0&&px+18>o.x&&px-18<o.x+o.w&&py>GY-o.h+6){p.inv=60;hurt('Aduh, kaktus!')}});
+  G.words.forEach(function(w){x.font='700 22px Space Grotesk';var ww=x.measureText(w.t).width+20;if(px+20>w.x-ww/2&&px-20<w.x+ww/2&&py-46<w.y+18&&py>w.y-18){w.got=true;
+    if(w.b){G.score+=10;G.benar++;EDU.setScore(G.score);EDU.sfx('ok');EDU.floatText(w.x,w.y,'+10 '+w.t,true)}else{G.salah++;hurt(w.t+' = kata kerja')}}});
+  if(G.t%6===0){G.score+=0;}
+}
+function hurt(m){G.lives--;EDU.setLives(G.lives);EDU.sfx('bad');EDU.toast(m,false);if(G.lives<=0){G.run=false;setTimeout(function(){EDU.end({key:'larikata',score:G.score,benar:G.benar,salah:G.salah,max:150,head:'Game over',note:'<p>Jarak: '+Math.round(G.dist/10)+' m</p>'},start)},400)}}
+function demo(){var p=G.p;if(!p.on)return;var px=p.x;
+  var o=G.obs.find(function(o){return o.x>px&&o.x-px<G.sp*14});var w=G.words.find(function(w){return w.x>px&&w.x-px<G.sp*16&&w.x-px>G.sp*10});
+  var bad=G.words.find(function(w){return !w.b&&w.x>px-20&&w.x-px<G.sp*26});
+  if(o&&!(bad&&Math.abs(bad.x-o.x)<90))jump();else if(w&&w.b)jump();else if(o)jump()}
+function runner(px,py,t){ // karakter bulat berkaki (bukan dino Google)
+  x.fillStyle='#535353';x.beginPath();x.ellipse(px,py-30,20,22,0,0,7);x.fill();
+  x.fillStyle='#f7f7f7';x.fillRect(px+6,py-40,6,6);x.fillStyle='#535353';x.fillRect(px+9,py-38,3,3);
+  x.fillStyle='#FD5E2B';x.fillRect(px-22,py-34,10,5);
+  var k=G.p.on?Math.floor(t/5)%2:0;x.fillStyle='#535353';x.fillRect(px-10,py-10,6,k?10:6);x.fillRect(px+4,py-10,6,k?6:10)}
+function draw(){
+  x.fillStyle='#f7f7f7';x.fillRect(0,0,Wd,Ht);
+  x.fillStyle='#e2e2e2';for(var i=0;i<5;i++){var cx=((i*Wd/4)-G.dist*.2)%(Wd+120);if(cx<-120)cx+=Wd+240;x.beginPath();x.ellipse(cx,Ht*.28+i%3*30,46,14,0,0,7);x.ellipse(cx+26,Ht*.28+i%3*30-8,28,14,0,0,7);x.fill()}
+  x.fillStyle='#535353';x.fillRect(0,GY,Wd,2);for(i=0;i<40;i++){var gx=((i*53)-G.dist)%Wd;if(gx<0)gx+=Wd;x.fillRect(gx,GY+8+(i%3)*6,(i%4)+2,2)}
+  G.obs.forEach(function(o){x.fillStyle='#535353';x.fillRect(o.x+o.w/2-6,GY-o.h,12,o.h);x.fillRect(o.x,GY-o.h*.7,6,o.h*.35);x.fillRect(o.x,GY-o.h*.4,o.w/2,5);x.fillRect(o.x+o.w-6,GY-o.h*.8,6,o.h*.35);x.fillRect(o.x+o.w/2,GY-o.h*.5,o.w/2,5)});
+  G.words.forEach(function(w){x.font='700 22px Space Grotesk';var ww=x.measureText(w.t).width+20;x.fillStyle='#fff';x.strokeStyle='#535353';x.lineWidth=3;x.beginPath();x.roundRect(w.x-ww/2,w.y-18,ww,36,18);x.fill();x.stroke();
+    x.fillStyle='#535353';x.textAlign='center';x.textBaseline='middle';x.fillText(w.t,w.x,w.y+1)});
+  if(G.p&&!(G.p.inv>0&&Math.floor(G.p.inv/5)%2))runner(G.p.x,GY+G.p.y,G.t);
+  x.fillStyle='#535353';x.font='700 18px Space Mono';x.textAlign='right';x.fillText(String(Math.round(G.dist/10)).padStart(5,'0')+' m',Wd-20,GY+50);
+}
+function loop(){update();draw();requestAnimationFrame(loop)}
+addEventListener('keydown',function(e){if(e.key===' '||e.key==='ArrowUp'){e.preventDefault();jump()}});
+cv.addEventListener('pointerdown',jump);
+requestAnimationFrame(loop);
+EDU.title({key:'larikata',title:'Lari Kata Benda',mapel:'Bahasa Indonesia · SD Kelas 2–4',desc:'Lompat untuk mengambil kata benda. Jangan ambil kata kerja!',how:['Spasi / panah atas / ketuk layar = lompat.','Kata benda (meja, buku…) = +10.','Kata kerja (berlari, makan…) dan kaktus = nyawa berkurang.']},start);
+</script></body></html>

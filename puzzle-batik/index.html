@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Puzzle Motif Batik</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#2a1b4a;background:radial-gradient(circle at 50% 20%,#3d2a6b,#1a1030);display:grid;place-items:center;color:#fff}
+.wrap{margin-top:60px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center}
+#bd{position:relative;background:#120a24;border-radius:16px;padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.tl{position:absolute;border-radius:8px;transition:left .16s ease,top .16s ease;cursor:pointer;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.side{width:230px;max-width:92vw;text-align:center}.side h3{margin:0 0 6px;color:#ffd166}.side canvas{width:170px;height:170px;border-radius:12px;box-shadow:0 0 0 3px rgba(255,255,255,.2)}
+.side p{font-size:14px;color:#d8ccf5}.lv{display:flex;gap:6px;justify-content:center;margin-top:8px}.lv button{border:0;border-radius:10px;padding:6px 12px;font:700 13px 'Space Grotesk';background:#3d2a6b;color:#fff;cursor:pointer}.lv button.on{background:#FD5E2B}
+#quiz{position:fixed;inset:0;display:none;place-items:center;z-index:70;background:rgba(20,10,40,.5)}#quiz.on{display:grid}
+#quiz .c{background:#F9F3E5;color:#2a1a10;border-radius:24px;padding:18px 20px;text-align:center;width:min(400px,92vw);animation:eduIn .3s}
+#quiz small{color:#FD5E2B;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px}#quiz h3{margin:6px 0 12px}
+#quiz .o{display:grid;gap:8px}#quiz button{border:0;border-radius:14px;padding:12px;font:700 16px 'Space Grotesk';background:#fff;box-shadow:0 4px 0 #e2d4bb;cursor:pointer}
+#quiz button.ok{background:#3ecf8e;color:#fff}#quiz button.no{background:#ff6b5b;color:#fff}#quiz p{font-size:14px;color:#5a4636;margin:10px 0 0}
+</style></head><body>
+<div class="wrap"><div id="bd"></div><div class="side"><h3>Susun motif ini</h3><canvas id="pv" width="340" height="340"></canvas><p id="hint">Klik kotak di sebelah ruang kosong untuk menggeser.</p><div class="lv"><button data-n="3" class="on">3×3</button><button data-n="4">4×4</button></div></div></div>
+<div id="quiz"><div class="c"><small>Puzzle selesai · bonus</small><h3 id="qh">Motif ini berasal dari daerah mana?</h3><div class="o" id="qo"></div><p id="fact"></p></div></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Puzzle Motif Batik: terinspirasi Sliding Puzzle (he-is-talha/html-css-javascript-games, MIT). Kode ditulis ulang; motif batik digambar dengan kode. */
+var MOTIF=[{n:'Kawung',asal:'Yogyakarta dan Solo (Jawa Tengah)',f:'Bentuknya seperti irisan buah aren (kolang-kaling) yang tersusun rapi.'},
+  {n:'Parang',asal:'Yogyakarta dan Solo (Jawa Tengah)',f:'Garis miring berulang seperti ombak atau lereng, lambang semangat pantang menyerah.'},
+  {n:'Mega Mendung',asal:'Cirebon (Jawa Barat)',f:'Bergambar awan bergulung-gulung dengan gradasi warna.'},
+  {n:'Truntum',asal:'Solo (Jawa Tengah)',f:'Berbentuk bunga-bunga kecil seperti bintang, lambang cinta yang tumbuh kembali.'}];
+var G={n:3},S;
+EDU.hud({title:'Puzzle Motif Batik',timer:true,credit:'Terinspirasi Sliding Puzzle · he-is-talha (MIT)'});
+function paint(c,m){var x=c.getContext('2d'),W=c.width,u=W/6;x.save();
+  if(m===0){x.fillStyle='#4a2c17';x.fillRect(0,0,W,W);for(var i=-1;i<=6;i++)for(var j=-1;j<=6;j++){var cx=i*u+u/2,cy=j*u+u/2;x.fillStyle='#e9c46a';[[0,-1],[1,0],[0,1],[-1,0]].forEach(function(d){x.beginPath();x.ellipse(cx+d[0]*u*.27,cy+d[1]*u*.27,u*(d[0]?.27:.15),u*(d[1]?.27:.15),0,0,7);x.fill()});
+    x.fillStyle='#4a2c17';x.beginPath();x.arc(cx,cy,u*.07,0,7);x.fill();x.fillStyle='#8a4b24';[[0,-1],[1,0],[0,1],[-1,0]].forEach(function(d){x.beginPath();x.arc(cx+d[0]*u*.28,cy+d[1]*u*.28,u*.05,0,7);x.fill()})}}
+  if(m===1){x.fillStyle='#f1e3c6';x.fillRect(0,0,W,W);x.translate(W/2,W/2);x.rotate(-Math.PI/4);for(var k=-8;k<=8;k++){var y=k*u*.75;x.fillStyle=k%2?'#5b2a12':'#9c4f1f';x.fillRect(-W,y-u*.18,W*2,u*.36);
+    x.fillStyle='#f1e3c6';for(var s=-12;s<12;s++){x.beginPath();x.ellipse(s*u*.6,y,u*.2,u*.1,.6,0,7);x.fill()}x.fillStyle='#5b2a12';for(s=-12;s<12;s++){x.beginPath();x.arc(s*u*.6+u*.3,y+u*.36,u*.06,0,7);x.fill()}}}
+  if(m===2){var g=x.createLinearGradient(0,0,0,W);g.addColorStop(0,'#0b3a6b');g.addColorStop(1,'#1d5fa0');x.fillStyle=g;x.fillRect(0,0,W,W);var cols=['#0d2b4f','#1f4f86','#3b78b8','#7fb2e6','#dbeeff'];
+    [[.25,.3],[.75,.2],[.55,.62],[.15,.82],[.9,.75]].forEach(function(p){cols.forEach(function(cl,i){var r=u*(1.15-i*.2);x.fillStyle=cl;x.beginPath();x.arc(p[0]*W,p[1]*W,r,Math.PI,0);x.arc(p[0]*W+r*.9,p[1]*W,r*.55,Math.PI,0);x.arc(p[0]*W-r*.9,p[1]*W,r*.55,Math.PI,0);x.closePath();x.fill()})})}
+  if(m===3){x.fillStyle='#1e1b3a';x.fillRect(0,0,W,W);for(var a=0;a<9;a++)for(var b=0;b<9;b++){var px=a*W/8+(b%2?W/16:0),py=b*W/8;x.fillStyle='#f4d58d';for(var q=0;q<8;q++){x.beginPath();x.ellipse(px+Math.cos(q*Math.PI/4)*u*.18,py+Math.sin(q*Math.PI/4)*u*.18,u*.1,u*.04,q*Math.PI/4,0,7);x.fill()}
+    x.fillStyle='#c97b2a';x.beginPath();x.arc(px,py,u*.07,0,7);x.fill();x.fillStyle='rgba(244,213,141,.5)';x.beginPath();x.arc(px+W/16,py+W/16,u*.025,0,7);x.fill()}}
+  x.restore();
+  var v=x.createRadialGradient(W/2,W/2,W*.2,W/2,W/2,W*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.45)');x.fillStyle=v;x.fillRect(0,0,W,W);
+  x.strokeStyle='rgba(255,236,190,.85)';x.lineWidth=W*.012;x.beginPath();x.arc(W/2,W/2,W*.3,0,7);x.stroke();x.lineWidth=W*.005;x.beginPath();x.arc(W/2,W/2,W*.34,0,7);x.stroke();
+  x.fillStyle='rgba(20,10,5,.72)';x.beginPath();x.roundRect(W*.18,W*.43,W*.64,W*.14,W*.04);x.fill();
+  x.fillStyle='#ffe9b8';x.font='800 '+Math.round(W*.075)+'px Space Grotesk, Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(MOTIF[m].n.toUpperCase(),W/2,W*.5);
+  [[.08,.08],[.92,.08],[.08,.92],[.92,.92]].forEach(function(p,i){x.fillStyle='rgba(255,236,190,.9)';x.beginPath();x.moveTo(p[0]*W,p[1]*W-W*.05);x.lineTo(p[0]*W+W*.05,p[1]*W);x.lineTo(p[0]*W,p[1]*W+W*.05);x.lineTo(p[0]*W-W*.05,p[1]*W);x.fill();x.fillStyle='#3a2410';x.font='700 '+Math.round(W*.04)+'px Arial';x.fillText(i+1,p[0]*W,p[1]*W+1)});
+  x.strokeStyle='rgba(255,255,255,.2)';x.lineWidth=6;x.strokeRect(3,3,W-6,W-6)}
+function size(){var s=Math.floor(Math.min(innerWidth-40,innerHeight-150,560));G.px=s;var bd=EDU.$('#bd');bd.style.width=bd.style.height=s+12+'px'}
+function build(){size();var n=G.n,s=G.px,ts=s/n;G.img=document.createElement('canvas');G.img.width=G.img.height=s;paint(G.img,G.m);paint(EDU.$('#pv'),G.m);
+  var bd=EDU.$('#bd');bd.innerHTML='';G.els=[];for(var i=0;i<n*n-1;i++){var c=document.createElement('canvas');c.width=c.height=Math.round(ts-4);c.className='tl';c.getContext('2d').drawImage(G.img,(i%n)*ts,Math.floor(i/n)*ts,ts,ts,0,0,ts-4,ts-4);
+    c.onclick=(function(k){return function(){tap(k)}})(i);bd.appendChild(c);G.els.push(c)}place()}
+function place(){var n=G.n,ts=G.px/n;G.pos.forEach(function(t,cell){if(t<0)return;var e=G.els[t];e.style.left=(6+(cell%n)*ts+2)+'px';e.style.top=(6+Math.floor(cell/n)*ts+2)+'px'})}
+function nbs(cell){var n=G.n,r=Math.floor(cell/n),c=cell%n,o=[];if(r>0)o.push(cell-n);if(r<n-1)o.push(cell+n);if(c>0)o.push(cell-1);if(c<n-1)o.push(cell+1);return o}
+function slide(cell){var e=G.pos.indexOf(-1);if(nbs(e).indexOf(cell)<0)return false;G.pos[e]=G.pos[cell];G.pos[cell]=-1;return true}
+function tap(t){if(G.done||G.quiz)return;var cell=G.pos.indexOf(t);if(slide(cell)){G.moves++;EDU.sfx('tick');place();EDU.setQ(G.moves+' langkah');check()}}
+function check(){if(G.pos.every(function(t,i){return i===G.pos.length-1?t===-1:t===i})){G.done=true;EDU.sfx('win');G.score+=Math.max(20,100-G.moves);EDU.setScore(G.score);setTimeout(ask,500)}}
+function ask(){G.quiz=true;var m=MOTIF[G.m],ASAL=['Cirebon (Jawa Barat)','Yogyakarta dan Solo (Jawa Tengah)','Solo (Jawa Tengah)','Pekalongan (Jawa Tengah)','Madura (Jawa Timur)'],opts=EDU.shuffle([m.asal].concat(EDU.shuffle(ASAL.filter(function(a){return a!==m.asal&&!(m.asal.indexOf('Solo')>=0&&a.indexOf('Solo')>=0)})).slice(0,2)));
+  EDU.$('#qo').innerHTML=opts.map(function(o){return '<button>'+o+'</button>'}).join('');EDU.$('#fact').textContent='';EDU.$('#quiz').classList.add('on');
+  [].forEach.call(document.querySelectorAll('#qo button'),function(b){b.onclick=function(){if(G.quiz!==true)return;G.quiz='x';var ok=b.textContent===m.asal;b.classList.add(ok?'ok':'no');if(ok){G.score+=30;G.benar++;EDU.sfx('ok')}else{G.salah++;EDU.sfx('bad');[].find.call(document.querySelectorAll('#qo button'),function(z){return z.textContent===m.asal}).classList.add('ok')}
+    EDU.setScore(G.score);EDU.$('#fact').innerHTML='<b>'+m.n+'</b> · '+m.asal+'. '+m.f;setTimeout(function(){EDU.$('#quiz').classList.remove('on');G.quiz=false;next()},2600)}});
+  if(EDU.demo)setTimeout(function(){var want=Math.random()<.85?m.asal:opts.find(function(o){return o!==m.asal});[].find.call(document.querySelectorAll('#qo button'),function(z){return z.textContent===want}).click()},1200)}
+function shuffle(k){G.hist=[];var last=-1;for(var i=0;i<k;i++){var e=G.pos.indexOf(-1),c=EDU.pick(nbs(e).filter(function(z){return z!==last}));last=e;slide(c);G.hist.push(e)}}
+function next(){G.round++;if(G.round>=MOTIF.length){return EDU.end({key:'batik'+G.n,score:G.score,benar:G.benar,salah:G.salah,max:500,head:'4 motif selesai!'},start)}G.m=G.order[G.round];setup()}
+function setup(){var n=G.n;G.pos=[];for(var i=0;i<n*n-1;i++)G.pos.push(i);G.pos.push(-1);shuffle(EDU.demo?(n===3?22:30):n*n*25);G.moves=0;G.done=false;build();EDU.setQ('Susun motif batik');G.t0=Date.now();if(EDU.demo)setTimeout(auto,600)}
+function start(){G.order=EDU.shuffle([0,1,2,3]);G.round=0;G.m=G.order[0];G.score=0;G.benar=0;G.salah=0;EDU.setScore(0);setup()}
+function auto(){if(G.done||document.querySelector('.edu-ov'))return;var target=G.hist.pop();if(target==null)return;var t=G.pos[target];tap(t);setTimeout(auto,230)}
+setInterval(function(){if(G.t0&&!G.done)EDU.setTime(Math.floor((Date.now()-G.t0)/1000)+'s')},500);
+document.querySelectorAll('.lv button').forEach(function(b){b.onclick=function(){document.querySelectorAll('.lv button').forEach(function(z){z.classList.toggle('on',z===b)});G.n=+b.dataset.n;start()}});
+addEventListener('resize',function(){if(G.pos)build()});
+EDU.title({key:'batik3',title:'Puzzle Motif Batik',mapel:'Seni Budaya / IPS · SD Kelas 3 – SMP',desc:'Susun kepingan motif batik Nusantara, lalu tebak nama motif dan asal daerahnya.',how:['Klik kepingan di sebelah ruang kosong untuk menggeser.','Lihat contoh motif di samping papan.','Setelah tersusun, jawab nama motifnya untuk bonus dan baca fakta singkatnya.']},start);
+</script></body></html>

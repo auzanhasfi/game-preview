@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Jalan Pulang Aman</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#bdf06a}#cv{position:fixed;inset:0;display:block}
+#quiz{position:fixed;inset:0;display:none;place-items:center;z-index:70;background:rgba(20,30,10,.45)}#quiz.on{display:grid}
+#quiz .c{background:#F9F3E5;color:#2a1a10;border-radius:24px;padding:18px 20px;text-align:center;width:min(380px,92vw);animation:eduIn .3s}
+#quiz small{color:#FD5E2B;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px}
+#quiz canvas{width:120px;height:120px;display:block;margin:6px auto}
+#quiz h3{margin:4px 0 12px;font-size:20px}
+#quiz .o{display:grid;gap:8px}#quiz button{border:0;border-radius:14px;padding:12px;font:700 16px 'Space Grotesk';background:#fff;box-shadow:0 4px 0 #e2d4bb;cursor:pointer;text-align:left}
+#quiz button.ok{background:#3ecf8e;color:#fff}#quiz button.no{background:#ff6b5b;color:#fff}
+#shield{position:fixed;left:14px;top:76px;z-index:40;background:rgba(255,250,240,.92);border-radius:12px;padding:6px 10px;font-weight:700;display:none}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"}}</script>
+</head><body>
+<canvas id="cv"></canvas><div id="shield">🛡️ Pelindung aktif</div>
+<div id="quiz"><div class="c"><small>Pos rambu · jawab dulu</small><canvas id="qs" width="240" height="240"></canvas><h3>Apa arti rambu ini?</h3><div class="o" id="qo"></div></div></div>
+<div class="edu-pad touch" style="left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,62px);gap:6px"><span></span><button data-d="up">▲</button><span></span><button data-d="left">◀</button><button data-d="down">▼</button><button data-d="right">▶</button></div>
+<script src="../_kit/edu.js"></script>
+<script type="module">
+/* Jalan Pulang Aman: terinspirasi Crossy Road (he-is-talha/html-css-javascript-games, MIT). Kode ditulis ulang dengan Three.js. */
+import * as THREE from 'three';
+const SIGNS=[
+  {id:'stop',a:'Berhenti sebentar, lalu jalan jika aman',o:['Boleh ngebut','Berhenti sebentar, lalu jalan jika aman','Tempat parkir']},
+  {id:'masuk',a:'Dilarang masuk',o:['Dilarang masuk','Jalan satu arah ke kanan','Boleh putar balik']},
+  {id:'seberang',a:'Tempat penyeberangan orang',o:['Halte bus','Tempat penyeberangan orang','Dilarang berjalan kaki']},
+  {id:'parkir',a:'Dilarang parkir',o:['Tempat parkir','Dilarang parkir','Pom bensin']},
+  {id:'henti',a:'Dilarang berhenti',o:['Dilarang berhenti','Boleh berhenti lama','Sekolah']},
+  {id:'anak',a:'Hati-hati, banyak anak sekolah',o:['Taman bermain','Hati-hati, banyak anak sekolah','Dilarang masuk']},
+  {id:'lampu',a:'Lampu merah: berhenti dan tunggu hijau',o:['Lampu merah: berhenti dan tunggu hijau','Lampu merah: jalan cepat','Lampu rusak']}];
+function drawSign(c,id){const x=c.getContext('2d'),W=c.width,s=W/240;x.clearRect(0,0,W,W);x.save();x.scale(s,s);x.lineJoin='round';
+  const circ=(fill,ring)=>{x.fillStyle=ring;x.beginPath();x.arc(120,120,108,0,7);x.fill();x.fillStyle=fill;x.beginPath();x.arc(120,120,88,0,7);x.fill()};
+  if(id==='stop'){x.fillStyle='#fff';x.beginPath();for(let i=0;i<8;i++){const a=Math.PI/8+i*Math.PI/4;x.lineTo(120+112*Math.cos(a),120+112*Math.sin(a))}x.fill();x.fillStyle='#d62828';x.beginPath();for(let i=0;i<8;i++){const a=Math.PI/8+i*Math.PI/4;x.lineTo(120+100*Math.cos(a),120+100*Math.sin(a))}x.fill();x.fillStyle='#fff';x.font='800 64px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText('STOP',120,124)}
+  if(id==='masuk'){x.fillStyle='#d62828';x.beginPath();x.arc(120,120,110,0,7);x.fill();x.fillStyle='#fff';x.fillRect(40,100,160,40)}
+  if(id==='seberang'){x.fillStyle='#1d5fd6';x.beginPath();x.roundRect(14,14,212,212,22);x.fill();x.fillStyle='#fff';x.beginPath();x.moveTo(120,30);x.lineTo(214,200);x.lineTo(26,200);x.closePath();x.fill();x.fillStyle='#111';x.beginPath();x.arc(124,92,13,0,7);x.fill();x.lineWidth=12;x.strokeStyle='#111';x.lineCap='round';x.beginPath();x.moveTo(120,108);x.lineTo(112,148);x.lineTo(94,178);x.moveTo(112,148);x.lineTo(132,178);x.moveTo(118,120);x.lineTo(98,140);x.moveTo(118,120);x.lineTo(140,136);x.stroke();for(let i=0;i<5;i++){x.fillRect(52+i*28,186,16,8)}}
+  if(id==='parkir'||id==='henti'){circ('#1d5fd6','#d62828');x.fillStyle='#fff';x.font='800 120px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(id==='parkir'?'P':'S',120,128);x.strokeStyle='#d62828';x.lineWidth=20;x.beginPath();x.moveTo(58,58);x.lineTo(182,182);x.stroke()}
+  if(id==='anak'){x.fillStyle='#d62828';x.beginPath();x.moveTo(120,8);x.lineTo(232,214);x.lineTo(8,214);x.closePath();x.fill();x.fillStyle='#ffd60a';x.beginPath();x.moveTo(120,40);x.lineTo(204,198);x.lineTo(36,198);x.closePath();x.fill();x.fillStyle='#111';[[100,110],[142,120]].forEach(([px,py],k)=>{x.beginPath();x.arc(px,py,11,0,7);x.fill();x.fillRect(px-8,py+12,16,34);x.fillRect(px-10,py+46,7,26);x.fillRect(px+3,py+46,7,26)});x.fillRect(108,138,26,6)}
+  if(id==='lampu'){x.fillStyle='#222';x.beginPath();x.roundRect(70,10,100,220,26);x.fill();[['#ff3b30',55],['#5a4a10',120],['#1f3d22',185]].forEach(([c,y])=>{x.fillStyle=c;x.beginPath();x.arc(120,y,30,0,7);x.fill()});x.fillStyle='rgba(255,90,80,.35)';x.beginPath();x.arc(120,55,42,0,7);x.fill()}
+  x.restore()}
+const cv=document.getElementById('cv');
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(2,devicePixelRatio));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+const scene=new THREE.Scene();scene.background=new THREE.Color('#bdf06a');
+const cam=new THREE.OrthographicCamera(-1,1,1,-1,.1,200);
+scene.add(new THREE.HemisphereLight('#ffffff','#7a8a50',1.2));
+const sun=new THREE.DirectionalLight('#fff4e0',1.6);sun.position.set(-8,20,6);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-16,right:16,top:16,bottom:-16});scene.add(sun,sun.target);
+const M=c=>new THREE.MeshLambertMaterial({color:c});
+const box=(w,h,d,c,x=0,y=0,z=0)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c));m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;return m};
+function resize(){const w=innerWidth,h=innerHeight,s=Math.max(7.5,11*Math.min(1,w/h*1.1));R.setSize(w,h);const a=w/h;cam.left=-s*a/2;cam.right=s*a/2;cam.top=s/2;cam.bottom=-s/2;cam.updateProjectionMatrix()}
+resize();addEventListener('resize',resize);
+EDU.hud({title:'Jalan Pulang Aman',lives:true,credit:'Terinspirasi Crossy Road · he-is-talha (MIT) · Three.js'});
+// ayam
+const hen=new THREE.Group();hen.add(box(.62,.62,.62,'#ffffff',0,.42,0),box(.5,.25,.5,'#ffffff',0,.86,-.05),box(.16,.18,.2,'#e63946',0,1.05,-.05),box(.14,.1,.16,'#f4a261',0,.75,-.38),box(.08,.08,.04,'#222',.18,.9,-.31),box(.08,.08,.04,'#222',-.18,.9,-.31),box(.1,.2,.1,'#f4a261',.14,.1,0),box(.1,.2,.1,'#f4a261',-.14,.1,0));scene.add(hen);
+const COLW=6;let lanes=[],G={};
+const CARC=['#e63946','#457b9d','#f4a261','#2a9d8f','#9b5de5','#ffbe0b'];
+function mkLane(r){
+  const L={r,type:'grass',cars:[],trees:{},mesh:new THREE.Group()};
+  const prev=lanes[lanes.length-1];
+  if(r>3){if(r%7===0)L.type='sign';else if(prev&&prev.type==='road'&&prev.run>=2)L.type='grass';else L.type=Math.random()<.62?'road':'grass'}
+  L.run=L.type==='road'&&prev&&prev.type==='road'?prev.run+1:1;
+  const z=-r;
+  if(L.type==='road'){L.mesh.add(box(40,.1,1,'#4a4e69',0,0,z));for(let i=-18;i<18;i+=2)L.mesh.add(box(.8,.11,.06,'#f1faee',i,.01,z+.5));
+    L.dir=Math.random()<.5?1:-1;L.speed=1.6+Math.random()*2.2+Math.min(2,r/40);const n=EDU.rand(2,3),gap=24/n;
+    for(let i=0;i<n;i++){const len=Math.random()<.3?2.2:1.4,c=new THREE.Group(),col=EDU.pick(CARC);c.add(box(len,.5,.8,col,0,.35,0),box(len*.55,.4,.72,'#e9f5ff',-.05,.75,0),box(len*.5,.12,.74,col,-.05,.98,0));
+      [[-len/2+.3,.42],[len/2-.3,.42],[-len/2+.3,-.42],[len/2-.3,-.42]].forEach(p=>c.add(box(.3,.3,.1,'#222',p[0],.18,p[1])));
+      c.position.set(-12+i*gap+Math.random()*2,0,z);c.rotation.y=L.dir>0?0:Math.PI;L.mesh.add(c);L.cars.push({m:c,len})}}
+  else{L.mesh.add(box(40,.2,1,(r%2)?'#a7e163':'#b5ea6f',0,-.05,z));
+    if(r>2)for(let c=-COLW;c<=COLW;c++){if(Math.random()<(L.type==='sign'?.08:.16)&&c!==0){L.trees[c]=1;const h=.6+Math.random()*.9;L.mesh.add(box(.3,.4,.3,'#7f5539',c,.3,z),box(.7,h,.7,'#2d6a4f',c,.5+h/2,z))}}
+    for(const c of[-COLW-1,COLW+1,-COLW-2,COLW+2]){const h=.8+Math.random()*.6;L.mesh.add(box(.3,.4,.3,'#7f5539',c,.3,z),box(.7,h,.7,'#40916c',c,.5+h/2,z))}
+    if(L.type==='sign'){L.sign=EDU.pick(SIGNS);const t=document.createElement('canvas');t.width=t.height=256;drawSign(t,L.sign.id);const tex=new THREE.CanvasTexture(t);tex.colorSpace=THREE.SRGBColorSpace;
+      const pole=box(.12,1.8,.12,'#adb5bd',3.6,.9,z);const p=new THREE.Mesh(new THREE.PlaneGeometry(1.3,1.3),new THREE.MeshBasicMaterial({map:tex,transparent:true}));p.position.set(3.6,2.1,z+.08);
+      L.mesh.add(pole,p);delete L.trees[4];delete L.trees[3]}}
+  scene.add(L.mesh);lanes.push(L);return L}
+function lane(r){return lanes.find(l=>l.r===r)}
+function reset(){lanes.forEach(l=>scene.remove(l.mesh));lanes=[];for(let r=-3;r<26;r++)mkLane(r);
+  G={r:0,c:0,max:0,score:0,lives:3,run:true,hop:null,shield:false,quiz:false,benar:0,salah:0,inv:0,done:{}};hen.position.set(0,0,0);hen.rotation.y=Math.PI;
+  EDU.setScore(0);EDU.setLives(3);EDU.setQ('Seberangi jalan, jawab rambu');document.getElementById('shield').style.display='none'}
+function move(d){if(!G.run||G.hop||G.quiz)return;let r=G.r,c=G.c;if(d==='up')r++;if(d==='down')r=Math.max(G.max-4,r-1);if(d==='left')c--;if(d==='right')c++;
+  if(c<-COLW||c>COLW)return;const L=lane(r);if(!L||L.trees[c])return;
+  hen.rotation.y={up:Math.PI,down:0,left:-Math.PI/2,right:Math.PI/2}[d];G.hop={t:0,fr:{r:G.r,c:G.c},to:{r,c}};EDU.sfx('pop')}
+function landed(){const L=lane(G.r);if(G.r>G.max){G.score+=G.r-G.max;G.max=G.r;EDU.setScore(G.score);while(lanes[lanes.length-1].r<G.r+24)mkLane(lanes[lanes.length-1].r+1);
+    lanes.filter(l=>l.r<G.r-8).forEach(l=>{scene.remove(l.mesh)});lanes=lanes.filter(l=>l.r>=G.r-8)}
+  if(L.type==='sign'&&!G.done[L.r]){G.done[L.r]=1;ask(L.sign)}}
+function ask(s){G.quiz=true;drawSign(document.getElementById('qs'),s.id);const o=EDU.shuffle(s.o);EDU.setQ('Apa arti rambu ini?');
+  document.getElementById('qo').innerHTML=o.map(v=>'<button>'+v+'</button>').join('');document.getElementById('quiz').classList.add('on');
+  [...document.querySelectorAll('#qo button')].forEach(b=>b.onclick=()=>{if(G.quiz!==true)return;G.quiz='x';const ok=b.textContent===s.a;b.classList.add(ok?'ok':'no');
+    if(ok){G.score+=20;G.benar++;G.shield=true;document.getElementById('shield').style.display='block';EDU.sfx('ok');EDU.toast('Benar! +20 dan dapat pelindung',true)}
+    else{G.salah++;EDU.sfx('bad');[...document.querySelectorAll('#qo button')].find(x=>x.textContent===s.a).classList.add('ok');EDU.toast('Artinya: '+s.a,false)}
+    EDU.setScore(G.score);setTimeout(()=>{document.getElementById('quiz').classList.remove('on');G.quiz=false;EDU.setQ('Seberangi jalan, jawab rambu')},ok?700:1500)});
+  if(EDU.demo)setTimeout(()=>{const want=Math.random()<.85?s.a:o.find(v=>v!==s.a);[...document.querySelectorAll('#qo button')].find(b=>b.textContent===want).click()},1300)}
+function hit(){if(G.inv>0)return;if(G.shield){G.shield=false;G.inv=1.2;document.getElementById('shield').style.display='none';EDU.toast('Pelindung terpakai!');EDU.sfx('tick');return}
+  G.lives--;EDU.setLives(G.lives);EDU.sfx('bad');G.inv=1.6;hen.scale.set(1.4,.3,1.4);setTimeout(()=>hen.scale.set(1,1,1),400);EDU.toast('Tertabrak! Lihat kiri-kanan dulu',false);
+  if(G.lives<=0){G.run=false;setTimeout(()=>EDU.end({key:'jalanaman',score:G.score,benar:G.benar,salah:G.salah,max:120,head:'Sampai '+G.max+' langkah'},reset),600)}}
+let last=performance.now(),camX=0,camZ=0,dk=0;
+function loop(t){const dt=Math.min(.05,(t-last)/1000);last=t;
+  lanes.forEach(L=>L.cars.forEach(c=>{if(!G.quiz)c.m.position.x+=L.dir*L.speed*dt;if(c.m.position.x>13)c.m.position.x-=26;if(c.m.position.x<-13)c.m.position.x+=26}));
+  if(G.hop){G.hop.t+=dt/.14;const k=Math.min(1,G.hop.t),f=G.hop.fr,to=G.hop.to;hen.position.set(f.c+(to.c-f.c)*k,Math.sin(k*Math.PI)*.45,-(f.r+(to.r-f.r)*k));if(k>=1){G.r=to.r;G.c=to.c;G.hop=null;landed()}}
+  if(G.run){G.inv-=dt;const L=lane(G.r);if(L&&L.type==='road'&&!G.hop)L.cars.forEach(c=>{if(Math.abs(c.m.position.x-hen.position.x)<c.len/2+.32)hit()});
+    hen.visible=!(G.inv>0&&Math.floor(G.inv*10)%2);if(EDU.demo&&!G.quiz&&++dk%9===0)demo()}
+  camX+=(hen.position.x*.5-camX)*.08;camZ+=(hen.position.z-camZ)*.08;cam.position.set(camX+4.5,11,camZ+8.5);cam.lookAt(camX,0,camZ-1.5);
+  sun.position.set(camX-6,18,camZ+6);sun.target.position.set(camX,0,camZ);
+  R.render(scene,cam);requestAnimationFrame(loop)}
+function safe(r,c,ahead){const L=lane(r);if(!L||L.trees[c])return false;if(L.type!=='road')return true;return L.cars.every(k=>{for(let s=0;s<=ahead;s+=.1){const x=k.m.position.x+L.dir*L.speed*s;if(Math.abs(x-c)<k.len/2+.75)return false}return true})}
+function demo(){if(G.hop)return;const here=lane(G.r);const stay=safe(G.r,G.c,.5);
+  if(safe(G.r+1,G.c,.45))return move('up');
+  if(!stay){for(const d of[['left',-1],['right',1]]){if(G.c+d[1]>=-COLW&&G.c+d[1]<=COLW&&safe(G.r,G.c+d[1],.5))return move(d[0])}if(safe(G.r-1,G.c,.4))return move('down')}
+  const L1=lane(G.r+1);if(L1&&L1.trees[G.c]){const d=G.c>0?'left':'right';if(safe(G.r,G.c+(d==='left'?-1:1),.4))move(d)}}
+addEventListener('keydown',e=>{const d={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'}[e.key];if(d){e.preventDefault();move(d)}});
+document.querySelectorAll('.edu-pad button').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();move(b.dataset.d)}));
+let sx,sy;cv.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});cv.addEventListener('pointerup',e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.hypot(dx,dy)<20)return move('up');move(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'))});
+reset();requestAnimationFrame(loop);window.__G=()=>G;
+G.run=false;EDU.title({key:'jalanaman',title:'Jalan Pulang Aman',mapel:'PPKn · Keselamatan jalan · SD Kelas 1–4',desc:'Bantu ayam pulang lewat jalan ramai. Di pos rambu, jawab arti rambu lalu lintas!',how:['Panah / geser / ketuk layar untuk melompat.','Lihat kiri-kanan, hindari mobil.','Di pos rambu: jawaban benar = +20 dan pelindung 1 kali.']},()=>{reset()});
+</script></body></html>

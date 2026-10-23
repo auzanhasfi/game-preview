@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Tangkap Serangga Angka</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#516dff;background:radial-gradient(circle at 30% 20%,#6f86ff,#516dff 50%,#3c52d6);color:#fff}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,.12) 2px,transparent 2.5px);background-size:38px 38px}
+.bug{position:absolute;width:86px;height:86px;margin:-43px 0 0 -43px;display:grid;place-items:center;cursor:pointer;transition:transform .2s;z-index:5}
+.bug .em{font-size:56px;line-height:1;transition:transform .15s;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
+.bug b{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);background:#fff;color:#2a2f6b;font:700 20px 'Space Mono',monospace;border-radius:10px;padding:0 9px;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.bug.caught{transform:scale(0) rotate(180deg);transition:transform .35s ease-in}
+.bug.bad .em{filter:drop-shadow(0 0 10px #ff4a4a)}
+#rule{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:30;background:rgba(255,255,255,.95);color:#2a2f6b;padding:10px 22px;border-radius:999px;font-weight:700;font-size:20px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#rule span{color:#FD5E2B}
+</style></head><body>
+<div id="rule">Tangkap angka <span>GENAP</span></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Tangkap Serangga Angka: tiru mekanik insect-catch-game (bradtraversy/50projects50days, MIT). Kode ditulis ulang. */
+var RULES=[['GENAP',function(n){return n%2===0}],['GANJIL',function(n){return n%2===1}],['kelipatan 3',function(n){return n%3===0}],['kelipatan 5',function(n){return n%5===0}],['lebih dari 50',function(n){return n>50}]];
+var G={bugs:[],score:0,lives:3,time:60,run:false,rule:0,count:0,benar:0,salah:0,iv:[]};
+EDU.hud({title:'Tangkap Serangga Angka',lives:true,timer:true,credit:'Terinspirasi Insect Catch · Brad Traversy (MIT)'});
+var EM=['🐞','🦋','🐝','🪲','🐛','🦗'];
+function ok(n){return RULES[G.rule][1](n)}
+function setRule(i){G.rule=i;EDU.$('#rule').innerHTML='Tangkap angka <span>'+RULES[i][0].toUpperCase()+'</span>';EDU.setQ('Tangkap: '+RULES[i][0]);EDU.toast('Aturan baru: '+RULES[i][0]+'!')}
+function spawn(){
+  if(!G.run||G.bugs.length>=9)return;
+  var n,want=Math.random()<.5,t=0;do{n=EDU.rand(1,99)}while(ok(n)!==want&&t++<50);
+  var W=innerWidth,H=innerHeight,side=EDU.rand(0,3);
+  var x=side===0?-40:side===1?W+40:EDU.rand(60,W-60),y=side===2?H+40:side===3?110:EDU.rand(120,H-90);
+  var el=document.createElement('div');el.className='bug';el.innerHTML='<span class="em">'+EDU.pick(EM)+'</span><b>'+n+'</b>';document.body.appendChild(el);
+  var b={el:el,n:n,x:x,y:y,a:Math.atan2(H/2-y,W/2-x)+(Math.random()-.5),sp:1.2+Math.random()*1.4+Math.min(1.5,G.score/120),wob:Math.random()*6};
+  el.addEventListener('pointerdown',function(e){e.preventDefault();catchBug(b)});G.bugs.push(b);
+}
+function catchBug(b){
+  if(!G.run||b.dead)return;b.dead=true;
+  if(ok(b.n)){G.score+=10;G.benar++;G.count++;EDU.setScore(G.score);EDU.sfx('ok');EDU.floatText(b.x,b.y-40,'+10',true);b.el.classList.add('caught');
+    if(G.count%6===0)setRule((G.rule+1)%RULES.length)}
+  else{G.lives--;G.salah++;EDU.setLives(G.lives);EDU.sfx('bad');EDU.floatText(b.x,b.y-40,b.n+' bukan '+RULES[G.rule][0],false);b.el.classList.add('bad','caught');if(G.lives<=0)setTimeout(finish,300)}
+  setTimeout(function(){b.el.remove()},360);G.bugs=G.bugs.filter(function(x){return x!==b});
+}
+var last=0;
+function loop(ts){
+  var W=innerWidth,H=innerHeight;
+  G.bugs.forEach(function(b){b.wob+=.05;b.a+=Math.sin(b.wob)*.03;
+    if(b.x<40&&Math.cos(b.a)<0||b.x>W-40&&Math.cos(b.a)>0)b.a=Math.PI-b.a;
+    if(b.y<110&&Math.sin(b.a)<0||b.y>H-60&&Math.sin(b.a)>0)b.a=-b.a;
+    b.x+=Math.cos(b.a)*b.sp;b.y+=Math.sin(b.a)*b.sp;
+    b.el.style.left=b.x+'px';b.el.style.top=b.y+'px';b.el.querySelector('.em').style.transform='rotate('+(b.a*180/Math.PI+90)+'deg)'});
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+function start(){
+  G.bugs.forEach(function(b){b.el.remove()});G.bugs=[];G.score=0;G.lives=3;G.time=60;G.count=0;G.benar=0;G.salah=0;G.run=true;
+  EDU.setScore(0);EDU.setLives(3);EDU.setTime(60);setRule(0);for(var i=0;i<5;i++)spawn();
+  G.iv.forEach(clearInterval);G.iv=[setInterval(spawn,700),setInterval(function(){G.time--;EDU.setTime(G.time);if(G.time<=0)finish()},1000)];
+  if(EDU.demo)G.iv.push(setInterval(auto,420));
+}
+function finish(){if(!G.run)return;G.run=false;G.iv.forEach(clearInterval);EDU.end({key:'serangga',score:G.score,benar:G.benar,salah:G.salah,max:250},start)}
+var k=0;function auto(){var W=innerWidth,H=innerHeight;var b=G.bugs.filter(function(b){return ok(b.n)&&b.x>60&&b.x<W-60&&b.y>120&&b.y<H-60})[0];if(!b&&++k%10===0)b=G.bugs[0];if(b)catchBug(b)}
+EDU.title({key:'serangga',title:'Tangkap Serangga Angka',mapel:'Matematika · SD Kelas 2–5',desc:'Serangga beterbangan membawa angka. Tangkap hanya yang sesuai aturan!',how:['Baca aturan di bawah layar (mis. GENAP).','Klik/ketuk serangga yang angkanya cocok.','Setiap 6 tangkapan, aturannya berganti.']},start);
+</script></body></html>

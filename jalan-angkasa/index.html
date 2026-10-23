@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jalan Angkasa — balap soal matematika</title>
+<meta name="description" content="Game edukasi: pesawat melaju di jalan neon luar angkasa, pindah ke jalur berisi jawaban yang benar.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Exo+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Jalan Angkasa: kode asli, gaya terinspirasi game balap luar angkasa retro (jalan ubin neon di atas bintang). */
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#07041a;font-family:"Exo 2",system-ui,sans-serif;color:#e9f1ff}
+canvas{display:block}
+.hud{position:fixed;inset:0;pointer-events:none}
+.q{position:absolute;left:50%;top:18px;transform:translateX(-50%);text-align:center}
+.q small{display:block;font:600 12px Orbitron;letter-spacing:.3em;color:#7fd7ff}
+.q b{display:block;font:800 clamp(30px,6vw,52px) Orbitron;letter-spacing:.04em;text-shadow:0 0 18px #3ac8ff,0 0 2px #fff}
+.bars{position:absolute;left:18px;bottom:18px;display:grid;gap:8px;width:220px}
+.bars div{font:600 11px Orbitron;letter-spacing:.2em;color:#9fb6d8}
+.bars i{display:block;height:10px;border:1px solid #3a5a88;margin-top:4px;background:linear-gradient(90deg,#1f3a66,#1f3a66)}
+.bars i span{display:block;height:100%;background:linear-gradient(90deg,#ff3cac,#ffd166)}
+.bars i.fuel span{background:linear-gradient(90deg,#3ac8ff,#7cff9e)}
+.score{position:absolute;right:18px;top:18px;text-align:right;font:800 26px Orbitron;text-shadow:0 0 12px #ff3cac}
+.score small{display:block;font:600 11px Orbitron;letter-spacing:.24em;color:#ff9fd6}
+.fb{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font:800 clamp(26px,5vw,44px) Orbitron;opacity:0;transition:opacity .2s}
+.fb.ok{color:#7cff9e;text-shadow:0 0 20px #2aff7a}.fb.no{color:#ff6b8b;text-shadow:0 0 20px #ff2a55}
+.ctrl{position:absolute;right:18px;bottom:18px;font:600 11px Orbitron;letter-spacing:.16em;color:#7a8db0;text-align:right;line-height:1.8}
+.intro{position:fixed;inset:0;display:grid;place-items:center;background:rgba(5,3,20,.6);pointer-events:auto}
+.intro .c{text-align:center;max-width:460px;padding:20px}
+.intro h1{font:800 clamp(34px,7vw,56px) Orbitron;margin:0;letter-spacing:.06em;background:linear-gradient(90deg,#3ac8ff,#ff3cac,#ffd166);-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro p{color:#b8c6e6;line-height:1.6}
+.intro button{font:800 16px Orbitron;letter-spacing:.2em;padding:14px 30px;border:2px solid #3ac8ff;background:rgba(58,200,255,.12);color:#fff;cursor:pointer;box-shadow:0 0 22px rgba(58,200,255,.5)}
+.pad{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:none;gap:10px;pointer-events:auto}
+.pad button{width:76px;height:56px;font:800 22px Orbitron;color:#fff;background:rgba(58,200,255,.15);border:2px solid #3ac8ff;border-radius:12px}
+@media (pointer:coarse){.pad{display:flex}.ctrl{display:none}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"}}</script>
+</head>
+<body>
+<div class="hud">
+  <div class="q"><small>PILIH JALUR JAWABAN</small><b id="q">—</b></div>
+  <div class="score"><small>SKOR</small><span id="score">0</span></div>
+  <div class="bars"><div>BAHAN BAKAR<i class="fuel"><span id="fuel" style="width:100%"></span></i></div><div>KECEPATAN<i><span id="spd" style="width:40%"></span></i></div></div>
+  <div class="fb" id="fb"></div>
+  <div class="ctrl">← → PINDAH JALUR<br>SPASI LOMPAT</div>
+</div>
+<div class="pad"><button id="bl">←</button><button id="bj">⤒</button><button id="br">→</button></div>
+<div class="intro" id="intro"><div class="c"><h1>JALAN ANGKASA</h1><p>Pesawatmu melaju di jalan neon luar angkasa. Soal muncul di atas. Pindah ke jalur dengan jawaban yang benar sebelum gerbang. Benar = tambah bahan bakar dan kecepatan.</p><button id="go">MULAI</button></div></div>
+<script type="module">
+import * as THREE from 'three';
+const demo=/demo/.test(location.search);
+const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));R.setSize(innerWidth,innerHeight);document.body.prepend(R.domElement);
+const S=new THREE.Scene();S.fog=new THREE.Fog(0x0a0628,40,170);
+const cam=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,400);
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();R.setSize(innerWidth,innerHeight)});
+// langit gradasi + bintang + planet
+const sky=new THREE.Mesh(new THREE.SphereGeometry(300,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,uniforms:{},vertexShader:'varying vec3 p;void main(){p=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 p;void main(){float h=p.y*.5+.5;vec3 a=vec3(.02,.01,.09),b=vec3(.35,.05,.38),c=vec3(.95,.45,.25);vec3 col=mix(c,b,smoothstep(.42,.55,h));col=mix(col,a,smoothstep(.55,.85,h));gl_FragColor=vec4(col,1.);}'}));S.add(sky);
+const sg=new THREE.BufferGeometry();const sp=[];for(let i=0;i<2500;i++){const v=new THREE.Vector3().randomDirection().multiplyScalar(250);if(v.y>-20)sp.push(v.x,v.y,v.z)}sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));S.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:1.1,sizeAttenuation:false,fog:false})));
+const planet=new THREE.Mesh(new THREE.SphereGeometry(38,48,32),new THREE.MeshStandardMaterial({color:0xb07ad8,emissive:0x6a2a9a,emissiveIntensity:.8,roughness:.9,fog:false}));planet.position.set(-90,30,-220);S.add(planet);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(58,2.2,8,90),new THREE.MeshBasicMaterial({color:0xffb36b,fog:false}));ring.position.copy(planet.position);ring.rotation.x=1.25;S.add(ring);
+S.add(new THREE.HemisphereLight(0x9ad8ff,0x30104a,1.4));const dl=new THREE.DirectionalLight(0xffd0a0,1.6);dl.position.set(-10,20,10);S.add(dl);
+// jalan ubin
+const LANES=[-4,0,4],TILE=6,ROWS=40,COLS=[0x2a6bff,0xff3cac,0x23e0c8,0xffd166,0x8a5cff];
+const tileG=new THREE.BoxGeometry(3.5,.5,TILE-.6);
+const road=[];// baris: {z, meshes[], gate}
+function edge(c){return new THREE.LineSegments(new THREE.EdgesGeometry(tileG),new THREE.LineBasicMaterial({color:c}))}
+function makeRow(i){const row={meshes:[],z:-i*TILE};for(let l=0;l<3;l++){const c=COLS[(i+l*2)%COLS.length];const m=new THREE.Mesh(tileG,new THREE.MeshStandardMaterial({color:new THREE.Color(c).multiplyScalar(.35),emissive:c,emissiveIntensity:.55,roughness:.25,metalness:.6}));m.add(edge(c));m.position.set(LANES[l],-.3,row.z);S.add(m);row.meshes.push(m)}road.push(row);return row}
+for(let i=0;i<ROWS;i++)makeRow(i);
+// pesawat
+const ship=new THREE.Group();
+const hull=new THREE.Mesh(new THREE.ConeGeometry(.9,3.2,6),new THREE.MeshStandardMaterial({color:0xdfe8ff,metalness:.6,roughness:.25}));hull.rotation.x=-Math.PI/2;ship.add(hull);
+const wing=new THREE.Mesh(new THREE.BoxGeometry(3.4,.15,1.2),new THREE.MeshStandardMaterial({color:0xff3cac,emissive:0x5a0a3a,metalness:.5}));wing.position.z=.6;ship.add(wing);
+const fin=new THREE.Mesh(new THREE.BoxGeometry(.15,.9,1),new THREE.MeshStandardMaterial({color:0x3ac8ff,emissive:0x0a3a5a}));fin.position.set(0,.45,1);ship.add(fin);
+const flame=new THREE.Mesh(new THREE.ConeGeometry(.45,1.8,12),new THREE.MeshBasicMaterial({color:0x6be8ff,transparent:true,opacity:.85}));flame.rotation.x=Math.PI/2;flame.position.z=2.3;ship.add(flame);
+ship.scale.setScalar(.62);ship.position.set(0,.8,0);S.add(ship);
+const glow=new THREE.PointLight(0x6be8ff,30,12);glow.position.set(0,.6,2.6);ship.add(glow);
+// gerbang soal
+function textTex(t,c){const cv=document.createElement('canvas');cv.width=256;cv.height=128;const x=cv.getContext('2d');x.fillStyle='rgba(8,4,30,.75)';x.fillRect(0,0,256,128);x.strokeStyle=c;x.lineWidth=8;x.strokeRect(4,4,248,120);x.fillStyle='#fff';x.font='800 64px Orbitron, sans-serif';x.textAlign='center';x.textBaseline='middle';x.shadowColor=c;x.shadowBlur=18;x.fillText(t,128,68);const tx=new THREE.CanvasTexture(cv);tx.colorSpace=THREE.SRGBColorSpace;return tx}
+let gate=null;
+function soal(){const r=n=>Math.floor(Math.random()*n);const k=r(3);let q,a;if(k===0){const x=3+r(7),y=3+r(7);q=x+' × '+y;a=x*y}else if(k===1){const y=2+r(8),z=2+r(9);q=(y*z)+' ÷ '+y;a=z}else{const x=12+r(40),y=6+r(30);q=x+' + '+y;a=x+y}
+  const s=new Set([a]);while(s.size<3){const d=a+(r(2)?1:-1)*(1+r(6));if(d>0)s.add(d)}return{q,a,opts:[...s].sort(()=>Math.random()-.5)}}
+function newGate(z){const s=soal();const g=new THREE.Group();g.position.z=z;
+  s.opts.forEach((v,l)=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(3.4,1.7),new THREE.MeshBasicMaterial({map:textTex(v,['#3ac8ff','#ff3cac','#ffd166'][l]),transparent:true}));p.position.set(LANES[l],2.6,0);g.add(p);
+    const posts=new THREE.Mesh(new THREE.BoxGeometry(.18,3.4,.18),new THREE.MeshBasicMaterial({color:0x6be8ff}));posts.position.set(LANES[l]-1.8,1.4,0);g.add(posts);const p2=posts.clone();p2.position.x=LANES[l]+1.8;g.add(p2)});
+  S.add(g);gate={g,s,z};document.getElementById('q').textContent=s.q+' = ?'}
+// kontrol
+let lane=1,targetX=0,vy=0,jumping=false,speed=22,fuel=100,score=0,run=false,dist=0;
+function move(d){lane=Math.max(0,Math.min(2,lane+d));targetX=LANES[lane]}
+function jump(){if(!jumping){vy=9;jumping=true}}
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a')move(-1);if(e.key==='ArrowRight'||e.key==='d')move(1);if(e.key===' '){jump();e.preventDefault()}});
+document.getElementById('bl').onclick=()=>move(-1);document.getElementById('br').onclick=()=>move(1);document.getElementById('bj').onclick=jump;
+const fb=document.getElementById('fb');function flash(t,ok){fb.textContent=t;fb.className='fb '+(ok?'ok':'no');fb.style.opacity=1;setTimeout(()=>fb.style.opacity=0,900)}
+function start(){document.getElementById('intro').remove();run=true;newGate(-60)}
+document.getElementById('go').onclick=start;if(demo)start();
+// loop
+const clock=new THREE.Clock();
+R.setAnimationLoop(()=>{const dt=Math.min(.05,clock.getDelta()),T=clock.elapsedTime;
+  if(run){dist+=speed*dt;fuel=Math.max(0,fuel-dt*2.2);if(fuel<=0){speed=Math.max(8,speed-dt*6)}}
+  const v=run?speed:6;
+  // geser dunia ke arah kamera
+  for(const r of road){r.z+=v*dt;if(r.z>TILE*2){r.z-=ROWS*TILE}r.meshes.forEach((m,l)=>{m.position.z=r.z;m.position.y=-.3+Math.sin(T*2+r.z*.1+l)*.04})}
+  if(gate){gate.z+=v*dt;gate.g.position.z=gate.z;
+    if(demo){const want=gate.s.opts.indexOf(gate.s.a);if(gate.z>-38&&lane!==want)move(want>lane?1:-1)}
+    if(gate.z>-.5){const ok=gate.s.opts[lane]===gate.s.a;if(ok){score+=10;fuel=Math.min(100,fuel+25);speed=Math.min(40,speed+2);flash('BENAR! +10',true)}else{fuel=Math.max(0,fuel-20);speed=Math.max(14,speed-3);flash(gate.s.q+' = '+gate.s.a,false)}
+      S.remove(gate.g);gate=null;setTimeout(()=>newGate(-70),500)}}
+  if(demo&&Math.sin(T*1.3)>.995)jump();
+  ship.position.x+= (targetX-ship.position.x)*Math.min(1,dt*9);ship.rotation.z=(ship.position.x-targetX)*.25;
+  if(jumping){ship.position.y+=vy*dt;vy-=24*dt;if(ship.position.y<=.8){ship.position.y=.8;jumping=false}}
+  ship.position.y+=Math.sin(T*6)*.004;flame.scale.y=.8+Math.random()*.5;
+  cam.position.set(ship.position.x*.5,4.6+ship.position.y*.3,9.5);cam.lookAt(ship.position.x*.7,.8,-16);
+  planet.rotation.y+=dt*.02;
+  document.getElementById('score').textContent=score;document.getElementById('fuel').style.width=fuel+'%';document.getElementById('spd').style.width=(speed/40*100)+'%';
+  R.render(S,cam)});
+</script>
+</body>
+</html>

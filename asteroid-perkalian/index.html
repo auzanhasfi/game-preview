@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Asteroid Perkalian</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>body{background:#000}#cv{position:fixed;inset:0;width:100%;height:100%}</style></head><body>
+<canvas id="cv"></canvas>
+<div class="edu-pad touch" style="left:14px"><button data-k="ArrowLeft">⟲</button><button data-k="ArrowRight">⟳</button></div>
+<div class="edu-pad touch" style="right:14px"><button data-k="ArrowUp">▲</button><button data-k=" ">●</button></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Asteroid Perkalian: remake HTML5-Asteroids (dmcinnes, MIT). Kode ditulis ulang, gaya garis vektor dipertahankan. */
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),Wd,Ht,K={};
+var G={ship:null,rocks:[],bullets:[],parts:[],q:null,score:0,lives:3,run:false,benar:0,salah:0,cool:0,inv:0,stars:[]};
+EDU.hud({title:'Asteroid Perkalian',lives:true,credit:'Remake HTML5-Asteroids · Doug McInnes (MIT)'});
+function size(){Wd=cv.width=innerWidth;Ht=cv.height=innerHeight;G.stars=[];for(var i=0;i<120;i++)G.stars.push([Math.random()*Wd,Math.random()*Ht,Math.random()])}size();addEventListener('resize',size);
+function rockShape(n){var p=[];for(var i=0;i<n;i++)p.push(.75+Math.random()*.35);return p}
+function mkRock(v,r,px,py){var a=Math.random()*7;if(px==null){do{px=Math.random()*Wd;py=80+Math.random()*(Ht-80)}while(G.ship&&Math.hypot(px-G.ship.x,py-G.ship.y)<220)}
+  return {x:px,y:py,vx:Math.cos(a)*(.4+Math.random()*.8),vy:Math.sin(a)*(.4+Math.random()*.8),r:r||Math.max(44,Math.min(62,Wd*.05)),v:v,sh:rockShape(11),rot:0,vr:(Math.random()-.5)*.01}}
+function newQ(){G.q=EDU.Q.kali(EDU.rand(2,9),EDU.rand(3,9));EDU.setQ('Tembak: '+G.q.q+' = ?');
+  var o=EDU.Q.opsi(G.q.a,5);G.rocks=G.rocks.filter(function(r){return r.small});
+  o.forEach(function(v){G.rocks.push(mkRock(v))})}
+function start(){G.ship={x:Wd/2,y:Ht/2,a:-Math.PI/2,vx:0,vy:0};G.rocks=[];G.bullets=[];G.score=0;G.lives=3;G.benar=0;G.salah=0;G.run=true;G.inv=2;EDU.setScore(0);EDU.setLives(3);newQ()}
+function boom(px,py,n,c){for(var i=0;i<n;i++){var a=Math.random()*7,s=Math.random()*4;G.parts.push({x:px,y:py,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:40,c:c})}}
+function wrap(o){if(o.x<0)o.x+=Wd;if(o.x>Wd)o.x-=Wd;if(o.y<60)o.y+=Ht-60;if(o.y>Ht)o.y-=Ht-60}
+function update(){
+  var s=G.ship;if(!G.run)return;if(EDU.demo)demo();
+  if(K.ArrowLeft)s.a-=.075;if(K.ArrowRight)s.a+=.075;if(K.ArrowUp){s.vx+=Math.cos(s.a)*.12;s.vy+=Math.sin(s.a)*.12}
+  s.vx*=.99;s.vy*=.99;s.x+=s.vx;s.y+=s.vy;wrap(s);G.cool--;G.inv-=1/60;
+  if(K[' ']&&G.cool<=0){G.bullets.push({x:s.x+Math.cos(s.a)*18,y:s.y+Math.sin(s.a)*18,vx:Math.cos(s.a)*9+s.vx,vy:Math.sin(s.a)*9+s.vy,l:70});G.cool=12;EDU.sfx('tick')}
+  G.bullets=G.bullets.filter(function(b){b.x+=b.vx;b.y+=b.vy;wrap(b);return --b.l>0});
+  G.rocks.forEach(function(r){r.x+=r.vx;r.y+=r.vy;r.rot+=r.vr;wrap(r)});
+  G.bullets.forEach(function(b){G.rocks.forEach(function(r){if(b.l>0&&!r.dead&&Math.hypot(b.x-r.x,b.y-r.y)<r.r){b.l=0;shoot(r)}})});
+  G.rocks=G.rocks.filter(function(r){return !r.dead});
+  if(G.inv<=0)G.rocks.forEach(function(r){if(!r.dead&&Math.hypot(s.x-r.x,s.y-r.y)<r.r+10){G.lives--;EDU.setLives(G.lives);EDU.sfx('boom');boom(s.x,s.y,30,'#fff');s.x=Wd/2;s.y=Ht/2;s.vx=s.vy=0;G.inv=2.5;r.vx*=-1;r.vy*=-1;
+    if(G.lives<=0){G.run=false;setTimeout(function(){EDU.end({key:'asteroid',score:G.score,benar:G.benar,salah:G.salah,max:200,head:'Kapal hancur!'},start)},700)}}});
+}
+function shoot(r){r.dead=true;
+  if(r.small){boom(r.x,r.y,10,'#888');return}
+  if(r.v===G.q.a){G.score+=10;G.benar++;EDU.setScore(G.score);EDU.sfx('ok');boom(r.x,r.y,40,'#5fe3a1');EDU.floatText(r.x,r.y,G.q.q+' = '+r.v,true);setTimeout(newQ,250)}
+  else{G.salah++;G.score=Math.max(0,G.score-5);EDU.setScore(G.score);EDU.sfx('bad');boom(r.x,r.y,20,'#ff5a4a');EDU.floatText(r.x,r.y,r.v+' salah',false);
+    for(var i=0;i<2;i++){var k=mkRock('',r.r*.45,r.x,r.y);k.small=true;k.vx*=2.2;k.vy*=2.2;G.rocks.push(k)}}}
+function draw(){
+  x.fillStyle='#000';x.fillRect(0,0,Wd,Ht);G.stars.forEach(function(s){x.fillStyle='rgba(255,255,255,'+(.2+s[2]*.5)+')';x.fillRect(s[0],s[1],1.5,1.5)});
+  x.lineWidth=2;x.strokeStyle='#fff';x.lineJoin='round';
+  G.rocks.forEach(function(r){x.save();x.translate(r.x,r.y);x.rotate(r.rot);x.beginPath();r.sh.forEach(function(k,i){var a=i/r.sh.length*Math.PI*2;x[i?'lineTo':'moveTo'](Math.cos(a)*r.r*k,Math.sin(a)*r.r*k)});x.closePath();x.strokeStyle=r.small?'#666':'#fff';x.stroke();x.restore();
+    if(r.v!==''){x.fillStyle='#ffe066';x.font='700 '+Math.round(r.r*.62)+'px Space Mono';x.textAlign='center';x.textBaseline='middle';x.fillText(r.v,r.x,r.y)}});
+  var s=G.ship;if(s&&!(G.inv>0&&Math.floor(G.inv*8)%2)){x.save();x.translate(s.x,s.y);x.rotate(s.a);x.strokeStyle='#fff';x.beginPath();x.moveTo(16,0);x.lineTo(-11,-10);x.lineTo(-6,0);x.lineTo(-11,10);x.closePath();x.stroke();
+    if(K.ArrowUp&&Math.random()<.7){x.strokeStyle='#FD5E2B';x.beginPath();x.moveTo(-8,-5);x.lineTo(-18-Math.random()*6,0);x.lineTo(-8,5);x.stroke()}x.restore()}
+  x.fillStyle='#fff';G.bullets.forEach(function(b){x.fillRect(b.x-1.5,b.y-1.5,3,3)});
+  G.parts=G.parts.filter(function(p){p.x+=p.vx;p.y+=p.vy;x.globalAlpha=p.l/40;x.fillStyle=p.c;x.fillRect(p.x,p.y,2,2);x.globalAlpha=1;return --p.l>0});
+}
+/* demo: putar ke asteroid benar, tembak saat lurus */
+function demo(){var s=G.ship,t=G.rocks.find(function(r){return !r.small&&r.v===(G.q&&G.q.a)});K.ArrowLeft=K.ArrowRight=K.ArrowUp=K[' ']=false;if(!t)return;
+  var a=Math.atan2(t.y+t.vy*20-s.y,t.x+t.vx*20-s.x),d=Math.atan2(Math.sin(a-s.a),Math.cos(a-s.a));if(d>.05)K.ArrowRight=true;else if(d<-.05)K.ArrowLeft=true;
+  var dist=Math.hypot(t.x-s.x,t.y-s.y);if(Math.abs(d)<.12)K[' ']=true;if(dist>380&&Math.abs(d)<.3)K.ArrowUp=true;
+  var near=G.rocks.find(function(r){return r!==t&&Math.hypot(r.x-s.x,r.y-s.y)<r.r+60});if(near&&Math.random()<.3)K.ArrowUp=true}
+function loop(){update();draw();requestAnimationFrame(loop)}
+addEventListener('keydown',function(e){if(['ArrowLeft','ArrowRight','ArrowUp',' '].indexOf(e.key)>=0){e.preventDefault();K[e.key]=true}});
+addEventListener('keyup',function(e){K[e.key]=false});
+document.querySelectorAll('.edu-pad button').forEach(function(b){b.addEventListener('pointerdown',function(e){e.preventDefault();K[b.dataset.k]=true});['pointerup','pointerleave','pointercancel'].forEach(function(ev){b.addEventListener(ev,function(){K[b.dataset.k]=false})})});
+requestAnimationFrame(loop);
+EDU.title({key:'asteroid',title:'Asteroid Perkalian',mapel:'Matematika · SD Kelas 3–5',desc:'Tembak asteroid yang membawa hasil perkalian yang benar.',how:['Panah kiri/kanan: putar · Panah atas: maju · Spasi: tembak.','Asteroid benar meledak hijau (+10).','Asteroid salah pecah jadi kepingan berbahaya (−5).']},start);
+</script></body></html>

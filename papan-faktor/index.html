@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Papan Faktor</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#141432;background:radial-gradient(circle at 50% 0,#2a2a66,#101028);color:#fff;display:grid;place-items:center}
+.wrap{margin-top:60px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center}
+#board{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:min(92vw,calc((100vh - 130px)*.72),420px)}
+.t{aspect-ratio:1;border-radius:14px;display:grid;place-items:center;font:700 clamp(18px,4vw,28px) 'Space Mono';color:#141432;position:relative;transition:transform .2s,opacity .3s}
+.t.used{opacity:.25}.t.can{cursor:pointer;outline:3px solid #fff;animation:pul 1s infinite}@keyframes pul{50%{transform:scale(1.06)}}
+.t.f::after{content:'÷';position:absolute;top:2px;right:6px;font-size:13px;opacity:.6}
+.me{grid-column:span 5;display:flex;justify-content:center}
+.me b{background:#fff;color:#141432;border-radius:999px;padding:6px 22px;font:700 30px 'Space Mono';box-shadow:0 0 0 5px #FD5E2B,0 0 30px #FD5E2B;transition:transform .25s}
+.side{width:260px;max-width:92vw}
+.side h3{margin:0 0 6px;color:#ffcf3d}.side p{margin:0 0 10px;color:#c6c6ee;font-size:14px}
+#log{font:700 17px 'Space Mono';display:grid;gap:6px;max-height:40vh;overflow:auto}
+#log div{background:rgba(255,255,255,.08);border-radius:10px;padding:6px 10px;animation:eduIn .3s}#log .d{color:#5fe3a1}#log .a{color:#ff9f6b}
+</style></head><body>
+<div class="wrap"><div id="board"></div><div class="side"><h3>Aturan</h3><p>Turunkan angkamu ke bawah papan. Jika angka di kotak adalah <b>faktor</b> angkamu → <span style="color:#5fe3a1">dibagi</span>. Jika bukan → <span style="color:#ff9f6b">ditambah</span>. Capai <b>1</b>!</p><div id="log"></div></div></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Papan Faktor: remake factors-game (mnito, MIT). Kode ditulis ulang. */
+var C=5,R=6,COL=['#ff6b6b','#ffa94d','#ffd43b','#69db7c','#4dabf7','#9775fa'];
+var G={b:[],n:0,start:0,row:-1,col:2,lvl:1,score:0,moves:0,run:false};
+EDU.hud({title:'Papan Faktor',credit:'Remake Factors Game · Michael Nitowski (MIT)'});
+function gen(){var path=[],c=2,prod=1;G.b=[];for(var r=0;r<R;r++){c=Math.max(0,Math.min(C-1,c+EDU.rand(-1,1)));path.push(c);var row=[];for(var k=0;k<C;k++)row.push(EDU.rand(2,9));G.b.push(row)}
+  var f=[];for(r=0;r<R;r++){var v=r<Math.min(R,2+G.lvl)?EDU.pick([2,2,3,3,5,7]):null;if(v){G.b[r][path[r]]=v;f.push(v)}}
+  prod=f.reduce(function(a,b){return a*b},1);
+  for(r=0;r<R;r++)if(f.length&&r>=f.length&&r<R)G.b[r][path[r]]=EDU.pick([4,6,8,9]);
+  G.start=prod;G.n=prod;G.row=-1;G.col=path[0];G.moves=0;G.used={};EDU.setQ('Mulai dari '+prod+' → capai 1');EDU.$('#log').innerHTML='';draw()}
+function opts(){if(G.row>=R-1)return [];var r=G.row+1;if(G.row<0)return [0,1,2,3,4].map(function(c){return [r,c]});return [-1,0,1].map(function(d){return [r,G.col+d]}).filter(function(p){return p[1]>=0&&p[1]<C})}
+function draw(){var h='<div class="me"><b id="me">'+G.n+'</b></div>',op=opts();
+  G.b.forEach(function(row,r){row.forEach(function(v,c){var can=op.some(function(p){return p[0]===r&&p[1]===c});h+='<div class="t'+(can?' can':'')+(G.used[r+','+c]?'':(r<=G.row?' used':''))+(G.n%v===0?' f':'')+'" data-r="'+r+'" data-c="'+c+'" style="background:'+COL[r]+(G.used[r+','+c]?';box-shadow:0 0 0 4px #fff inset':'')+'">'+v+'</div>'})});
+  EDU.$('#board').innerHTML=h}
+EDU.$('#board').onclick=function(e){var t=e.target.closest('.t.can');if(t)step(+t.dataset.r,+t.dataset.c)};
+function step(r,c){var v=G.b[r][c],old=G.n,line;G.row=r;G.col=c;G.used[r+','+c]=1;G.moves++;
+  if(old%v===0){G.n=old/v;line='<div class="d">'+old+' ÷ '+v+' = '+G.n+'</div>';EDU.sfx('ok')}else{G.n=old+v;line='<div class="a">'+old+' + '+v+' = '+G.n+'</div>';EDU.sfx('bad')}
+  EDU.$('#log').insertAdjacentHTML('beforeend',line);EDU.setQ(line.replace(/<[^>]+>/g,''));draw();
+  if(G.row>=R-1||G.n===1)setTimeout(done,500)}
+function done(){var pts=G.n===1?100:Math.max(5,50-G.n);G.score+=pts;EDU.setScore(G.score);
+  if(G.n===1){EDU.toast('🎉 Sampai di 1! +100',true);EDU.sfx('win')}else EDU.toast('Hasil akhir '+G.n+' · +'+pts);
+  G.lvl++;if(G.lvl>5){G.run=false;EDU.end({key:'faktor',score:G.score,max:500,head:'5 level selesai!'},start)}else setTimeout(gen,1300)}
+function start(){G.lvl=1;G.score=0;G.run=true;EDU.setScore(0);gen();if(EDU.demo)setTimeout(auto,900)}
+/* demo: cari jalur terbaik (min angka akhir) */
+function best(row,col,n){if(n===1||row>=R-1)return {n:n,p:[]};var r=row+1,cs=row<0?[0,1,2,3,4]:[col-1,col,col+1],b=null;
+  cs.forEach(function(c){if(c<0||c>=C)return;var v=G.b[r][c],m=n%v===0?n/v:n+v,s=best(r,c,m);if(!b||s.n<b.n||(s.n===b.n&&s.p.length<b.p.length-1))b={n:s.n,p:[c].concat(s.p)}});return b}
+function auto(){if(!G.run||document.querySelector('.edu-ov'))return setTimeout(auto,600);if(G.row>=R-1||G.n===1)return setTimeout(auto,600);
+  var b=best(G.row,G.col,G.n);if(b&&b.p.length)step(G.row+1,b.p[0]);setTimeout(auto,750)}
+EDU.title({key:'faktor',title:'Papan Faktor',mapel:'Matematika · SD Kelas 5 – SMP',desc:'Turunkan angkamu melewati papan. Faktor membagi, bukan-faktor menambah. Capai 1!',how:['Klik salah satu kotak bercahaya di baris bawahnya.','Kotak = faktor angkamu → dibagi. Bukan faktor → ditambah.','Sampai di 1 = +100. Selesaikan 5 level.']},start);
+</script></body></html>

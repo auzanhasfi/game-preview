@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Tembak Jawaban Hewan</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>body{background:#070b1f}#cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
+#fuel{position:fixed;right:16px;top:80px;bottom:80px;width:18px;border-radius:10px;background:rgba(255,255,255,.12);z-index:30;overflow:hidden}#fuel div{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(#ffe066,#FD5E2B);transition:height .3s}
+#fuel+span{position:fixed;right:8px;bottom:52px;color:#ffe066;font:700 12px 'Space Mono';z-index:30}</style></head><body>
+<canvas id="cv"></canvas><div id="fuel"><div id="fv" style="height:100%"></div></div><span>BENSIN</span>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Tembak Jawaban Hewan: remake star-battle (gd4Ark, MIT). Kode ditulis ulang: + skor kalau tembak benar, − kalau tembak salah, bensin. */
+var HERB=['Sapi','Kambing','Kelinci','Rusa','Jerapah','Kuda','Gajah','Zebra'],KARN=['Harimau','Singa','Elang','Buaya','Serigala','Hiu','Ular','Burung hantu'];
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),Wd,Ht,K={};
+var G={s:null,en:[],bul:[],parts:[],stars:[],score:0,fuel:100,run:false,rule:0,benar:0,salah:0,next:0,cool:0,cnt:0};
+EDU.hud({title:'Tembak Jawaban Hewan',credit:'Remake Star Battle · gd4Ark (MIT)'});
+function size(){Wd=cv.width=innerWidth;Ht=cv.height=innerHeight;G.stars=[];for(var i=0;i<140;i++)G.stars.push([Math.random()*Wd,Math.random()*Ht,Math.random()*2+.5])}size();addEventListener('resize',size);
+function ruleName(){return G.rule?'KARNIVORA (pemakan daging)':'HERBIVORA (pemakan tumbuhan)'}
+function good(e){return G.rule?KARN.indexOf(e.t)>=0:HERB.indexOf(e.t)>=0}
+function start(){G.s={x:Wd/2,y:Ht-90};G.en=[];G.bul=[];G.score=0;G.fuel=100;G.rule=0;G.benar=0;G.salah=0;G.next=0;G.cnt=0;G.run=true;EDU.setScore(0);EDU.setQ('Tembak: '+ruleName())}
+function spawn(){var g=Math.random()<.5,t=EDU.pick(G.rule?(g?KARN:HERB):(g?HERB:KARN));var lanes=Math.max(3,Math.floor((Wd-120)/170)),l=EDU.rand(0,lanes-1);
+  G.en.push({x:80+l*(Wd-160)/(lanes-1||1),y:60,t:t,vy:1+Math.random()*.7+G.score/600,wob:Math.random()*6});G.next=EDU.rand(30,52)}
+function update(){
+  if(!G.run)return;var s=G.s;if(EDU.demo)demo();
+  if(K.L)s.x-=7;if(K.R)s.x+=7;s.x=Math.max(30,Math.min(Wd-50,s.x));
+  G.fuel-=.045;if(G.fuel<=0){G.fuel=0;over()}EDU.$('#fv').style.height=G.fuel+'%';
+  if(--G.next<=0)spawn();G.cool--;if((K.F||EDU.demo&&K.F!==false)&&G.cool<=0){G.bul.push({x:s.x,y:s.y-26});G.cool=11;EDU.sfx('tick')}
+  G.bul=G.bul.filter(function(b){b.y-=11;return b.y>40});
+  G.en.forEach(function(e){e.y+=e.vy;e.wob+=.03;e.x+=Math.sin(e.wob)*.6});
+  G.bul.forEach(function(b){G.en.forEach(function(e){if(!e.dead&&b.y>0&&Math.abs(b.x-e.x)<56&&Math.abs(b.y-e.y)<26){b.y=-99;e.dead=true;hit(e)}})});
+  G.en=G.en.filter(function(e){return !e.dead&&e.y<Ht+30});
+}
+function hit(e){var ok=good(e);for(var i=0;i<24;i++){var a=Math.random()*7,v=Math.random()*5;G.parts.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:35,c:ok?'#5fe3a1':'#ff5a4a'})}
+  if(ok){G.score+=10;G.benar++;G.fuel=Math.min(100,G.fuel+9);EDU.sfx('ok');EDU.floatText(e.x,e.y,'+10 ⛽',true);if(++G.cnt%7===0){G.rule=1-G.rule;EDU.setQ('Tembak: '+ruleName());EDU.toast('Ganti target: '+ruleName())}}
+  else{G.score=Math.max(0,G.score-5);G.salah++;G.fuel-=12;EDU.sfx('bad');EDU.floatText(e.x,e.y,'−5 '+e.t+' bukan '+(G.rule?'karnivora':'herbivora'),false)}EDU.setScore(G.score)}
+function over(){if(!G.run)return;G.run=false;EDU.end({key:'tembak',score:G.score,benar:G.benar,salah:G.salah,max:300,head:'Bensin habis!'},start)}
+function demo(){var s=G.s;K.L=K.R=false;K.F=false;
+  var blocked=function(t){return G.en.some(function(e){return !good(e)&&Math.abs(e.x-t.x)<60&&e.y>t.y&&e.y<s.y-30})};
+  var c=G.en.filter(function(e){return good(e)&&e.y<s.y-80&&e.y>70});var t=c.filter(function(e){return !blocked(e)}).sort(function(a,b){return Math.abs(a.x-s.x)-Math.abs(b.x-s.x)})[0];
+  if(!t)return;if(t.x<s.x-8)K.L=true;else if(t.x>s.x+8)K.R=true;if(Math.abs(t.x-s.x)<30)K.F=true}
+function ship(px,py){x.save();x.translate(px,py);x.fillStyle='#cfd8ff';x.beginPath();x.moveTo(0,-30);x.lineTo(14,6);x.lineTo(30,18);x.lineTo(10,18);x.lineTo(0,26);x.lineTo(-10,18);x.lineTo(-30,18);x.lineTo(-14,6);x.closePath();x.fill();
+  x.fillStyle='#FD5E2B';x.beginPath();x.ellipse(0,-6,6,11,0,0,7);x.fill();x.fillStyle='rgba(255,180,60,'+(.5+Math.random()*.5)+')';x.beginPath();x.moveTo(-7,24);x.lineTo(0,40+Math.random()*12);x.lineTo(7,24);x.fill();x.restore()}
+function enemy(e){x.save();x.translate(e.x,e.y);x.fillStyle='#6b3bd6';x.beginPath();x.ellipse(0,0,58,22,0,0,7);x.fill();x.fillStyle='#9a7bff';x.beginPath();x.ellipse(0,-10,26,16,0,Math.PI,0);x.fill();
+  x.fillStyle='#fff';x.font='700 17px Space Grotesk';x.textAlign='center';x.textBaseline='middle';x.fillText(e.t,0,4);x.restore()}
+function draw(){
+  x.fillStyle='#070b1f';x.fillRect(0,0,Wd,Ht);G.stars.forEach(function(s){s[1]+=s[2]*.8;if(s[1]>Ht)s[1]=0;x.fillStyle='rgba(255,255,255,'+(s[2]/3)+')';x.fillRect(s[0],s[1],s[2],s[2])});
+  G.en.forEach(enemy);x.fillStyle='#ffe066';G.bul.forEach(function(b){x.fillRect(b.x-2,b.y-10,4,14)});
+  G.parts=G.parts.filter(function(p){p.x+=p.vx;p.y+=p.vy;x.globalAlpha=p.l/35;x.fillStyle=p.c;x.fillRect(p.x,p.y,3,3);x.globalAlpha=1;return --p.l>0});
+  if(G.s)ship(G.s.x,G.s.y);
+}
+function loop(){update();draw();requestAnimationFrame(loop)}
+addEventListener('keydown',function(e){if(e.key==='ArrowLeft')K.L=true;if(e.key==='ArrowRight')K.R=true;if(e.key===' '){e.preventDefault();K.F=true}});
+addEventListener('keyup',function(e){if(e.key==='ArrowLeft')K.L=false;if(e.key==='ArrowRight')K.R=false;if(e.key===' ')K.F=false});
+cv.addEventListener('pointerdown',function(e){K.F=true;G.s&&(G.s.x=e.clientX)});cv.addEventListener('pointermove',function(e){if(e.buttons||e.pointerType==='mouse')G.s&&(G.s.x=e.clientX)});cv.addEventListener('pointerup',function(){K.F=false});
+requestAnimationFrame(loop);
+EDU.title({key:'tembak',title:'Tembak Jawaban Hewan',mapel:'IPA · SD Kelas 4–6',desc:'Tembak pesawat yang membawa hewan sesuai target. Bensin terus berkurang!',how:['Gerak: mouse/jari atau panah · Tembak: klik/tahan atau spasi.','Tembak benar: +10 dan bensin bertambah.','Tembak salah: −5 dan bensin berkurang. Target berganti tiap 7 tembakan.']},start);
+</script></body></html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Paspor Perkalian</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+html{overflow:auto}
+body{background:#e9f4ff;background:radial-gradient(circle at 20% 10%,#fff,#dceeff 60%,#c4e0ff);color:#16325c;overflow:auto}
+.app{max-width:900px;margin:70px auto 20px;padding:0 14px;display:grid;grid-template-columns:300px 1fr;gap:18px}
+@media (max-width:760px){.app{grid-template-columns:1fr}}
+.pass{background:#16325c;color:#fff;border-radius:22px;padding:18px;box-shadow:0 14px 30px rgba(22,50,92,.3)}
+.pass h2{margin:0 0 2px;font-size:20px}.pass small{color:#9cc0ef}
+.stamps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.st{aspect-ratio:1;border-radius:50%;border:3px dashed #3d6aa8;display:grid;place-items:center;font:700 22px 'Space Mono';color:#6f95c8;cursor:pointer;background:none;position:relative}
+.st.on{border:4px solid #ffcf3d;color:#ffcf3d;background:rgba(255,207,61,.12);transform:rotate(-8deg)}
+.st.cur{box-shadow:0 0 0 4px #FD5E2B}
+.st.on::after{content:'LULUS';position:absolute;bottom:14%;font:700 9px 'Space Grotesk';letter-spacing:.1em}
+.badges{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}.badges span{background:#24467a;border-radius:999px;padding:4px 10px;font-size:12px;opacity:.35}.badges span.on{opacity:1;background:#FD5E2B}
+.card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 14px 30px rgba(22,50,92,.15);text-align:center}
+.prog{display:flex;gap:4px;justify-content:center;margin-bottom:12px}.prog i{width:22px;height:8px;border-radius:4px;background:#dbe7f6}.prog i.ok{background:#3ecf8e}.prog i.no{background:#ff6b5b}.prog i.now{background:#FD5E2B}
+.qq{font:700 clamp(44px,9vw,76px) 'Space Mono';margin:4px 0}.ans{font:700 40px 'Space Mono';min-height:56px;border-bottom:4px solid #dbe7f6;width:180px;margin:0 auto 14px;color:#FD5E2B}
+.ans.ok{color:#3ecf8e;border-color:#3ecf8e}.ans.no{color:#ff6b5b;border-color:#ff6b5b;animation:sh .3s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:300px;margin:0 auto}.pad button{border:0;border-radius:14px;padding:13px 0;font:700 24px 'Space Mono';background:#eef5ff;color:#16325c;box-shadow:0 4px 0 #cfe0f5;cursor:pointer}
+.pad button:active,.pad button.pr{transform:translateY(3px);box-shadow:0 1px 0 #cfe0f5}.pad .go{background:#FD5E2B;color:#fff;box-shadow:0 4px 0 #b8401a}
+.streak{font-weight:700;margin-top:10px;color:#FD5E2B}.rev{font-size:13px;color:#6f86a8;margin-top:6px}
+</style></head><body>
+<div class="app"><div class="pass"><small>PASPOR PERKALIAN</small><h2>Kumpulkan 9 cap!</h2><div class="stamps" id="stamps"></div><div class="badges" id="badges"></div></div>
+<div class="card"><div class="prog" id="prog"></div><div class="qq" id="qq">7 × 8</div><div class="ans" id="ans"></div>
+<div class="pad" id="pad"></div><div class="streak" id="streak"></div><div class="rev" id="rev"></div></div></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Paspor Perkalian: terinspirasi mathtable (madskristensen, Apache-2.0): hub tabel, streak, cap paspor, ulang soal yang salah. Kode ditulis ulang. */
+var S={stamps:{},tab:7,list:[],i:0,res:[],inp:'',streak:0,best:0,score:0,wrong:[]};
+try{S.stamps=JSON.parse(localStorage.getItem('paspor_cap'))||{}}catch(e){}
+if(EDU.demo)S.stamps={2:1,3:1,5:1};
+EDU.hud({title:'Paspor Perkalian',credit:'Terinspirasi Math Table · Mads Kristensen (Apache-2.0)'});EDU.$('.edu-credit').classList.add('dark');
+var BADGE=[['🔥 Streak 5',function(){return S.best>=5}],['⚡ Streak 10',function(){return S.best>=10}],['🏅 3 cap',function(){return Object.keys(S.stamps).length>=3}],['👑 Semua cap',function(){return Object.keys(S.stamps).length>=9}]];
+function side(){EDU.$('#stamps').innerHTML=[2,3,4,5,6,7,8,9,10].map(function(n){return '<button class="st'+(S.stamps[n]?' on':'')+(n===S.tab?' cur':'')+'" data-t="'+n+'">×'+n+'</button>'}).join('');
+  EDU.$('#badges').innerHTML=BADGE.map(function(b){return '<span class="'+(b[1]()?'on':'')+'">'+b[0]+'</span>'}).join('')}
+EDU.$('#stamps').onclick=function(e){var b=e.target.closest('[data-t]');if(b)begin(+b.dataset.t)};
+EDU.$('#pad').innerHTML=[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(function(k){return '<button class="'+(k==='✓'?'go':'')+'" data-k="'+k+'">'+k+'</button>'}).join('');
+EDU.$('#pad').onclick=function(e){var b=e.target.closest('[data-k]');if(b)key(b.dataset.k)};
+document.addEventListener('keydown',function(e){if(/^[0-9]$/.test(e.key))key(e.key);if(e.key==='Backspace')key('⌫');if(e.key==='Enter')key('✓')});
+function begin(t){S.tab=t;var b=EDU.shuffle([1,2,3,4,5,6,7,8,9,10]).slice(0,8);S.list=b.map(function(k){return {a:t,b:k}});S.i=0;S.res=[];S.wrong=[];show();side()}
+function show(){var q=S.list[S.i];EDU.$('#qq').textContent=q.a+' × '+q.b;S.inp='';EDU.$('#ans').textContent='';EDU.$('#ans').className='ans';EDU.setQ('Tabel ×'+S.tab+' · soal '+(S.i+1)+'/'+S.list.length);
+  EDU.$('#prog').innerHTML=S.list.map(function(_,i){return '<i class="'+(S.res[i]===true?'ok':S.res[i]===false?'no':i===S.i?'now':'')+'"></i>'}).join('');
+  EDU.$('#streak').textContent=S.streak?'🔥 '+S.streak+' benar berturut-turut':'';EDU.$('#rev').textContent=S.wrong.length?'Soal yang salah akan diulang di akhir: '+S.wrong.map(function(q){return q.a+'×'+q.b}).join(', '):''}
+function key(k){var a=EDU.$('#ans');if(a.classList.contains('ok')||a.classList.contains('no'))return;
+  if(k==='⌫')S.inp=S.inp.slice(0,-1);else if(k==='✓'){if(S.inp)check();return}else if(S.inp.length<3)S.inp+=k;a.textContent=S.inp}
+function check(){var q=S.list[S.i],ok=+S.inp===q.a*q.b,a=EDU.$('#ans');
+  if(S.res[S.i]==null)S.res[S.i]=ok;
+  if(ok){S.streak++;S.best=Math.max(S.best,S.streak);S.score+=10+S.streak;EDU.setScore(S.score);EDU.sfx('ok');a.className='ans ok'}
+  else{S.streak=0;EDU.sfx('bad');a.className='ans no';a.textContent=q.a*q.b;S.wrong.push(q);S.list.push(q);S.res.push(undefined)}
+  setTimeout(function(){S.i++;if(S.i>=S.list.length)done();else show()},ok?550:1300)}
+function done(){var semua=S.res.slice(0,8).every(function(r){return r===true});if(S.res.slice(0,8).filter(Boolean).length>=7){S.stamps[S.tab]=1;try{localStorage.setItem('paspor_cap',JSON.stringify(S.stamps))}catch(e){}EDU.toast('🛂 Cap ×'+S.tab+' didapat!',true);EDU.sfx('win')}
+  side();EDU.end({key:'paspor',score:S.score,benar:S.res.filter(function(r){return r===true}).length,salah:S.wrong.length,max:200,head:S.stamps[S.tab]?'Cap ×'+S.tab+' didapat!':'Coba lagi untuk cap',note:'<p>Benar minimal 7 dari 8 untuk mendapat cap.</p>'},function(){begin(EDU.demo?EDU.pick([4,6,8,9]):S.tab)})}
+/* demo: menekan tombol angka satu per satu */
+function auto(){var q=S.list[S.i],a=EDU.$('#ans');if(!q||a.classList.contains('ok')||a.classList.contains('no')||document.querySelector('.edu-ov'))return setTimeout(auto,400);
+  var target=String(Math.random()<.88?q.a*q.b:q.a*q.b+EDU.pick([-1,1,10]));var nk=S.inp.length<target.length?target[S.inp.length]:'✓';
+  var b=EDU.$('#pad [data-k="'+nk+'"]');b.classList.add('pr');setTimeout(function(){b.classList.remove('pr')},120);key(nk);setTimeout(auto,nk==='✓'?500:260)}
+side();
+EDU.title({key:'paspor',title:'Paspor Perkalian',mapel:'Matematika · SD Kelas 2–4',desc:'Pilih tabel perkalian, jawab 8 soal, kumpulkan cap di paspormu.',how:['Klik cap ×2 sampai ×10 untuk memilih tabel.','Ketik jawaban dengan tombol angka lalu ✓.','Benar 7 dari 8 = dapat cap. Soal yang salah diulang di akhir.']},function(){begin(S.tab);if(EDU.demo)setTimeout(auto,400)});
+</script></body></html>

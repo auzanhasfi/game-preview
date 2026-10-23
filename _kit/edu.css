@@ -1,0 +1,43 @@
+/* EDU KIT: gaya bersama 20 contoh game (HUD, layar judul/hasil, toast) */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@700&display=swap');
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;font-family:'Space Grotesk',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.edu-hud{position:fixed;left:10px;right:10px;top:10px;z-index:50;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 14px;border-radius:16px;background:rgba(255,250,240,.94);color:#2a1a10;box-shadow:0 6px 20px rgba(0,0,0,.18);font-size:15px}
+.edu-title{font-size:14px;white-space:nowrap;color:#FD5E2B}
+.edu-q{font-family:'Space Mono',monospace;font-size:20px;background:#2a1a10;color:#fff;padding:4px 12px;border-radius:10px;min-height:1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56vw}
+.edu-q:empty{display:none}
+.edu-q.flash{animation:eduFlash .5s}
+@keyframes eduFlash{0%{transform:scale(1.25)}100%{transform:scale(1)}}
+.edu-sp{flex:1}
+.edu-stat{font-weight:700;white-space:nowrap}
+.edu-stat.bump{animation:eduFlash .35s}
+.edu-mute{border:0;background:#f1e6d2;border-radius:10px;width:34px;height:34px;font-size:16px;cursor:pointer}
+.edu-credit{position:fixed;left:10px;bottom:8px;z-index:40;font-size:11px;color:rgba(255,255,255,.75);text-shadow:0 1px 2px rgba(0,0,0,.6);pointer-events:none}
+.edu-credit.dark{color:rgba(40,25,15,.6);text-shadow:none}
+.edu-ov{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(20,12,6,.55);padding:16px;backdrop-filter:blur(3px)}
+.edu-card{width:min(440px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#F9F3E5;color:#2a1a10;border-radius:24px;padding:22px 22px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:eduIn .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes eduIn{from{transform:translateY(30px) scale(.94)}to{transform:none}}
+.edu-mas{width:74px;height:74px;margin:-4px auto 4px;animation:eduBob 2s ease-in-out infinite}
+@keyframes eduBob{50%{transform:translateY(-6px) rotate(-4deg)}}
+.edu-card small{font-family:'Space Mono',monospace;color:#FD5E2B;text-transform:uppercase;letter-spacing:.08em;font-size:12px}
+.edu-card h1{margin:4px 0 6px;font-size:28px;line-height:1.1}
+.edu-card p{margin:0 0 10px;color:#5a4636;font-size:15px}
+.edu-card ol{text-align:left;margin:0 0 14px;padding-left:22px;font-size:14.5px;color:#3d2c1f}
+.edu-card li{margin:4px 0}
+.edu-btn{border:0;background:#FD5E2B;color:#fff;font:700 18px 'Space Grotesk',sans-serif;padding:13px 26px;border-radius:14px;cursor:pointer;box-shadow:0 5px 0 #b8401a;width:100%}
+.edu-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #b8401a}
+.edu-best{margin-top:10px;font-size:13px;color:#7a6452}
+.edu-stars{font-size:38px;color:#FFB020;letter-spacing:4px}.edu-stars i{color:#e0d3bd;font-style:normal}
+.edu-res{display:flex;gap:8px;justify-content:center;margin:10px 0 14px}
+.edu-res div{background:#fff;border-radius:14px;padding:8px 12px;min-width:70px}
+.edu-res b{display:block;font-size:22px}.edu-res span{font-size:12px;color:#7a6452}
+.edu-toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:90;padding:10px 18px;border-radius:14px;background:#2a1a10;color:#fff;font-weight:700;font-size:17px;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:eduIn .3s;max-width:92vw;text-align:center}
+.edu-toast.good{background:#12946A}.edu-toast.bad{background:#d63a2b}
+.edu-float{position:fixed;z-index:85;font:700 24px 'Space Mono',monospace;pointer-events:none;transform:translate(-50%,-50%);animation:eduUp .9s forwards;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.edu-float.good{color:#3ee08f}.edu-float.bad{color:#ff5a4a}
+@keyframes eduUp{to{transform:translate(-50%,-140%);opacity:0}}
+.edu-pad{position:fixed;bottom:14px;z-index:45;display:flex;gap:10px}
+.edu-pad button{width:62px;height:62px;border-radius:50%;border:0;background:rgba(255,250,240,.85);font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,.25);touch-action:none}
+@media (hover:hover) and (pointer:fine){.edu-pad.touch{display:none}}
+@media (max-width:640px){.edu-hud{flex-wrap:wrap;font-size:13px;gap:6px}.edu-title{display:none}.edu-q{font-size:16px;max-width:none;order:9;flex-basis:100%;text-align:center}}
+.demo .edu-pad{display:none!important}

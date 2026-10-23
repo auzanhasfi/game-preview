@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Misi Air — Vesper Street (versi edukasi)</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #07090c; overflow: hidden; font-family: "Segoe UI", system-ui, sans-serif; color: #c8ccd0; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; cursor: crosshair; }
+  #hud { position: fixed; inset: 0; pointer-events: none; }
+  #hud.hidden { display: none; }
+  #title { position: absolute; left: 22px; top: 18px; letter-spacing: 0.32em; font-size: 12px; text-transform: uppercase; color: #9aa0a6; opacity: 0.85; }
+  #title b { display: block; font-size: 20px; letter-spacing: 0.22em; color: #e6e1d6; font-weight: 500; margin-bottom: 4px; text-shadow: 0 0 18px rgba(255, 200, 140, 0.25); }
+  #hint { position: absolute; left: 22px; bottom: 18px; font-size: 12px; color: #8a9096; letter-spacing: 0.08em; line-height: 1.7; }
+  #hint span { color: #d8d2c4; }
+  #stats { position: absolute; right: 18px; top: 18px; font-size: 11px; color: #7d848a; letter-spacing: 0.12em; text-align: right; font-variant-numeric: tabular-nums; }
+  #stats #quality { text-transform: uppercase; }
+  #objective { position: absolute; left: 50%; top: 22px; transform: translateX(-50%); font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: #d8d2c4; text-shadow: 0 0 12px rgba(0,0,0,0.9); max-width: 70vw; text-align: center; }
+  #objective.flash { animation: objflash 1.6s ease-out; }
+  @keyframes objflash { 0% { color: #fff3d8; text-shadow: 0 0 22px rgba(255, 220, 160, 0.8); } 100% { color: #d8d2c4; } }
+  #status { position: absolute; right: 22px; bottom: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  #battery { width: 120px; height: 8px; border: 1px solid #6a7077; padding: 1px; position: relative; }
+  #battery::after { content: ""; position: absolute; right: -5px; top: 2px; width: 3px; height: 4px; background: #6a7077; }
+  #batteryFill { height: 100%; background: #e6d29a; transition: width 0.3s linear; }
+  #battery.low #batteryFill { background: #d8503a; animation: blink 0.9s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0.35; } }
+  #sanity { display: flex; gap: 6px; }
+  #sanity i { display: block; width: 10px; height: 10px; border: 1px solid #b8b0a0; transform: rotate(45deg); background: #d8c8b0; }
+  #sanity i.off { background: transparent; border-color: #4a4f55; }
+  #static { display: flex; gap: 3px; align-items: flex-end; height: 14px; }
+  #static i { display: block; width: 6px; background: #3a3f45; }
+  #static i:nth-child(1) { height: 4px; } #static i:nth-child(2) { height: 7px; } #static i:nth-child(3) { height: 10px; } #static i:nth-child(4) { height: 14px; }
+  #static i.on { background: #e6e1d6; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+  #prompt { position: fixed; pointer-events: none; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #f0e8d8; background: rgba(6, 8, 10, 0.75); padding: 4px 8px; border: 1px solid rgba(255, 240, 220, 0.25); opacity: 0; transition: opacity 0.15s; }
+  #prompt.show { opacity: 1; }
+  #toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); font-size: 14px; color: #e6e1d6; letter-spacing: 0.06em; background: rgba(6, 8, 10, 0.7); padding: 8px 16px; border-left: 2px solid #c8b890; opacity: 0; transition: opacity 0.4s; pointer-events: none; max-width: 60vw; text-align: center; }
+  #toast.show { opacity: 1; }
+  #fade { position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.7s ease; }
+  #fade.show { opacity: 1; pointer-events: all; }
+  #card { position: fixed; inset: 0; display: grid; place-items: center; text-align: center; pointer-events: none; opacity: 0; transition: opacity 1.2s ease; }
+  #card.show { opacity: 1; }
+  #card h1 { font-size: 44px; letter-spacing: 0.34em; font-weight: 400; color: #ece6d8; margin: 0 0 14px; text-shadow: 0 0 30px rgba(0,0,0,1); text-transform: uppercase; }
+  #card p { font-size: 15px; color: #a8aeb4; letter-spacing: 0.1em; max-width: 520px; line-height: 1.7; margin: 0; text-shadow: 0 0 12px #000; }
+  .overlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(4, 5, 7, 0.55); opacity: 0; pointer-events: none; transition: opacity 0.35s; cursor: pointer; }
+  .overlay.show { opacity: 1; pointer-events: all; }
+  .paper { width: min(520px, 86vw); background: #e8e0cc; color: #2a2622; padding: 34px 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); transform: rotate(-1.2deg); font-family: "Courier New", Courier, monospace; }
+  .paper h2 { margin: 0 0 16px; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: #6a5a48; font-weight: 600; }
+  .paper pre { white-space: pre-wrap; font-family: inherit; font-size: 15px; line-height: 1.65; margin: 0; min-height: 120px; }
+  .paper small { display: block; margin-top: 18px; font-size: 11px; letter-spacing: 0.15em; color: #8a7a68; text-transform: uppercase; }
+  .phone { width: min(560px, 86vw); background: #0b0d10; color: #cfe4ff; padding: 30px 38px; border: 1px solid rgba(160, 200, 255, 0.25); box-shadow: 0 0 60px rgba(120, 160, 255, 0.15); font-family: "Courier New", Courier, monospace; }
+  .phone h2 { margin: 0 0 12px; font-size: 12px; letter-spacing: 0.3em; color: #6f8aa8; font-weight: 600; text-transform: uppercase; }
+  .phone pre { white-space: pre-wrap; font-family: inherit; font-size: 16px; line-height: 1.8; margin: 0; min-height: 140px; text-shadow: 0 0 8px rgba(160, 200, 255, 0.4); }
+  .phone small { display: block; margin-top: 16px; font-size: 11px; letter-spacing: 0.15em; color: #4f6a88; text-transform: uppercase; min-height: 14px; }
+  #death { position: fixed; inset: 0; display: grid; place-items: center; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.5s; text-align: center; }
+  #death.show { opacity: 1; }
+  #death p { font-size: 18px; letter-spacing: 0.24em; text-transform: uppercase; color: #b8b0a0; }
+  #menu, #ending { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(4, 5, 7, 0.62); opacity: 0; pointer-events: none; transition: opacity 0.6s; text-align: center; }
+  #menu.show, #ending.show { opacity: 1; pointer-events: all; }
+  #menu h1, #ending h1 { font-size: 52px; letter-spacing: 0.4em; font-weight: 400; color: #ece6d8; margin: 0 0 8px; text-transform: uppercase; text-shadow: 0 0 34px rgba(255, 200, 140, 0.25); }
+  #menu p, #ending p { color: #a8aeb4; letter-spacing: 0.1em; font-size: 14px; max-width: 560px; line-height: 1.7; white-space: pre-wrap; }
+  #menu button { font: inherit; letter-spacing: 0.3em; text-transform: uppercase; font-size: 14px; color: #ece6d8; background: transparent; border: 1px solid rgba(236, 230, 216, 0.4); padding: 12px 34px; margin: 10px; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+  #menu button:hover { background: rgba(236, 230, 216, 0.1); border-color: #ece6d8; }
+  #menu .controls { font-size: 12px; color: #7d848a; margin-top: 26px; }
+  #menu .controls span { color: #d8d2c4; }
+  #nomod { position: fixed; inset: 0; display: none; place-items: center; background: #07090c; color: #c8ccd0; font-size: 14px; text-align: center; line-height: 1.8; }
+  #quiz { margin-top: 16px; display: grid; gap: 8px; }
+  #quiz b { font-size: 14px; line-height: 1.5; color: #3a2a1a; }
+  #quiz button { font: inherit; font-size: 14px; text-align: left; padding: 9px 12px; background: #f4ecd8; border: 1px solid #a8987e; color: #2a2622; cursor: pointer; }
+  #quiz button:hover:not(:disabled) { background: #fff7e2; border-color: #2a2622; }
+  #quiz button.ok { background: #cfe8c4; border-color: #3f7a32; }
+  #quiz button.no { background: #f0c8bc; border-color: #9a3a2a; }
+  #quiz button:disabled { cursor: default; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" } }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div id="title"><b>Misi Air</b>IPA · siklus air &amp; banjir<br><span id="eduScore" style="color:#e6d29a">Skor IPA 0/7</span></div>
+  <div id="objective"></div>
+  <div id="hint"><span>klik</span> jalan / pakai &nbsp;·&nbsp; <span>seret</span> putar &nbsp;·&nbsp; <span>scroll</span> zoom &nbsp;·&nbsp; <span>F</span> senter &nbsp;·&nbsp; <span>M</span> suara</div>
+  <div id="stats"><div id="fps">— fps</div><div id="quality">high</div></div>
+  <div id="status">
+    <div id="static"><i></i><i></i><i></i><i></i></div>
+    <div id="sanity"><i></i><i></i><i></i></div>
+    <div id="battery"><div id="batteryFill"></div></div>
+  </div>
+</div>
+<div id="prompt"></div>
+<div id="toast"></div>
+<div id="fade"></div>
+<div id="card"><div><h1 id="cardTitle"></h1><p id="cardSub"></p></div></div>
+<div id="note" class="overlay"><div class="paper"><h2 id="noteTitle"></h2><pre id="noteBody"></pre><div id="quiz"></div><small id="noteHint">klik untuk menutup</small></div></div>
+<div id="call" class="overlay"><div class="phone"><h2>— line open —</h2><pre id="callBody"></pre><small id="callHint"></small></div></div>
+<div id="death"><div><p id="deathText"></p></div></div>
+<div id="ending"><div><h1 id="endTitle"></h1><p id="endBody"></p><p style="font-size:11px;color:#6a7077;letter-spacing:0.2em">CLICK TO RETURN</p></div></div>
+<div id="menu"><div>
+  <h1>Misi Air</h1>
+  <p>Kota Vesper tenggelam setelah waduk jebol.
+Kumpulkan 7 catatan ilmuwan, pelajari siklus air dan banjir,
+lalu jawab soalnya untuk menambah baterai senter.</p>
+  <div><button id="btnNew">Mulai</button><button id="btnContinue">Lanjutkan</button></div>
+  <p class="controls"><span>klik</span> untuk berjalan dan memakai benda &nbsp;·&nbsp; <span>seret</span> untuk melihat sekitar &nbsp;·&nbsp; <span>F</span> senter<br>Bayangan berhenti saat terkena cahaya senter. Lampu jalan aman. Baterai terbatas.<br>Versi edukasi IPA (siklus air) dari Vesper Street karya winchxyz, lisensi MIT.</p>
+</div></div>
+<div id="nomod">This demo uses ES modules and must be served over http.<br>Run <code>node dev-server.js</code> in this folder and open <code>http://localhost:8801</code>.</div>
+<script>
+  if (location.protocol === 'file:') document.getElementById('nomod').style.display = 'grid';
+</script>
+<script type="module" src="js/main.js?v=28"></script>
+</body>
+</html>

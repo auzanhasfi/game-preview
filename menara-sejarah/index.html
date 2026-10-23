@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Menara Sejarah</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#d0cbc7}#cv{position:fixed;inset:0;display:block;cursor:pointer}
+#ev{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:30;background:rgba(255,250,240,.95);border-radius:16px;padding:10px 18px;text-align:center;min-width:260px;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+#ev b{display:block;font:700 26px 'Space Mono';color:#FD5E2B}#ev span{font-size:15px;color:#3a2a1f}
+#big{position:fixed;left:50%;top:9%;transform:translateX(-50%);z-index:20;font:700 clamp(60px,12vw,120px) 'Space Grotesk';color:rgba(51,51,51,.55);pointer-events:none}
+#quiz{position:fixed;inset:0;display:none;place-items:center;z-index:70;background:rgba(40,30,20,.4)}#quiz.on{display:grid}
+#quiz .c{background:#F9F3E5;border-radius:24px;padding:18px 20px;text-align:center;width:min(420px,92vw);animation:eduIn .3s}
+#quiz small{color:#FD5E2B;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px}#quiz h3{margin:6px 0 12px}
+#quiz .o{display:grid;gap:8px}#quiz button{border:0;border-radius:14px;padding:12px;font:700 16px 'Space Grotesk';background:#fff;box-shadow:0 4px 0 #e2d4bb;cursor:pointer}
+#quiz button.ok{background:#3ecf8e;color:#fff}#quiz button.no{background:#ff6b5b;color:#fff}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"}}</script>
+</head><body>
+<canvas id="cv"></canvas><div id="big">0</div><div id="ev"><b>Tumpuk!</b><span>Klik / ketuk / spasi untuk menjatuhkan balok</span></div>
+<div id="quiz"><div class="c"><small>Kuis lantai · bonus balok lebar</small><h3>Mana yang terjadi LEBIH DULU?</h3><div class="o" id="qo"></div></div></div>
+<script src="../_kit/edu.js"></script>
+<script type="module">
+/* Menara Sejarah: terinspirasi Tower Blocks (he-is-talha/html-css-javascript-games, MIT; asal ide CodePen Steve Gardner). Kode ditulis ulang dengan Three.js. */
+import * as THREE from 'three';
+const EV=[[1908,'Berdirinya Budi Utomo'],[1928,'Sumpah Pemuda'],[1942,'Jepang masuk ke Indonesia'],[1945,'Proklamasi Kemerdekaan'],[1945,'Pertempuran Surabaya 10 November'],[1946,'Bandung Lautan Api'],
+  [1948,'Agresi Militer Belanda II'],[1949,'Konferensi Meja Bundar'],[1955,'Konferensi Asia Afrika di Bandung'],[1955,'Pemilu pertama Indonesia'],[1998,'Reformasi'],[2004,'Pemilihan presiden langsung pertama']];
+const cv=document.getElementById('cv');const R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(2,devicePixelRatio));
+const scene=new THREE.Scene();scene.background=new THREE.Color('#d0cbc7');
+const cam=new THREE.OrthographicCamera(-1,1,1,-1,-100,1000);
+scene.add(new THREE.AmbientLight('#ffffff',.55));const dl=new THREE.DirectionalLight('#ffffff',1.1);dl.position.set(0,499,0);scene.add(dl);const dl2=new THREE.DirectionalLight('#ffffff',.6);dl2.position.set(-6,8,10);scene.add(dl2);
+function resize(){const w=innerWidth,h=innerHeight,a=w/h,d=20;R.setSize(w,h);cam.left=-d*a;cam.right=d*a;cam.top=d;cam.bottom=-d;cam.updateProjectionMatrix()}resize();addEventListener('resize',resize);
+EDU.hud({title:'Menara Sejarah',credit:'Terinspirasi Tower Blocks · he-is-talha (MIT) · Three.js'});EDU.$('.edu-credit').classList.add('dark');
+const H=2;let blocks=[],falls=[],G={},camY=0;
+function col(i){const c=new THREE.Color();c.setHSL((.08+i*.035)%1,.55,.62);return c}
+function label(i){const e=G.events[i%G.events.length];const c=document.createElement('canvas');c.width=512;c.height=512;const x=c.getContext('2d');x.fillStyle='#'+col(i).getHexString();x.fillRect(0,0,512,512);
+  x.fillStyle='rgba(255,255,255,.9)';x.font='800 150px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(e[0],256,230);x.font='700 38px Arial';x.fillStyle='rgba(40,30,20,.75)';
+  const words=e[1].split(' '),lines=[''];words.forEach(w=>{if((lines[lines.length-1]+' '+w).length>22)lines.push(w);else lines[lines.length-1]=(lines[lines.length-1]+' '+w).trim()});lines.slice(0,2).forEach((l,k)=>x.fillText(l,256,350+k*46));
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
+function mkBlock(w,d,x,z,i,withLabel){const mat=new THREE.MeshLambertMaterial({color:col(i)});const mats=[mat,mat,withLabel?new THREE.MeshLambertMaterial({map:label(i)}):mat,mat,mat,mat];
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,H,d),mats);m.position.set(x,i*H,z);scene.add(m);return m}
+function reset(){blocks.forEach(b=>scene.remove(b.m));falls.forEach(f=>scene.remove(f.m));blocks=[];falls=[];
+  G={events:EV.slice(),i:0,score:0,run:true,dir:1,axis:'x',speed:.22,cur:null,quiz:false,benar:0,salah:0};
+  blocks.push({w:10,d:10,x:0,z:0,m:mkBlock(10,10,0,0,0,false)});camY=0;spawn();EDU.setScore(0);document.getElementById('big').textContent=0}
+function spawn(){const top=blocks[blocks.length-1],i=blocks.length;G.axis=i%2?'x':'z';const start=-14;
+  const b={w:top.w,d:top.d,x:G.axis==='x'?start:top.x,z:G.axis==='z'?start:top.z,i};b.m=mkBlock(b.w,b.d,b.x,b.z,i,true);G.cur=b;G.dir=1;
+  const e=G.events[(i)%G.events.length];document.getElementById('ev').innerHTML='<b>'+e[0]+'</b><span>'+e[1]+'</span>';EDU.setQ(e[0]+' · '+e[1])}
+function drop(){if(!G.run||G.quiz||!G.cur)return;const b=G.cur,t=blocks[blocks.length-1],ax=G.axis,size=ax==='x'?'w':'d',pos=ax;
+  let delta=b[pos]-t[pos];if(Math.abs(delta)<.35){delta=0;b[pos]=t[pos];EDU.sfx('ok')}
+  const over=b[size]-Math.abs(delta);
+  if(over<=0){G.run=false;scene.remove(b.m);const f=mkBlock(b.w,b.d,b.x,b.z,b.i,true);falls.push({m:f,v:0});EDU.sfx('bad');setTimeout(()=>EDU.end({key:'menara',score:G.score,benar:G.benar,salah:G.salah,max:30,head:'Menara '+(blocks.length-1)+' lantai'},reset),900);return}
+  const newW=ax==='x'?over:b.w,newD=ax==='z'?over:b.d,newX=ax==='x'?t.x+delta/2:b.x,newZ=ax==='z'?t.z+delta/2:b.z;
+  if(delta!==0){const cutSize=Math.abs(delta),cX=ax==='x'?newX+Math.sign(delta)*(over/2+cutSize/2):b.x,cZ=ax==='z'?newZ+Math.sign(delta)*(over/2+cutSize/2):b.z;
+    const f=mkBlock(ax==='x'?cutSize:b.w,ax==='z'?cutSize:b.d,cX,cZ,b.i,false);falls.push({m:f,v:0,rx:(Math.random()-.5)*.05});EDU.sfx('pop')}
+  scene.remove(b.m);const nb={w:newW,d:newD,x:newX,z:newZ,i:b.i};nb.m=mkBlock(newW,newD,newX,newZ,b.i,true);blocks.push(nb);G.cur=null;
+  G.score++;EDU.setScore(G.score);document.getElementById('big').textContent=G.score;G.speed=Math.min(.42,G.speed+.008);
+  if(G.score%4===0)ask();else spawn()}
+function ask(){G.quiz=true;const used=blocks.slice(1).map(b=>G.events[b.i%G.events.length]);let a=EDU.pick(used),b,t=0;do{b=EDU.pick(G.events)}while((b[0]===a[0])&&t++<40);
+  const first=a[0]<b[0]?a:b;const o=EDU.shuffle([a,b]);document.getElementById('qo').innerHTML=o.map(e=>'<button data-y="'+e[0]+'">'+e[1]+'</button>').join('');document.getElementById('quiz').classList.add('on');EDU.setQ('Mana yang lebih dulu?');
+  [...document.querySelectorAll('#qo button')].forEach(btn=>btn.onclick=()=>{if(G.quiz!==true)return;G.quiz='x';const ok=+btn.dataset.y===first[0];btn.classList.add(ok?'ok':'no');
+    [...document.querySelectorAll('#qo button')].forEach(x=>x.textContent=x.textContent+' ('+x.dataset.y+')');
+    if(ok){G.benar++;G.score+=2;const t=blocks[blocks.length-1];const nb={w:Math.min(10,t.w+2.5),d:Math.min(10,t.d+2.5),x:t.x,z:t.z,i:t.i};scene.remove(t.m);nb.m=mkBlock(nb.w,nb.d,nb.x,nb.z,nb.i,true);blocks[blocks.length-1]=nb;EDU.sfx('ok');EDU.toast('Benar! Balok jadi lebih lebar',true)}
+    else{G.salah++;EDU.sfx('bad');document.querySelector('#qo [data-y="'+first[0]+'"]').classList.add('ok');EDU.toast(first[1]+' lebih dulu ('+first[0]+')',false)}
+    EDU.setScore(G.score);document.getElementById('big').textContent=G.score;setTimeout(()=>{document.getElementById('quiz').classList.remove('on');G.quiz=false;spawn()},ok?900:1700)});
+  if(EDU.demo)setTimeout(()=>{const pick=Math.random()<.85?first[0]:(first===a?b:a)[0];document.querySelector('#qo [data-y="'+pick+'"]').click()},1300)}
+let last=performance.now();
+function loop(t){const dt=Math.min(.05,(t-last)/1000)*60;last=t;
+  if(G.run&&G.cur&&!G.quiz){const b=G.cur,ax=G.axis;b[ax]+=G.speed*G.dir*dt;if(b[ax]>14||b[ax]<-14)G.dir*=-1;b.m.position[ax]=b[ax];
+    if(EDU.demo){const tp=blocks[blocks.length-1];if(Math.abs(b[ax]-tp[ax]-(G.miss||0))<G.speed*1.1){drop();G.miss=Math.random()<.25?(Math.random()-.5)*2.4:0}}}
+  falls=falls.filter(f=>{f.v+=.02*dt;f.m.position.y-=f.v*dt;f.m.rotation.x+=(f.rx||.01)*dt;if(f.m.position.y<camY-40){scene.remove(f.m);return false}return true});
+  const ty=Math.max(0,(blocks.length-1)*H-2);camY+=(ty-camY)*.06;cam.position.set(2,camY+2,2);cam.lookAt(0,camY,0);
+  R.render(scene,cam);requestAnimationFrame(loop)}
+cam.position.set(2,2,2);cam.lookAt(0,0,0);
+addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();drop()}});cv.addEventListener('pointerdown',drop);
+reset();G.run=false;requestAnimationFrame(loop);window.__G=()=>G;
+EDU.title({key:'menara',title:'Menara Sejarah',mapel:'Sejarah / IPS · SD Kelas 5 – SMP',desc:'Tumpuk balok peristiwa sejarah Indonesia setinggi mungkin. Setiap 4 lantai ada kuis urutan waktu.',how:['Klik / ketuk / spasi saat balok tepat di atas menara.','Bagian yang meleset terpotong. Pas sempurna = tidak terpotong.','Kuis "mana yang lebih dulu?": benar = balok jadi lebih lebar.']},reset);
+</script></body></html>

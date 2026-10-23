@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Kuis Kilat IPA</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+html,body{overflow:auto}
+body{background:#ecf5ff;color:#1f2d4a;display:grid;place-items:center;min-height:100%}
+.box{width:min(640px,92vw);margin:74px 0 20px}
+.hd{display:flex;justify-content:space-between;align-items:end;margin-bottom:8px;font-weight:700}
+.hd small{display:block;color:#56a5eb;font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+.pb{height:16px;border:3px solid #56a5eb;border-radius:20px;overflow:hidden;margin-bottom:18px}.pb div{height:100%;background:#56a5eb;transition:width .4s}
+h2{font-size:clamp(22px,4vw,30px);margin:0 0 18px;line-height:1.25}
+.ch{display:flex;margin-bottom:10px;border-radius:14px;background:#fff;box-shadow:0 4px 14px rgba(86,165,235,.25);cursor:pointer;overflow:hidden;font-size:clamp(16px,2.6vw,20px);transition:transform .15s}
+.ch:hover{transform:translateY(-2px)}.ch b{background:#56a5eb;color:#fff;padding:14px 20px;font-family:'Space Mono'}.ch span{padding:14px 16px}
+.ch.ok b,.ch.ok{background:#28a745;color:#fff}.ch.no b,.ch.no{background:#dc3545;color:#fff}
+.why{min-height:24px;color:#4a5b7a;font-size:15px}
+.hs{background:#fff;border-radius:14px;padding:12px 16px;margin-top:10px}.hs h4{margin:0 0 6px;color:#56a5eb}.hs ol{margin:0;padding-left:20px}
+</style></head><body>
+<div class="box"><div class="hd"><div><small>Soal</small><span id="cnt">1/10</span></div><div style="text-align:right"><small>Skor</small><span id="sc">0</span></div></div>
+<div class="pb"><div id="pb" style="width:0"></div></div><h2 id="q"></h2><div id="chs"></div><div class="why" id="why"></div>
+<div class="hs"><h4>🏆 Skor tertinggi kelas</h4><ol id="hs"></ol></div></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Kuis Kilat IPA: remake Build-A-Quiz-App (jamesqquick, MIT): bank soal, progress bar, skor tertinggi di localStorage. Kode ditulis ulang. */
+var G={list:[],i:0,score:0,lock:false,benar:0,salah:0},MAX=8;
+EDU.hud({title:'Kuis Kilat IPA',credit:'Remake Build A Quiz App · James Q Quick (MIT)'});EDU.$('.edu-credit').classList.add('dark');
+function hs(){var a;try{a=JSON.parse(localStorage.getItem('kuis_ipa_hs'))||[]}catch(e){a=[]}if(!a.length)a=[{n:'Rani',s:70},{n:'Bima',s:60},{n:'Sari',s:40}];return a}
+function showHs(){EDU.$('#hs').innerHTML=hs().slice(0,5).map(function(h){return '<li>'+h.n+' — <b>'+h.s+'</b></li>'}).join('')}
+function show(){var q=G.list[G.i];EDU.$('#cnt').textContent=(G.i+1)+'/'+MAX;EDU.$('#pb').style.width=(G.i/MAX*100)+'%';EDU.$('#q').textContent=q.q;EDU.$('#why').textContent='';EDU.setQ('Soal '+(G.i+1)+' dari '+MAX);
+  EDU.$('#chs').innerHTML=q.o.map(function(o,k){return '<div class="ch" data-k="'+k+'"><b>'+'ABCD'[k]+'</b><span>'+o+'</span></div>'}).join('');G.lock=false}
+EDU.$('#chs').onclick=function(e){var c=e.target.closest('.ch');if(!c||G.lock)return;G.lock=true;var q=G.list[G.i],ok=+c.dataset.k===q.a;c.classList.add(ok?'ok':'no');
+  if(ok){G.score+=10;G.benar++;EDU.sfx('ok');EDU.$('#why').textContent='✔ Benar!'}else{G.salah++;EDU.sfx('bad');EDU.$('#chs [data-k="'+q.a+'"]').classList.add('ok');EDU.$('#why').textContent='Jawaban benar: '+q.o[q.a]}
+  EDU.$('#sc').textContent=G.score;EDU.setScore(G.score);setTimeout(function(){G.i++;if(G.i>=MAX)finish();else show()},ok?800:1500)};
+function start(){G.list=EDU.shuffle(EDU.IPA).slice(0,MAX);G.i=0;G.score=0;G.benar=0;G.salah=0;EDU.$('#sc').textContent=0;EDU.setScore(0);show();showHs();if(EDU.demo)setTimeout(auto,900)}
+function finish(){EDU.$('#pb').style.width='100%';var a=hs();a.push({n:EDU.demo?'Kamu':'Kamu',s:G.score});a.sort(function(x,y){return y.s-x.s});try{localStorage.setItem('kuis_ipa_hs',JSON.stringify(a.slice(0,5)))}catch(e){}showHs();
+  EDU.end({key:'kuisipa',score:G.score,benar:G.benar,salah:G.salah,max:MAX*10,head:G.benar>=6?'Ilmuwan cilik!':'Ayo coba lagi'},start)}
+function auto(){if(document.querySelector('.edu-ov'))return;if(!G.lock){var q=G.list[G.i],k=Math.random()<.8?q.a:(q.a+1)%4;EDU.$('#chs [data-k="'+k+'"]').click()}setTimeout(auto,1500)}
+EDU.title({key:'kuisipa',title:'Kuis Kilat IPA',mapel:'IPA · SD Kelas 4–6',desc:'8 soal IPA pilihan ganda. Masuk papan skor tertinggi kelas!',how:['Baca soal, klik jawaban A–D.','Hijau = benar (+10). Merah = salah, jawaban benar ditunjukkan.','Skor tertinggi tersimpan di perangkat ini.']},start);
+</script></body></html>

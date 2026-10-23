@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Ruang Soal Aljabar</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>body{background:#140c08;display:grid;place-items:center}#cv{margin-top:50px;border-radius:10px;touch-action:none}</style></head><body>
+<canvas id="cv"></canvas>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Ruang Soal Aljabar: terinspirasi binding-of-isaac-webgame (liyupi, MIT). Kode ditulis ulang: pintu ruangan terbuka setelah soal benar. */
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),RW=15,RH=9,T,K={};
+var G={p:null,tears:[],flies:[],orbs:[],parts:[],q:null,open:false,room:1,score:0,hp:6,run:false,benar:0,salah:0,cool:0,rocks:[],mv:null};
+EDU.hud({title:'Ruang Soal Aljabar',credit:'Terinspirasi binding-of-isaac-webgame · liyupi (MIT)'});
+function size(){T=Math.floor(Math.min((innerWidth-20)/RW,(innerHeight-110)/RH));cv.width=T*RW;cv.height=T*RH}size();
+function hearts(){EDU.setQ(G.q?G.q.q:'');var h='';for(var i=0;i<3;i++)h+=G.hp>=i*2+2?'❤️':G.hp===i*2+1?'💔':'🤍';EDU.$('.edu-hud .edu-stat').title=h;EDU.toastHp&&0;var e=EDU.$('#hp');if(e)e.textContent=h}
+function newRoom(){G.room>1&&EDU.sfx('win');var X=EDU.rand(2,9),a=EDU.rand(2,5),b=EDU.rand(1,9);G.q={q:a+'x + '+b+' = '+(a*X+b)+'  →  x = ?',a:X};EDU.setQ(G.q.q);G.open=false;
+  G.rocks=[];for(var i=0;i<4;i++)G.rocks.push([EDU.rand(3,RW-4),EDU.rand(2,RH-3)]);
+  var o=EDU.Q.opsi(X,3),spots=[[RW*.3,RH*.3],[RW*.5,RH*.22],[RW*.7,RH*.3]];G.orbs=o.map(function(v,i){return {x:spots[i][0]*T,y:spots[i][1]*T,v:v,bob:i}});
+  G.flies=[];for(i=0;i<Math.min(2+G.room,6);i++)G.flies.push({x:EDU.rand(2,RW-3)*T,y:EDU.rand(2,RH-3)*T,hp:2,t:Math.random()*9});
+  G.p={x:RW/2*T,y:(RH-1.8)*T,inv:60};G.tears=[]}
+function start(){G.room=1;G.score=0;G.hp=6;G.benar=0;G.salah=0;G.run=true;EDU.setScore(0);newRoom();hearts()}
+function inRock(px,py,r){return G.rocks.some(function(k){return px>k[0]*T-r&&px<(k[0]+1)*T+r&&py>k[1]*T-r&&py<(k[1]+1)*T+r})}
+function update(){
+  if(!G.run)return;var p=G.p,sp=T*.075;if(EDU.demo)demo();
+  var dx=(K.d?1:0)-(K.a?1:0),dy=(K.s?1:0)-(K.w?1:0);if(G.mv&&!EDU.demo){var vx=G.mv[0]-p.x,vy=G.mv[1]-p.y,l=Math.hypot(vx,vy);if(l>6){dx=vx/l;dy=vy/l}}
+  var nx=p.x+dx*sp,ny=p.y+dy*sp,r=T*.32;if(!inRock(nx,p.y,r*.8))p.x=nx;if(!inRock(p.x,ny,r*.8))p.y=ny;
+  var door=G.open&&(p.y<T*1.16&&Math.abs(p.x-RW/2*T)<T||p.x<T*1.16&&Math.abs(p.y-RH/2*T)<T||p.x>(RW-1.16)*T&&Math.abs(p.y-RH/2*T)<T);
+  if(door){G.room++;G.score+=20;EDU.setScore(G.score);EDU.toast('Ruang '+G.room+'!',true);newRoom();return}
+  p.x=Math.max(T*1.1,Math.min((RW-1.1)*T,p.x));p.y=Math.max(T*1.1,Math.min((RH-1.1)*T,p.y));p.inv--;
+  var sx=(K.ArrowRight?1:0)-(K.ArrowLeft?1:0),sy=(K.ArrowDown?1:0)-(K.ArrowUp?1:0);
+  if(G.auto){sx=G.auto[0];sy=G.auto[1]}
+  if((sx||sy)&&--G.cool<=0){var l2=Math.hypot(sx,sy);G.tears.push({x:p.x,y:p.y-T*.1,vx:sx/l2*T*.16,vy:sy/l2*T*.16,l:46});G.cool=14;EDU.sfx('tick')}
+  G.tears=G.tears.filter(function(t){t.x+=t.vx;t.y+=t.vy;if(inRock(t.x,t.y,0)||t.x<T||t.x>(RW-1)*T||t.y<T||t.y>(RH-1)*T){splash(t.x,t.y,'#7fc8ff');return false}
+    for(var i=0;i<G.flies.length;i++){var f=G.flies[i];if(Math.hypot(t.x-f.x,t.y-f.y)<T*.4){f.hp--;splash(t.x,t.y,'#7fc8ff');if(f.hp<=0){f.dead=true;splash(f.x,f.y,'#8b2c1c',20);G.score+=2;EDU.setScore(G.score)}return false}}
+    if(!G.open)for(i=0;i<G.orbs.length;i++){var o=G.orbs[i];if(Math.hypot(t.x-o.x,t.y-o.y)<T*.45){orb(o);return false}}
+    return --t.l>0});
+  G.flies=G.flies.filter(function(f){return !f.dead});
+  G.flies.forEach(function(f){f.t+=.08;var a=Math.atan2(p.y-f.y,p.x-f.x)+Math.sin(f.t)*1.2;f.x+=Math.cos(a)*T*.025;f.y+=Math.sin(a)*T*.025;
+    if(p.inv<=0&&Math.hypot(p.x-f.x,p.y-f.y)<T*.5){G.hp--;p.inv=70;EDU.sfx('bad');hearts();if(G.hp<=0)over()}});
+}
+function orb(o){if(o.v===G.q.a){G.open=true;G.benar++;G.score+=15;EDU.setScore(G.score);EDU.sfx('ok');EDU.toast('✔ x = '+o.v+' · pintu terbuka!',true);splash(o.x,o.y,'#5fe3a1',30);G.orbs=[]}
+  else{G.salah++;EDU.sfx('bad');EDU.floatText(cv.getBoundingClientRect().left+o.x,cv.getBoundingClientRect().top+o.y,'x ≠ '+o.v,false);G.orbs=G.orbs.filter(function(z){return z!==o});splash(o.x,o.y,'#ff5a4a',20);G.flies.push({x:o.x,y:o.y,hp:2,t:0})}}
+function splash(px,py,c,n){for(var i=0;i<(n||6);i++){var a=Math.random()*7,v=Math.random()*3;G.parts.push({x:px,y:py,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:22,c:c})}}
+function over(){G.run=false;EDU.end({key:'ruang',score:G.score,benar:G.benar,salah:G.salah,max:150,head:'Kalah di ruang '+G.room},start)}
+/* demo: bersihkan lalat, tembak jawaban benar, lalu keluar lewat pintu atas */
+function demo(){var p=G.p;K.w=K.a=K.s=K.d=false;G.auto=null;var tgt=null;
+  var f=G.flies.slice().sort(function(a,b){return Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y)})[0];
+  if(f&&Math.hypot(f.x-p.x,f.y-p.y)<T*4)tgt=f;else if(!G.open){tgt=G.orbs.find(function(o){return o.v===G.q.a})}
+  if(tgt){var ax=tgt.x-p.x,ay=tgt.y-p.y;G.auto=[ax,ay];if(Math.hypot(ax,ay)>T*3.5){if(ax>T*.3)K.d=true;if(ax<-T*.3)K.a=true;if(ay>T*.3)K.s=true;if(ay<-T*.3)K.w=true}}
+  else if(G.open){if(p.x<RW/2*T-6)K.d=true;else if(p.x>RW/2*T+6)K.a=true;K.w=true;if(inRock(p.x,p.y-T*.5,T*.3)){K.a=true}}
+  if(f&&Math.hypot(f.x-p.x,f.y-p.y)<T*1.4){if(f.x>p.x)K.a=true;else K.d=true}}
+function draw(){
+  x.fillStyle='#3a2418';x.fillRect(0,0,cv.width,cv.height);
+  for(var r=1;r<RH-1;r++)for(var c=1;c<RW-1;c++){x.fillStyle=(r+c)%2?'#6b4a33':'#634430';x.fillRect(c*T,r*T,T,T)}
+  x.strokeStyle='#24150d';x.lineWidth=T*.1;x.strokeRect(T*.95,T*.95,(RW-1.9)*T,(RH-1.9)*T);
+  [[RW/2*T,T*.5],[T*.5,RH/2*T],[(RW-.5)*T,RH/2*T]].forEach(function(d){x.fillStyle=G.open?'#000':'#4a2e1c';x.beginPath();x.roundRect(d[0]-T*.7,d[1]-T*.5,T*1.4,T,T*.2);x.fill();x.fillStyle=G.open?'#5fe3a1':'#a07040';x.font='700 '+Math.round(T*.35)+'px Space Grotesk';x.textAlign='center';x.textBaseline='middle';x.fillText(G.open?'▲':'🔒',d[0],d[1])});
+  G.rocks.forEach(function(k){x.fillStyle='#8a8070';x.beginPath();x.roundRect(k[0]*T+3,k[1]*T+5,T-6,T-8,T*.25);x.fill();x.fillStyle='#a49a88';x.beginPath();x.roundRect(k[0]*T+6,k[1]*T+5,T-14,T*.35,T*.15);x.fill()});
+  G.orbs.forEach(function(o){o.bob+=.05;var y=o.y+Math.sin(o.bob)*4;x.fillStyle='#ffe066';x.shadowColor='#ffe066';x.shadowBlur=18;x.beginPath();x.arc(o.x,y,T*.42,0,7);x.fill();x.shadowBlur=0;x.fillStyle='#3a2418';x.font='700 '+Math.round(T*.5)+'px Space Mono';x.textAlign='center';x.textBaseline='middle';x.fillText(o.v,o.x,y+1)});
+  G.flies.forEach(function(f){var w=Math.sin(f.t*8)*T*.15;x.fillStyle='rgba(255,255,255,.5)';x.beginPath();x.ellipse(f.x-T*.18,f.y-T*.18,T*.14,T*.08+Math.abs(w)*.3,0,0,7);x.ellipse(f.x+T*.18,f.y-T*.18,T*.14,T*.08+Math.abs(w)*.3,0,0,7);x.fill();
+    x.fillStyle='#1a1a1a';x.beginPath();x.arc(f.x,f.y,T*.2,0,7);x.fill();x.fillStyle='#ff3030';x.fillRect(f.x-T*.1,f.y-T*.05,T*.06,T*.06);x.fillRect(f.x+T*.04,f.y-T*.05,T*.06,T*.06)});
+  x.fillStyle='#7fc8ff';G.tears.forEach(function(t){x.beginPath();x.arc(t.x,t.y,T*.12,0,7);x.fill()});
+  G.parts=G.parts.filter(function(p){p.x+=p.vx;p.y+=p.vy;x.globalAlpha=p.l/22;x.fillStyle=p.c;x.fillRect(p.x,p.y,3,3);x.globalAlpha=1;return --p.l>0});
+  var p=G.p;if(p&&!(p.inv>0&&Math.floor(p.inv/5)%2)){x.fillStyle='rgba(0,0,0,.3)';x.beginPath();x.ellipse(p.x,p.y+T*.32,T*.3,T*.1,0,0,7);x.fill();
+    x.fillStyle='#f3c9b0';x.beginPath();x.arc(p.x,p.y,T*.34,0,7);x.fill();x.strokeStyle='#5a3020';x.lineWidth=2;x.stroke();x.fillStyle='#1a0e08';x.beginPath();x.arc(p.x-T*.12,p.y-T*.04,T*.07,0,7);x.arc(p.x+T*.12,p.y-T*.04,T*.07,0,7);x.fill();
+    x.strokeStyle='#5a3020';x.beginPath();x.arc(p.x,p.y+T*.1,T*.08,0,Math.PI);x.stroke()}
+  x.fillStyle='#fff';x.font='700 '+Math.round(T*.32)+'px Space Grotesk';x.textAlign='left';x.textBaseline='top';var h='';for(var i=0;i<3;i++)h+=G.hp>=i*2+2?'♥':G.hp===i*2+1?'♡':'·';x.fillStyle='#ff4a5a';x.fillText(h+'   ',T*.2,T*.2);x.fillStyle='#e8d8c0';x.fillText('Ruang '+G.room,T*1.6,T*.2);
+}
+function loop(){update();draw();requestAnimationFrame(loop)}
+addEventListener('keydown',function(e){var k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=true;if(k.indexOf('Arrow')===0)e.preventDefault()});addEventListener('keyup',function(e){var k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=false});
+cv.addEventListener('pointerdown',function(e){var r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*cv.width/r.width,py=(e.clientY-r.top)*cv.height/r.height;
+  var o=G.orbs.concat(G.flies).find(function(o){return Math.hypot(o.x-px,o.y-py)<T*.8});if(o){G.auto=[o.x-G.p.x,o.y-G.p.y];setTimeout(function(){G.auto=null},300)}else G.mv=[px,py]});
+requestAnimationFrame(loop);
+EDU.title({key:'ruang',title:'Ruang Soal Aljabar',mapel:'Matematika · SMP Kelas 7–8',desc:'Kamu terkunci di ruang bawah tanah. Tembak bola berisi nilai x yang benar untuk membuka pintu.',how:['WASD: jalan · Panah: menembak (di HP: ketuk tempat tujuan / ketuk bola).','Selesaikan persamaan, tembak bola dengan nilai x yang benar.','Bola salah memanggil lalat baru. Keluar lewat pintu ke ruang berikutnya.']},start);
+</script></body></html>

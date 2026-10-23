@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Peta Harta Bulat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Geist:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="../../kit/ink.css">
+</head><body>
+<script src="../../kit/ink.js"></script>
+<script>
+/* Peta Harta Bulat — petualangan peta tinta (tampak atas). Jalan ke batu yang berisi jawaban benar untuk membuka peti harta. */
+(function () {
+  'use strict';
+  var I = INK, C = I.C, W = I.W, H = I.H, CS = 30, COLS = 16, ROWS = 9;
+  var walls = {}, stones = [], coins = [], enemies = [], steps = [], cur = null, opened = null;
+  var P = { x: 45, y: 135, vx: 0, vy: 0, face: 1, t: 0, inv: 0, dist: 0, sq: 0 };
+  var demoWrong = false;
+
+  function key(c, r) { return c + ',' + r; }
+  function cellOf(x, y) { return [Math.floor(x / CS), Math.floor(y / CS)]; }
+  function center(c, r) { return [c * CS + CS / 2, r * CS + CS / 2]; }
+  function free(c, r) { return c >= 0 && r >= 1 && c < COLS && r < ROWS && !walls[key(c, r)]; }
+  function bfs(from, to, block) {
+    var q = [from], prev = {}, seen = {}; seen[key(from[0], from[1])] = true;
+    while (q.length) {
+      var n = q.shift();
+      if (n[0] === to[0] && n[1] === to[1]) { var path = [n], k = key(n[0], n[1]); while (prev[k]) { path.unshift(prev[k]); k = key(prev[k][0], prev[k][1]); } return path; }
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) {
+        var c = n[0] + d[0], r = n[1] + d[1], kk = key(c, r);
+        if (seen[kk] || !free(c, r)) return;
+        if (block && block[kk] && !(c === to[0] && r === to[1])) return;
+        seen[kk] = true; prev[kk] = n; q.push([c, r]);
+      });
+    }
+    return null;
+  }
+
+  function stage() {
+    cur = I.mathQ(I.S.diff, 3);
+    I.setQ(cur.text);
+    var pc = cellOf(P.x, P.y), ok = false, tries = 0;
+    while (!ok && tries++ < 200) {
+      walls = {};
+      var n = I.ri(16, 22);
+      for (var i = 0; i < n; i++) {
+        var c = I.ri(0, COLS - 1), r = I.ri(1, ROWS - 1);
+        if (Math.abs(c - pc[0]) <= 1 && Math.abs(r - pc[1]) <= 1) continue;
+        walls[key(c, r)] = { type: I.pick(['tree', 'tree', 'rock', 'water']), u: I.ri(1, 90) };
+      }
+      var cells = [];
+      for (var cc = 0; cc < COLS; cc++) for (var rr = 2; rr < ROWS; rr++) if (free(cc, rr) && Math.abs(cc - pc[0]) + Math.abs(rr - pc[1]) >= 5) cells.push([cc, rr]);
+      cells = I.shuffle(cells);
+      var pickd = [];
+      for (var j = 0; j < cells.length && pickd.length < 3; j++) {
+        if (pickd.every(function (p) { return Math.abs(p[0] - cells[j][0]) + Math.abs(p[1] - cells[j][1]) >= 4; })) pickd.push(cells[j]);
+      }
+      if (pickd.length < 3) continue;
+      ok = pickd.every(function (p) { return bfs(pc, p); });
+      if (ok) stones = pickd.map(function (p, i) { var ce = center(p[0], p[1]); return { c: p[0], r: p[1], x: ce[0], y: ce[1], v: cur.options[i], used: false, good: false, wrong: false, pop: 0, u: I.ri(1, 80) }; });
+    }
+    coins = [];
+    for (var k = 0; k < 40 && coins.length < 4; k++) {
+      var c2 = I.ri(0, COLS - 1), r2 = I.ri(1, ROWS - 1);
+      if (free(c2, r2) && !stones.some(function (s) { return s.c === c2 && s.r === r2; })) { var ce2 = center(c2, r2); coins.push({ x: ce2[0], y: ce2[1], got: false, t: Math.random() * 6 }); }
+    }
+    enemies = [];
+    var ne = 1 + (I.S.q >= 4 ? 1 : 0);
+    for (var e = 0; e < ne; e++) {
+      for (var t2 = 0; t2 < 50; t2++) {
+        var ec = I.ri(0, COLS - 1), er = I.ri(1, ROWS - 1);
+        if (free(ec, er) && Math.abs(ec - pc[0]) + Math.abs(er - pc[1]) > 5) { var ce3 = center(ec, er); enemies.push({ x: ce3[0], y: ce3[1], dir: I.pick([[1, 0], [-1, 0], [0, 1], [0, -1]]), sp: 26 + I.S.q * 2 + (I.S.diff === 'sulit' ? 8 : 0), t: Math.random() * 3, dead: 0, turn: 0 }); break; }
+      }
+    }
+    opened = null;
+    demoWrong = I.demo && Math.random() < 0.18;
+  }
+
+  function hitWall(x, y, r) {
+    if (x - r < 0 || x + r > W || y - r < CS || y + r > H) return true;
+    var c0 = Math.floor((x - r) / CS), c1 = Math.floor((x + r) / CS), r0 = Math.floor((y - r) / CS), r1 = Math.floor((y + r) / CS);
+    for (var c = c0; c <= c1; c++) for (var rr = r0; rr <= r1; rr++) if (walls[key(c, rr)]) {
+      var bx = c * CS + 3, by = rr * CS + 3, bw = CS - 6;
+      if (x + r > bx && x - r < bx + bw && y + r > by && y - r < by + bw) return true;
+    }
+    return false;
+  }
+
+  function update(dt) {
+    P.t += dt; if (P.inv > 0) P.inv -= dt;
+    P.sq = I.approach(P.sq, 0, 2 * dt);
+    var play = I.state === 'play';
+    var dx = play ? (I.key.R ? 1 : 0) - (I.key.L ? 1 : 0) : 0, dy = play ? (I.key.D ? 1 : 0) - (I.key.U ? 1 : 0) : 0;
+    if (dx && dy) { dx *= 0.707; dy *= 0.707; }
+    P.vx = I.approach(P.vx, dx * 110, 1200 * dt); P.vy = I.approach(P.vy, dy * 110, 1200 * dt);
+    if (dx) P.face = dx > 0 ? 1 : -1;
+    var nx = P.x + P.vx * dt; if (!hitWall(nx, P.y, 9)) P.x = nx; else P.vx = 0;
+    var ny = P.y + P.vy * dt; if (!hitWall(P.x, ny, 9)) P.y = ny; else P.vy = 0;
+    var sp = Math.hypot(P.vx, P.vy);
+    P.dist += sp * dt;
+    if (P.dist > 13) { P.dist = 0; steps.push({ x: P.x, y: P.y + 9, s: steps.length % 2 ? 1 : -1, born: I.time }); if (steps.length > 46) steps.shift(); }
+    if (I.state === 'between' && opened && I.S.hearts > 0 && Math.floor(I.time * 3) % 2 === 0 && P.sq === 0) P.sq = -0.18;
+
+    if (play) stones.forEach(function (s) {
+      if (s.used || Math.hypot(P.x - s.x, P.y - s.y) > 13) return;
+      s.used = true; I.sfx('bump');
+      if (s.v === cur.ans) {
+        s.good = true; opened = s; I.good(s.x, s.y - 8, { word: 'HARTA!' });
+        enemies.forEach(function (e) { if (!e.dead) { e.dead = 0.6; I.splat(e.x, e.y + 10, 10); I.drops(e.x, e.y, 8, 110); } });
+      } else {
+        s.wrong = true; demoWrong = false; I.bad(s.x, s.y - 8);
+        var a = Math.atan2(P.y - s.y, P.x - s.x);
+        P.vx = Math.cos(a) * 220; P.vy = Math.sin(a) * 220;
+      }
+    });
+    stones.forEach(function (s) { if (s.pop < 1) s.pop = Math.min(1, s.pop + dt * 4); });
+    coins.forEach(function (c) {
+      c.t += dt;
+      if (!c.got && play && Math.hypot(P.x - c.x, P.y - c.y) < 14) { c.got = true; I.addScore(1, c.x, c.y); I.coinFx(c.x, c.y); I.sfx('coin'); }
+    });
+    for (var i = enemies.length - 1; i >= 0; i--) {
+      var e = enemies[i]; e.t += dt;
+      if (e.dead > 0) { e.dead -= dt; if (e.dead <= 0) enemies.splice(i, 1); continue; }
+      e.turn -= dt;
+      var ex = e.x + e.dir[0] * e.sp * dt, ey = e.y + e.dir[1] * e.sp * dt;
+      if (hitWall(ex, ey, 10) || e.turn < -2.5) { e.dir = I.pick([[1, 0], [-1, 0], [0, 1], [0, -1]]); e.turn = 0; }
+      else { e.x = ex; e.y = ey; }
+      if (play && P.inv <= 0 && Math.hypot(P.x - e.x, P.y - e.y) < 17) {
+        P.inv = 1.6; var a2 = Math.atan2(P.y - e.y, P.x - e.x); P.vx = Math.cos(a2) * 240; P.vy = Math.sin(a2) * 240;
+        I.bad(P.x, P.y - 10, { word: 'AUW!', sound: 'hurt' });
+      }
+    }
+  }
+
+  /* demo: cari jalur (BFS) ke batu jawaban, gerak satu sumbu dulu supaya tidak tersangkut pohon */
+  function demo() {
+    I.key.L = I.key.R = I.key.U = I.key.D = false;
+    var tgt = null;
+    if (demoWrong) tgt = stones.find(function (s) { return !s.used && s.v !== cur.ans; });
+    if (!tgt) tgt = stones.find(function (s) { return s.v === cur.ans; });
+    if (!tgt || tgt.used) return;
+    var pc = cellOf(P.x, P.y), block = {};
+    stones.forEach(function (s) { if (s !== tgt && !s.used) block[key(s.c, s.r)] = true; });
+    var eb = Object.assign({}, block);
+    enemies.forEach(function (e) { if (!e.dead) { var ec = cellOf(e.x, e.y); eb[key(ec[0], ec[1])] = true; } });
+    var path = bfs(pc, [tgt.c, tgt.r], eb) || bfs(pc, [tgt.c, tgt.r], block);
+    if (!path) return;
+    var nx = path.length > 1 ? path[1] : path[0], ce = center(nx[0], nx[1]), cc = center(pc[0], pc[1]);
+    if (path.length > 1 && nx[1] === pc[1] && Math.abs(P.y - cc[1]) > 3) { if (P.y < cc[1]) I.key.D = true; else I.key.U = true; return; }
+    if (path.length > 1 && nx[0] === pc[0] && Math.abs(P.x - cc[0]) > 3) { if (P.x < cc[0]) I.key.R = true; else I.key.L = true; return; }
+    if (ce[0] > P.x + 2) I.key.R = true; else if (ce[0] < P.x - 2) I.key.L = true;
+    if (ce[1] > P.y + 2) I.key.D = true; else if (ce[1] < P.y - 2) I.key.U = true;
+  }
+
+  function drawWall(c, r, w) {
+    var x = c * CS, y = r * CS, cx = x + CS / 2, cy = y + CS / 2, u = w.u;
+    if (w.type === 'tree') {
+      I.line(cx, cy + 4, cx, cy + 12, u, 0.6, 1.4);
+      I.circle(cx, cy - 2, 10, u, 1, 1.5, C.ink, C.paper2);
+      I.hatch(cx - 1, cy - 12, 12, 20, 3.5, C.ink, 0.7, 0.4);
+      I.circle(cx - 4, cy - 4, 2.2, u + 5, 0.4, 1.1, C.ink, C.org);
+    } else if (w.type === 'rock') {
+      var pts = [[cx - 12, cy + 10], [cx - 9, cy - 2], [cx - 2, cy - 8], [cx + 7, cy - 6], [cx + 12, cy + 2], [cx + 12, cy + 10]];
+      I.trace(pts); var x2 = I.ctx(); x2.closePath(); x2.fillStyle = C.paper2; x2.fill(); I.stroke(1.5);
+      I.hatch(cx, cy - 6, 12, 16, 3.5, C.ink, 0.7, 0.45);
+    } else {
+      var x3 = I.ctx(); x3.fillStyle = 'rgba(160,170,175,0.18)'; x3.fillRect(x + 1, y + 1, CS - 2, CS - 2);
+      for (var k = 0; k < 3; k++) { var yy = y + 8 + k * 8; I.line(x + 4, yy, x + 12, yy - 2, u + k, 0.4, 1.1); I.line(x + 12, yy - 2, x + 20, yy, u + k + 9, 0.4, 1.1); I.line(x + 20, yy, x + 26, yy - 2, u + k + 19, 0.4, 1.1); }
+    }
+  }
+  function drawStone(s) {
+    var e = 1 - Math.pow(1 - s.pop, 3), x = I.ctx();
+    x.save(); x.translate(s.x, s.y); x.scale(e, e); x.translate(-s.x, -s.y);
+    if (s.good) {
+      I.star4(s.x, s.y - 4, 22 + Math.sin(I.time * 12) * 3, I.time * 1.4, C.org, 1.6);
+      I.line(s.x - 9, s.y + 6, s.x + 9, s.y + 14, s.u, 0.6, 2.4, C.org); I.line(s.x + 9, s.y + 6, s.x - 9, s.y + 14, s.u + 1, 0.6, 2.4, C.org);
+      x.fillStyle = C.org; x.fillRect(s.x - 12, s.y - 6, 24, 14); I.rect(s.x - 12, s.y - 6, 24, 14, s.u, 0.6, 1.6);
+      x.save(); x.translate(s.x - 12, s.y - 6); x.rotate(-0.5); x.fillStyle = C.orgD; x.fillRect(0, -8, 24, 8); I.rect(0, -8, 24, 8, s.u + 4, 0.5, 1.5); x.restore();
+      [-5, 0, 5].forEach(function (d, i) { I.circle(s.x + d, s.y - 9 - (i % 2) * 3, 3, s.u + i, 0.3, 1, C.ink, '#f4c05a'); });
+      I.text(String(s.v), s.x, s.y + 1, { size: 11, col: '#fff' });
+    } else {
+      x.fillStyle = 'rgba(43,42,40,0.12)'; x.beginPath(); x.ellipse(s.x + 2, s.y + 12, 13, 4, 0, 0, 6.3); x.fill();
+      I.card(s.x - 13, s.y - 13, 26, 26, s.u, { fill: s.wrong ? C.wash : C.paper2, hatch: s.wrong, mark: !s.wrong, text: s.v, size: String(s.v).length >= 3 ? 11 : 14, col: s.wrong ? 'rgba(43,42,40,0.5)' : C.ink, cross: s.wrong });
+      if (s.wrong) I.blot(s.x + 3, s.y + 4, 8, s.u);
+    }
+    x.restore();
+  }
+  function drawCompass() {
+    var cx = 452, cy = 16, x = I.ctx();
+    I.circle(cx, cy, 10, 7, 0.5, 1.2, C.ink, C.paper2);
+    x.beginPath(); x.moveTo(cx, cy - 9); x.lineTo(cx + 3, cy); x.lineTo(cx - 3, cy); x.closePath(); x.fillStyle = C.org; x.fill();
+    x.beginPath(); x.moveTo(cx, cy + 9); x.lineTo(cx + 3, cy); x.lineTo(cx - 3, cy); x.closePath(); x.fillStyle = C.ink; x.fill();
+    I.text('U', cx - 16, cy, { font: 'mono', size: 7 });
+  }
+  function draw() {
+    var x = I.ctx();
+    I.paper(0.05);
+    /* bingkai peta + garis grid tipis */
+    x.globalAlpha = 0.16;
+    for (var c = 1; c < COLS; c++) I.line(c * CS, CS, c * CS, H, c + 200, 0.4, 0.8);
+    for (var r = 2; r < ROWS; r++) I.line(0, r * CS, W, r * CS, r + 230, 0.4, 0.8);
+    x.globalAlpha = 1;
+    I.line(0, CS, W, CS, 9, 0.8, 1.6);
+    if (!I.preview) I.text('peta harta · ' + (I.S.q + 1) + ' dari ' + I.S.total, 380, 16, { font: 'hand', size: 16, col: C.orgD, align: 'right' });
+    drawCompass();
+    /* jejak kaki */
+    steps.forEach(function (s) {
+      var a = Math.max(0, 1 - (I.time - s.born) / 4);
+      x.globalAlpha = a * 0.55; x.fillStyle = C.ink;
+      x.beginPath(); x.ellipse(s.x + s.s * 3, s.y, 1.8, 1.2, 0, 0, 6.3); x.fill();
+    });
+    x.globalAlpha = 1;
+    I.drawSplats();
+    Object.keys(walls).forEach(function (k) { var p = k.split(','); drawWall(+p[0], +p[1], walls[k]); });
+    coins.forEach(function (c) {
+      if (c.got) return;
+      var w = Math.abs(Math.cos(c.t * 4)) * 4.5 + 1.2, yy = c.y + Math.sin(c.t * 3) * 2;
+      x.beginPath(); x.ellipse(c.x, yy, w, 6.5, 0, 0, 6.3); x.fillStyle = C.org; x.fill(); I.stroke(1.4);
+    });
+    stones.forEach(drawStone);
+    var list = enemies.map(function (e) { return { y: e.y, f: function () { I.blob(e.x, e.y + 12, { t: e.t, dir: e.dir[0] || 1, dead: e.dead, s: 0.8 }); } }; });
+    list.push({ y: P.y, f: function () {
+      x.globalAlpha = 0.25; x.fillStyle = C.ink; x.beginPath(); x.ellipse(P.x, P.y + 11, 10, 3, 0, 0, 6.3); x.fill(); x.globalAlpha = 1;
+      if (!(P.inv > 0 && Math.floor(I.time * 20) % 2 === 0)) I.bulat(P.x, P.y + 11, { r: 10, face: P.face, run: Math.hypot(P.vx, P.vy) > 20, t: P.t, sq: P.sq, mood: I.S.hearts <= 0 ? 'hurt' : P.inv > 1.2 ? 'wow' : 'happy' });
+    } });
+    list.sort(function (a, b) { return a.y - b.y; }).forEach(function (o) { o.f(); });
+  }
+  function mini(t) {
+    var x = I.ctx();
+    x.globalAlpha = 0.2; for (var i = 1; i < 5; i++) I.line(i * 30, 6, i * 30, 94, i, 0.4, 0.8); x.globalAlpha = 1;
+    I.circle(28, 30, 10, 3, 1, 1.4, C.ink, C.paper2); I.hatch(27, 20, 12, 20, 3.5, C.ink, 0.7, 0.4);
+    var px = 30 + ((t * 30) % 90);
+    for (var k = 0; k < 6; k++) { x.globalAlpha = 0.5; x.fillStyle = C.ink; x.beginPath(); x.ellipse(px - 12 - k * 10, 78 + (k % 2) * 3, 1.6, 1.1, 0, 0, 6.3); x.fill(); }
+    x.globalAlpha = 1;
+    I.line(112, 60, 128, 72, 2, 0.6, 2.4, C.org); I.line(128, 60, 112, 72, 3, 0.6, 2.4, C.org);
+    I.bulat(px, 84, { r: 11, run: true, t: t });
+  }
+
+  I.game({
+    id: 'peta-harta', title: 'Peta Harta Bulat', tag: 'Petualangan · Matematika',
+    desc: 'Si Bulat menjelajah peta tinta. Jalan ke batu berisi jawaban benar untuk membuka peti harta. Awas monster tinta yang berkeliaran!',
+    levels: [{ d: 'mudah', b: 'Mudah', s: 'Tambah dan kurang sampai 24' }, { d: 'sedang', b: 'Sedang', s: 'Perkalian 2–9, tambah kurang sampai 60' }, { d: 'sulit', b: 'Sulit', s: 'Kali, bagi, dan dua langkah' }],
+    note: '10 peta, 3 nyawa. Ikuti jejak kakimu sendiri!', tip: 'jalan ke batu yang berisi jawaban', unit: 'Peta',
+    pad: [{ k: 'L', label: '◀', aria: 'Kiri', wide: 1 }, { k: 'U', label: '▲', aria: 'Atas', wide: 1 }, { k: 'D', label: '▼', aria: 'Bawah', wide: 1 }, { k: 'R', label: '▶', aria: 'Kanan', wide: 1 }],
+    keyHelp: 'Keyboard: <kbd>←</kbd> <kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> jalan',
+    winTitle: 'Semua harta ditemukan',
+    start: function () { P.x = 45; P.y = 135; P.vx = P.vy = 0; P.inv = 0; steps = []; },
+    stage: stage, update: update, draw: draw, demo: demo, mini: mini,
+    answer: function () { return cur ? cur.ans : ''; }
+  });
+})();
+</script>
+</body></html>

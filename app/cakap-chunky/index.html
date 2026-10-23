@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Cakap · Belajar Bahasa Inggris untuk Anak SD</title>
+<meta name="description" content="Cakap — belajar Bahasa Inggris untuk anak SD Indonesia. Playful flat design dengan maskot geometris.">
+<meta name="theme-color" content="#FF9270">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23FF9270'/%3E%3Ccircle cx='35' cy='42' r='6' fill='%23131313'/%3E%3Ccircle cx='65' cy='42' r='6' fill='%23131313'/%3E%3Cpath d='M32 62q18 18 36 0' stroke='%23131313' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL@24,400,1&display=swap" rel="stylesheet">
+<style>
+:root{--mint:#C3F0A8;--lime:#B7EE86;--lavender:#DCCBF7;--coral:#FF9270;--kuning:#FFDD57;--langit:#A5DAF7;--pink:#FFB3C9;--kertas:#FAF9F6;--tinta:#131313;--putih:#FFFFFF;--garis:#E6E2DA;--garis2:#F0EDE6;--abu:#EDEAE3;--abu-teks:#8A8494;--abu-teks2:#A8A49B;--teks2:#4A4552;--teks3:#6B6478;--ungu:#8B6FC7;--biru:#4A9FCB;--latar:#EDE8F6;--ink-mint:#3C4A33;--ink-lav:#463C55;--ink-coral:#5A2E1E;--ink-kuning:#5A4A0E;--ink-langit:#1E4457;--ink-pink:#5A2436;--coral-muda:#FFE0D6;--bata:#B5412F;--krem:#FFF1E0;--peta:#F1E8D8;--fig:'Figtree',system-ui,sans-serif;--jak:'Plus Jakarta Sans',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{font-family:var(--jak);background:var(--krem);color:var(--tinta);overflow-x:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--tinta);outline-offset:2px}
+.panggung{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
+.ponsel{position:relative;width:390px;height:844px;border:9px solid var(--tinta);border-radius:52px;background:var(--kertas);box-shadow:0 26px 60px rgba(19,19,19,.20);overflow:hidden;display:flex;flex-direction:column;transition:background .3s}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:118px;height:28px;background:var(--tinta);border-radius:0 0 18px 18px;z-index:6}
+.status{display:flex;justify-content:space-between;align-items:center;padding:max(14px,env(safe-area-inset-top)) 26px 4px;font:800 14px var(--fig);flex:none}
+.status .ik{font-size:16px}
+.screens{flex:1;min-height:0;position:relative}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;gap:14px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:8px 22px 24px;background:var(--kertas)}
+.screen[data-bg]{background:transparent}
+.screen>*{flex-shrink:0}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{display:flex;animation:masuk .28s cubic-bezier(.22,.9,.3,1)}
+@keyframes masuk{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes apung{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes jatuh{to{transform:translateY(900px) rotate(720deg);opacity:0}}
+@keyframes scan{from{top:6%}to{top:88%}}
+.ik{font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;font-size:24px;line-height:1;width:1em;height:1em;overflow:hidden;display:inline-block;font-variation-settings:'FILL' 1,'opsz' 24;letter-spacing:normal;text-transform:none;white-space:nowrap;flex:none}
+.kol{display:flex;flex-direction:column}.baris{display:flex;align-items:center}
+.g6{gap:6px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g14{gap:14px}.g16{gap:16px}.g20{gap:20px}
+.f1{flex:1;min-width:0}.mt-auto{margin-top:auto}.tengah{text-align:center;justify-content:center}.hidden{display:none!important}
+.rw{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gulung-x{overflow-x:auto;scrollbar-width:none}.gulung-x::-webkit-scrollbar{display:none}
+.mini{font:600 13px var(--jak);color:var(--abu-teks)}
+.hero{font:900 42px/.98 var(--fig);letter-spacing:-.03em}
+.tajuk{font:900 34px/1 var(--fig);letter-spacing:-.02em}
+.judul-skrin{font:800 21px var(--fig)}
+.sub{font:500 16px/1.45 var(--jak);color:var(--teks2)}
+.eyebrow{font:700 13px var(--jak);text-transform:uppercase;letter-spacing:.14em;color:var(--abu-teks)}
+.btn{--lip:#4a4a4a;padding:17px 26px;border-radius:100px;background:var(--tinta);color:var(--kertas);font:700 16px var(--jak);display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;box-shadow:0 5px 0 var(--lip);transition:transform .12s,box-shadow .12s;margin-bottom:5px}
+.btn:active,.bulat:active,.key:active{transform:translateY(3px);box-shadow:0 2px 0 var(--lip,#4a4a4a)}
+.btn.lebar{width:100%;padding:19px;font-size:17px}
+.btn.kecil{padding:12px 18px;font-size:14px;min-height:44px}
+.btn:disabled{background:var(--abu);color:var(--abu-teks2);--lip:var(--garis);cursor:default}
+.btn.putih{background:var(--putih);color:var(--tinta);--lip:#D9D4C8}
+.btn.coral{background:var(--coral);color:var(--tinta);--lip:var(--bata)}
+.btn.lime{background:var(--lime);color:var(--ink-mint);--lip:#7FB84F}
+.btn.garis{background:transparent;color:var(--tinta);box-shadow:none;border:2px solid var(--garis)}
+.bulat{--lip:var(--bata);width:54px;height:54px;border-radius:50%;background:var(--coral);color:var(--tinta);display:grid;place-items:center;flex:none;box-shadow:0 5px 0 var(--lip);transition:transform .12s,box-shadow .12s;margin-bottom:5px}
+.bulat.tinta{background:var(--tinta);color:var(--kertas);--lip:#4a4a4a}.bulat.putih{background:var(--putih);--lip:#D9D4C8}.bulat.besar{width:84px;height:84px}
+.ikon-btn{width:44px;height:44px;border-radius:50%;background:var(--putih);display:grid;place-items:center;flex:none;box-shadow:0 3px 0 var(--garis)}
+.kartu{background:var(--putih);border-radius:28px;padding:20px;text-align:left;box-shadow:0 4px 0 var(--garis2)}
+.cip{padding:10px 18px;border-radius:100px;font:700 14px var(--jak);display:inline-flex;gap:6px;align-items:center;flex:none;min-height:40px}
+.cip.mati{background:var(--abu);color:var(--abu-teks)}
+.seg{display:flex;background:var(--abu);border-radius:100px;padding:4px}
+.seg button{padding:8px 16px;border-radius:100px;font:700 13px var(--jak);min-height:36px}
+.seg .on{background:var(--tinta);color:var(--kertas)}
+.suis{width:50px;height:30px;border-radius:100px;background:var(--abu);position:relative;transition:background .2s;flex:none}
+.suis i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s cubic-bezier(.22,.9,.3,1)}
+.suis.on{background:var(--tinta)}.suis.on i{transform:translateX(20px)}
+.bar{height:10px;border-radius:99px;background:var(--abu);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--tinta);border-radius:99px;transition:width .5s ease}
+.bar.tebal{height:14px}
+.tab{display:flex;align-items:center;justify-content:space-around;background:var(--tinta);padding:12px 14px calc(16px + env(safe-area-inset-bottom));flex:none}
+.tab button{width:54px;height:46px;display:grid;place-items:center;color:rgba(255,255,255,.55);border-radius:99px}
+.tab button.on{color:var(--coral)}
+.tab .fab{width:62px;height:62px;border-radius:50%;background:var(--coral);color:var(--tinta);margin-top:-36px;border:5px solid var(--kertas);box-shadow:0 5px 0 var(--bata)}
+.mas{position:relative;display:flex;align-items:center;justify-content:center;flex:none}
+.muka{display:flex;flex-direction:column;align-items:center}
+.mata{display:flex}.mata i{background:var(--tinta);display:block}
+.lenc{position:absolute;top:-4px;right:-4px;background:var(--kuning);border:3px solid var(--tinta);border-radius:50%;display:grid;place-items:center}
+.apung{animation:apung 4.5s ease-in-out infinite}
+mark{background:var(--kuning);color:var(--ink-kuning);padding:0 4px;border-radius:6px}
+.mb{display:flex;align-items:flex-end;gap:4px;height:34px}.mb i{flex:1;background:rgba(19,19,19,.55);border-radius:4px}
+.opsi{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:22px;background:var(--putih);border:2px solid var(--garis);text-align:left;width:100%;font:600 16px var(--jak);min-height:58px;box-shadow:0 4px 0 var(--garis)}
+.opsi .huruf{width:36px;height:36px;border-radius:50%;background:var(--abu);display:grid;place-items:center;font:800 15px var(--fig);flex:none}
+.opsi .rad{display:none}
+.opsi.pilih{border-color:var(--tinta);background:var(--coral-muda);box-shadow:0 4px 0 var(--tinta)}.opsi.pilih .rad{display:block}.opsi.pilih .huruf{background:var(--tinta);color:var(--coral)}
+.kecil{font-size:21px!important}
+.gel{display:flex;align-items:center;gap:5px;height:84px}
+.gel i{flex:1;border-radius:99px;background:var(--ink-langit);opacity:.45;transition:height .12s}
+.gel.rek i{opacity:1}.gel i.kuat{background:var(--tinta)}
+.mik.rekam{background:var(--kuning)}
+.cincin{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;flex:none}
+.cincin span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:800 13px var(--fig)}
+.kf{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:jatuh 1.5s ease-in forwards;z-index:20;pointer-events:none}
+.toast{position:absolute;top:62px;left:50%;transform:translate(-50%,-10px);background:var(--tinta);color:var(--kertas);padding:12px 20px;border-radius:100px;font:700 14px var(--jak);opacity:0;pointer-events:none;transition:opacity .28s ease,transform .28s ease;z-index:30;max-width:92%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.grafik{display:flex;align-items:flex-end;gap:8px;height:120px}
+.grafik div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%;font:700 12px var(--jak)}
+.grafik i{width:100%;border-radius:10px;background:var(--ungu);display:block}
+.grafik .hi i{background:var(--tinta)}
+.rank{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:22px;background:var(--putih);box-shadow:0 3px 0 var(--garis2)}
+.rank b.n{width:26px;font:900 18px var(--fig);text-align:center}
+/* layout baru */
+.pola{position:absolute;inset:0;pointer-events:none;overflow:hidden}.pola i{position:absolute;background:rgba(255,255,255,.28)}
+.logo{width:150px;height:150px;border-radius:44px;background:var(--putih);display:grid;place-items:center;box-shadow:0 7px 0 var(--bata)}
+.scene{position:relative;height:330px;flex:none}.scene>*{position:absolute}
+.gelembung{padding:12px 18px;font:800 18px var(--fig);color:var(--tinta)}
+.kartu-form{background:var(--putih);border-radius:32px;padding:22px 20px;display:flex;flex-direction:column;gap:14px;position:relative;box-shadow:0 7px 0 var(--bata)}
+.lbl-f{font:700 13px var(--jak);color:var(--teks2)}
+.fld{display:flex;align-items:center;gap:10px;background:var(--coral-muda);border-radius:100px;padding:0 18px;min-height:52px}
+.fld input{flex:1;min-width:0;background:transparent;border:0;outline:0;font:600 15px var(--jak);height:50px}
+.fld:focus-within{box-shadow:0 0 0 3px var(--tinta)}
+.kls{width:44px;height:44px;border-radius:14px;background:var(--coral-muda);font:800 16px var(--fig)}
+.kls.on{background:var(--tinta);color:var(--coral)}
+.atau{display:flex;align-items:center;gap:10px;color:var(--abu-teks);font:600 13px var(--jak)}.atau i{flex:1;height:2px;background:var(--garis2)}
+.btns2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.link{font:800 13px var(--jak);color:var(--bata);text-decoration:underline;min-height:32px;padding:0 2px}
+.cek{display:flex;align-items:center;gap:8px;font:600 13px var(--jak);color:var(--teks2)}.cek input{width:20px;height:20px;accent-color:var(--tinta)}
+.dots{display:flex;gap:14px;justify-content:center}.dots i{width:20px;height:20px;border-radius:50%;background:var(--coral-muda);border:3px solid var(--tinta);display:block}.dots i.on{background:var(--tinta)}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:auto}
+.key{min-height:62px;border-radius:20px;background:var(--coral-muda);font:800 24px var(--fig);box-shadow:0 5px 0 var(--coral);--lip:var(--coral);display:grid;place-items:center;margin-bottom:5px}
+.modal{background:var(--putih);border-radius:32px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.25);position:relative}
+.hero-home{margin:-8px -22px 0;padding:14px 22px 52px;background:var(--coral);border-radius:0 0 36px 36px}
+.lbl-h{font:700 12px var(--jak);color:var(--ink-coral)}
+.avatar-btn{width:46px;height:46px;border-radius:50%;flex:none;display:grid;place-items:center}
+.cari{display:flex;align-items:center;gap:10px;background:var(--putih);border-radius:100px;padding:5px 5px 5px 18px;margin-top:-40px;position:relative;box-shadow:0 5px 0 var(--garis)}
+.cari input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:600 15px var(--jak);height:44px}
+.kat{width:84px;min-height:98px;border-radius:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:none;font:700 12px var(--jak);padding:8px 4px;box-shadow:0 4px 0 rgba(19,19,19,.12)}
+.banner{background:var(--bata);color:var(--putih);border-radius:28px;padding:18px 8px 18px 20px;display:flex;align-items:center;gap:6px;box-shadow:0 5px 0 rgba(19,19,19,.3);overflow:hidden}
+.banner .besar{font:900 46px/1 var(--fig);color:var(--kuning)}
+.kartu-p{width:150px;flex:none;background:var(--coral-muda);border-radius:26px;padding:10px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 4px 0 var(--coral)}
+.kartu-p .blok,.kartu-g .blok{height:96px;border-radius:20px;display:grid;place-items:center;position:relative}
+.kartu-g{background:var(--coral-muda);border-radius:26px;padding:10px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 4px 0 var(--coral);width:100%}
+.kartu-g.kunci{opacity:.6}
+.plus{width:34px;height:34px;border-radius:50%;background:var(--coral);display:grid;place-items:center;flex:none;box-shadow:0 3px 0 var(--bata)}.plus.on{background:var(--tinta);color:var(--coral);box-shadow:0 3px 0 #4a4a4a}
+.row-k{background:var(--coral-muda);border-radius:26px;padding:12px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 0 var(--coral)}
+.thumb{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;font:900 28px var(--fig);flex:none}
+.step{display:flex;flex-direction:column;align-items:center;background:var(--coral);border-radius:99px;padding:3px;flex:none}.step button{width:36px;height:32px;font:800 20px var(--fig);display:grid;place-items:center}.step b{font:800 14px var(--fig)}
+.tot{display:flex;justify-content:space-between;font:700 16px var(--jak)}
+.tot b{font:900 20px var(--fig)}
+.chipu{display:flex;flex-direction:column;align-items:center;gap:6px;flex:none;font:700 12px var(--jak);width:64px}
+.chipu .bl{width:58px;height:58px;border-radius:20px;display:grid;place-items:center;box-shadow:0 4px 0 rgba(19,19,19,.12)}.chipu.on .bl{outline:3px solid var(--tinta);outline-offset:2px}
+.ttl{position:sticky;bottom:0;background:var(--tinta);color:var(--kertas);border-radius:26px;padding:12px 12px 12px 20px;display:flex;align-items:center;gap:10px;box-shadow:0 5px 0 #4a4a4a;margin-top:auto}
+.ib{width:40px;height:40px;border-radius:13px;background:var(--coral-muda);display:grid;place-items:center;flex:none}
+.menu-r{display:flex;align-items:center;gap:14px;background:var(--putih);border-radius:22px;padding:10px 16px 10px 10px;box-shadow:0 3px 0 var(--garis);width:100%;text-align:left;min-height:58px;font:700 15px var(--jak)}
+.jd{display:flex;align-items:center;gap:14px;background:var(--putih);border-radius:24px;padding:14px;box-shadow:0 5px 0 var(--garis)}
+.peta{position:absolute;inset:0}.peta svg{width:100%;height:100%;display:block}
+.nodo{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1}
+.nodo .bl{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;box-shadow:0 5px 0 rgba(19,19,19,.18);background:var(--abu);color:var(--abu-teks)}
+.nodo.selesai .bl{background:var(--lime);color:var(--ink-mint)}
+.nodo.kini .bl{background:var(--coral);width:68px;height:68px;border:4px solid #fff;color:var(--tinta)}
+.nodo .tg{background:#fff;border-radius:99px;padding:5px 11px;font:700 12px var(--jak);white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis;box-shadow:0 3px 0 var(--garis)}
+.atas{position:absolute;top:8px;left:22px;right:22px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:2}
+.bawah{position:absolute;left:16px;right:16px;bottom:14px;display:flex;flex-direction:column;gap:10px;z-index:2}
+.info{background:var(--coral-muda);border-radius:26px;padding:12px;display:flex;flex-direction:column;gap:10px;box-shadow:0 5px 0 var(--coral)}
+.info .baris .ib{background:#fff}
+.bar-c{background:var(--coral);border-radius:22px;padding:10px 10px 10px 12px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 0 var(--bata)}
+.scanner{position:relative;width:250px;height:250px;margin:0 auto;display:grid;place-items:center;flex:none}
+.scanner .sudut{position:absolute;width:44px;height:44px;border:6px solid var(--coral)}
+.sudut.a{left:0;top:0;border-right:0;border-bottom:0;border-radius:22px 0 0 0}.sudut.b{right:0;top:0;border-left:0;border-bottom:0;border-radius:0 22px 0 0}.sudut.c{left:0;bottom:0;border-right:0;border-top:0;border-radius:0 0 0 22px}.sudut.d{right:0;bottom:0;border-left:0;border-top:0;border-radius:0 0 22px 0}
+.qr{display:grid;grid-template-columns:repeat(9,1fr);width:150px;height:150px;gap:2px}.qr i{background:var(--garis2);border-radius:2px}.qr i.on{background:var(--tinta)}
+.gs{position:absolute;left:12px;right:12px;height:5px;border-radius:9px;background:var(--coral);animation:scan 2.4s ease-in-out infinite alternate}
+.lencana-b{width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.35);display:grid;place-items:center;margin:0 auto}
+.lencana-b>div{width:150px;height:150px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 6px 0 var(--bata)}
+.pill-g{position:fixed;top:16px;left:16px;z-index:9;background:var(--tinta);color:var(--kertas);border-radius:100px;padding:11px 16px;font:700 13px var(--jak);display:flex;gap:6px;align-items:center}
+#galeri{position:fixed;inset:0;z-index:100;background:var(--krem);overflow:auto;padding:20px 20px 40px}
+#galeri .g-top{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1300px;margin:0 auto 20px;font:900 24px var(--fig)}
+#galeri .g-grid{display:flex;flex-wrap:wrap;gap:24px 22px;justify-content:center;max-width:1300px;margin:0 auto}
+#galeri figure{width:234px}
+#galeri .g-fr{width:234px;height:506px;overflow:hidden;position:relative}
+#galeri iframe{position:absolute;left:0;top:0;width:390px;height:844px;border:0;transform:scale(.6);transform-origin:0 0;background:transparent}
+#galeri figcaption{font:700 13px var(--jak);color:var(--teks2);margin-top:8px;text-align:center}
+html.gal,html.gal body{background:transparent}
+.gal .panggung{padding:0;min-height:0;display:block}
+.gal .ponsel{width:390px;max-width:none;height:844px;border:9px solid var(--tinta);border-radius:52px;box-shadow:none}
+.gal .notch{display:block}.gal .pill-g{display:none}
+@media (max-width:600px),(max-height:900px){.panggung{padding:0}.ponsel{width:100%;max-width:520px;height:100dvh;border:0;border-radius:0;box-shadow:none}.notch{display:none}.pill-g{display:none}}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="panggung"><div class="ponsel" id="ponsel">
+<div class="notch"></div>
+<div class="status"><span id="jam">9:41</span><span class="baris g6"><span class="ik">signal_cellular_alt</span><span class="ik">battery_full</span></span></div>
+<div class="screens">
+<section class="screen" id="s-splash" data-bg="coral"></section>
+<section class="screen" id="s-onboarding"></section>
+<section class="screen" id="s-daftar" data-bg="coral"></section>
+<section class="screen" id="s-masuk" data-bg="coral"></section>
+<section class="screen" id="s-pin"></section>
+<section class="screen" id="s-berhasil" data-bg="bata"></section>
+<section class="screen" id="s-home" data-st="coral"></section>
+<section class="screen" id="s-kata"></section>
+<section class="screen" id="s-pelajaran"></section>
+<section class="screen" id="s-jadwal"></section>
+<section class="screen" id="s-jalur" data-bg="peta" style="padding:0;overflow:hidden"></section>
+<section class="screen" id="s-profil"></section>
+<section class="screen" id="s-scan"></section>
+<section class="screen" id="s-selesai" data-bg="coral"></section>
+<section class="screen" id="s-card"></section>
+<section class="screen" id="s-quiz"></section>
+<section class="screen" id="s-betul" data-bg="lime"></section>
+<section class="screen" id="s-salah"></section>
+<section class="screen" id="s-sebut"></section>
+<section class="screen" id="s-papan"></section>
+<section class="screen" id="s-kemajuan"></section>
+</div>
+<nav class="tab hidden" id="tab" aria-label="Menu">
+<button data-go="s-home" aria-label="Beranda"><span class="ik">home</span></button>
+<button data-go="s-kata" aria-label="Kata saya"><span class="ik">style</span></button>
+<button class="fab" data-do="mulaiUcap" aria-label="Latihan ucapan"><span class="ik">mic</span></button>
+<button data-go="s-pelajaran" aria-label="Pelajaran"><span class="ik">school</span></button>
+<button data-go="s-profil" aria-label="Profil"><span class="ik">person</span></button>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+</div></div>
+<button class="pill-g" data-do="galeri"><span class="ik" style="font-size:18px">grid_view</span>Semua layar</button>
+<script>
+const SRC=document.documentElement.outerHTML;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const AWAL={nama:'Aisyah Nabila',level:'A1',kelas:5,sudah:false,bahasa:'ID',xp:1940,beruntun:12,menit:184,xpMinggu:1240,kata:412,benar:0,jawab:0,selesai:{},hafal:{},simpan:[],suis:{ingat:true,luring:false},hariMenit:[40,62,30,78,52,84,22]};
+let S=JSON.parse(JSON.stringify(AWAL));
+try{Object.assign(S,JSON.parse(localStorage.getItem('cakap-id-v1')||'{}'))}catch(e){}
+const simpan=()=>{try{localStorage.setItem('cakap-id-v1',JSON.stringify(S))}catch(e){}};
+const T=(a,b)=>S.bahasa==='EN'?b:a;
+const fmt=n=>n.toLocaleString('id-ID');
+const ik=(n,c)=>`<span class="ik${c?' '+c:''}">${n}</span>`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let ses={les:null,kartu:0,soal:0,nyawa:3,betul:0,pilih:-1,solo:false,sx:0},lihat=null,perPapan=0,perKm=0,cur='s-splash',rek=null,pelUnit=-1,pelQ='',pelPilih=new Set(),pinBuf='',tgt={},kelasPil=5;
+const LAYAR=window.LAYAR||null;
+const hl=(s,w)=>{const t=w.replace(/[?!.…]+$/,''),i=s.toLowerCase().indexOf(t.toLowerCase());return i<0?s:s.slice(0,i)+'<mark>'+s.slice(i,i+t.length)+'</mark>'+s.slice(i+t.length)};
+const Q=(k,r)=>({prompt:r[0],audio:r[5]||'',opts:r[1],a:r[2],note:{title:r[3],body:r[4],chips:r[6]||k.slice(0,2).map(c=>c[0]+' · '+c[3].toLowerCase())},why:{rows:r[7]||[[k[0][3].toLowerCase(),k[0][0],true],[k[1][3].toLowerCase(),k[1][0],false]]}});
+const L=(id,en,idn,tipe,k,q,s)=>({id,en,idn,tipe,k,q:q.map(r=>Q(k,r)),s});
+const U=(id,w,ink,en,idn,l)=>{const u={id,w,ink,en,idn,lv:'A1',l};const all=l.flatMap(x=>x.k);u.l.push({id:id+'-ulangan',en:'Unit Review',idn:'Ulangan Unit',tipe:'Ulangan',k:[0,3,6,9].map(i=>all[i]),q:l.map(x=>x.q[0]),s:l[0].s});return u};
+const KURIKULUM=[
+U('u1','langit','ink-langit','Greetings','Sapaan & Perkenalan',[
+L('u1l1','Hello & Goodbye','Halo & Pamit','Kosa kata',[["Hello","/həˈloʊ/","sapaan","Halo","Hello, I am Rani.","Halo, saya Rani."],["Good morning","/ɡʊd ˈmɔːrnɪŋ/","sapaan","Selamat pagi","Good morning, teacher.","Selamat pagi, Bu Guru."],["Goodbye","/ɡʊdˈbaɪ/","sapaan","Selamat tinggal","Goodbye, see you tomorrow.","Selamat tinggal, sampai jumpa besok."],["Thank you","/ˈθæŋk juː/","ungkapan","Terima kasih","Thank you for the book.","Terima kasih untuk bukunya."]],[
+["“Good morning, teacher.”",["Selamat malam, Bu Guru","Selamat pagi, Bu Guru","Selamat tinggal, Bu Guru","Terima kasih, Bu Guru"],1,"“Good morning” = Selamat pagi","Kita memakai good morning sampai sekitar pukul 12 siang.","Good morning, teacher.",["good morning · pagi","good afternoon · siang"],[["pagi","good morning",true],["malam","good night",false]]],
+["Ibu guru memberimu buku. Apa yang kamu katakan?",["Goodbye!","Hello!","Thank you!","Good night!"],2,"“Thank you” = Terima kasih","Ucapkan thank you setiap kali menerima sesuatu."],
+["“Sampai jumpa besok!” dalam bahasa Inggris adalah…",["See you tomorrow!","See you yesterday!","Look you tomorrow!","Meet you morning!"],0,"“See you tomorrow”","Gunakan see you untuk berpisah dengan teman."]],
+["Good morning, teacher!","Selamat pagi, Bu Guru!","morning","/ˈmɔːrnɪŋ/"]),
+L('u1l2','How Are You?','Apa Kabar?','Ucapan',[["How are you?","/haʊ ɑːr juː/","pertanyaan","Apa kabar?","How are you? I am fine.","Apa kabar? Saya baik."],["I'm fine","/aɪm faɪn/","jawaban","Saya baik","I'm fine, thank you.","Saya baik, terima kasih."],["Nice to meet you","/naɪs tə miːt juː/","ungkapan","Senang bertemu denganmu","Nice to meet you, Rani.","Senang bertemu denganmu, Rani."],["See you","/siː juː/","ungkapan","Sampai jumpa","See you on Monday.","Sampai jumpa hari Senin."]],[
+["“How are you?”",["Siapa namamu?","Apa kabar?","Di mana kamu?","Kamu mau apa?"],1,"“How are you?” = Apa kabar?","Jawab dengan I'm fine, thank you.","How are you?"],
+["Temanmu bertanya “How are you?”. Jawaban yang tepat…",["I'm fine, thank you.","My name is Rani.","Goodbye!","It is a book."],0,"Jawab pertanyaan kabar","Gunakan I'm fine untuk menjawab How are you?."],
+["Saat berkenalan, kita berkata…",["See you!","Nice to meet you.","Thank you for the food.","Good night."],1,"“Nice to meet you”","Dipakai saat bertemu seseorang untuk pertama kali."]],
+["How are you today?","Apa kabar hari ini?","today","/təˈdeɪ/"]),
+L('u1l3','My Name Is…','Nama Saya…','Tata bahasa',[["name","/neɪm/","kata benda","nama","My name is Rani.","Namaku Rani."],["my","/maɪ/","kata ganti","milikku","This is my bag.","Ini tasku."],["I am","/aɪ æm/","kata kerja","saya adalah","I am ten years old.","Saya berumur sepuluh tahun."],["friend","/frend/","kata benda","teman","He is my friend.","Dia temanku."]],[
+["Lengkapi: “___ name is Rani.”",["Me","My","I","Mine"],1,"“My name is…”","my = milikku, dipakai sebelum kata benda."],
+["Lengkapi: “I ___ ten years old.”",["is","are","am","be"],2,"“I am…”","Setelah I, kita memakai am."],
+["“Dia temanku.” dalam bahasa Inggris…",["He is my friend.","He is me friend.","His my friend.","He are my friend."],0,"“He is my friend”","He memakai is, dan milikku = my."]],
+["My name is Aisyah.","Nama saya Aisyah.","name","/neɪm/"])]),
+U('u2','lavender','ink-lav','Numbers & Colours','Angka & Warna',[
+L('u2l1','Numbers 1–20','Angka 1–20','Kosa kata',[["five","/faɪv/","angka","lima","I have five books.","Saya punya lima buku."],["ten","/ten/","angka","sepuluh","Ten pencils, please.","Sepuluh pensil, ya."],["twelve","/twelv/","angka","dua belas","I have twelve pencils.","Saya punya dua belas pensil."],["twenty","/ˈtwenti/","angka","dua puluh","Twenty students are here.","Dua puluh siswa ada di sini."]],[
+["Angka 12 dalam bahasa Inggris adalah…",["twenty","twelve","two","twenty-one"],1,"“twelve” = 12","twelve (12) berbeda dari twenty (20). Dengarkan akhiran -ve dan -ty.","",["twelve · 12","twenty · 20"],[["dua belas","twelve",true],["dua puluh","twenty",false]]],
+["“Lima belas” dalam bahasa Inggris…",["fifteen","fifty","five","fourteen"],0,"“fifteen” = 15","-teen berarti belasan, -ty berarti puluhan."],
+["Satu tangan punya ___ jari. Pilih angka Inggris.",["five","four","six","ten"],0,"“five” = 5","Satu tangan punya lima jari."]],
+["I have twelve pencils.","Saya punya dua belas pensil.","twelve","/twelv/"]),
+L('u2l2','Colours','Warna','Ucapan',[["red","/red/","kata sifat","merah","The apple is red.","Apelnya merah."],["blue","/bluː/","kata sifat","biru","The sky is blue.","Langitnya biru."],["green","/ɡriːn/","kata sifat","hijau","The leaf is green.","Daunnya hijau."],["yellow","/ˈjeloʊ/","kata sifat","kuning","The sun is yellow.","Mataharinya kuning."]],[
+["“red”",["blue","red","green","pink"],1,"“red” = merah","Warna apel dan cabai.","red"],
+["Langit yang cerah berwarna…",["green","yellow","blue","black"],2,"“blue” = biru","Langit dan laut berwarna blue."],
+["Warna daun adalah ___.",["green","red","white","purple"],0,"“green” = hijau","Daun yang segar berwarna green."]],
+["The sky is blue.","Langit berwarna biru.","blue","/bluː/"]),
+L('u2l3','Shapes & Counting','Bentuk & Berhitung','Tata bahasa',[["circle","/ˈsɜːrkl/","kata benda","lingkaran","The ball is a circle.","Bola berbentuk lingkaran."],["square","/skwer/","kata benda","persegi","The book is a square.","Bukunya berbentuk persegi."],["triangle","/ˈtraɪæŋɡl/","kata benda","segitiga","A triangle has three sides.","Segitiga punya tiga sisi."],["count","/kaʊnt/","kata kerja","menghitung","Count to ten.","Hitung sampai sepuluh."]],[
+["Bentuk bola adalah…",["square","triangle","circle","star"],2,"“circle” = lingkaran","Bola dan matahari berbentuk circle."],
+["Lengkapi: “There ___ three squares.”",["is","are","am","be"],1,"“There are…”","Untuk jumlah banyak kita memakai there are."],
+["“Hitung sampai sepuluh.”",["Count to ten.","Cut to ten.","Come to ten.","Cook to ten."],0,"“Count to ten”","count = menghitung."]],
+["Count to ten, please.","Hitung sampai sepuluh, ya.","count","/kaʊnt/"])]),
+U('u3','kuning','ink-kuning','At the Canteen','Di Kantin',[
+L('u3l1','Food & Drink','Makanan & Minuman','Kosa kata',[["fried rice","/fraɪd raɪs/","kata benda","nasi goreng","This fried rice is delicious.","Nasi goreng ini enak."],["water","/ˈwɔːtər/","kata benda","air","Water, please.","Air, tolong."],["milk","/mɪlk/","kata benda","susu","I like milk.","Saya suka susu."],["banana","/bəˈnɑːnə/","kata benda","pisang","The banana is yellow.","Pisangnya kuning."]],[
+["“Nasi goreng ini enak.”",["This fried rice is delicious.","This fried rice is expensive.","This fried rice is hot.","This fried rice is small."],0,"“delicious” = enak","delicious dipakai untuk makanan yang lezat."],
+["Kamu haus. Kamu meminta…",["Water, please.","Chair, please.","Pencil, please.","Bag, please."],0,"“Water, please.”","Tambahkan please agar sopan."],
+["“pisang” dalam bahasa Inggris…",["banana","apple","bread","grape"],0,"“banana” = pisang","Pisang berwarna yellow."]],
+["This fried rice is delicious.","Nasi goreng ini enak.","delicious","/dɪˈlɪʃəs/"]),
+L('u3l2','How Much Is It?','Berapa Harganya?','Ucapan',[["How much is it?","/haʊ mʌtʃ ɪz ɪt/","pertanyaan","Berapa harganya?","How much is it? Five thousand.","Berapa harganya? Lima ribu."],["cheap","/tʃiːp/","kata sifat","murah","The milk is cheap.","Susunya murah."],["expensive","/ɪkˈspensɪv/","kata sifat","mahal","The bag is expensive.","Tasnya mahal."],["change","/tʃeɪndʒ/","kata benda","uang kembalian","Here is your change.","Ini uang kembalianmu."]],[
+["“How much is it?” artinya…",["Berapa harganya?","Berapa umurmu?","Siapa itu?","Apa ini?"],0,"“How much…?”","Dipakai untuk menanyakan harga.","How much is it?"],
+["Harga barang itu tinggi. Kata yang tepat…",["cheap","expensive","small","fast"],1,"“expensive” = mahal","Lawan kata expensive adalah cheap."],
+["Lengkapi: “How ___ is the milk?”",["many","much","long","old"],1,"“How much”","much untuk harga atau jumlah yang tak dapat dihitung."]],
+["How much is the banana?","Berapa harga pisangnya?","much","/mʌtʃ/"]),
+L('u3l3','Polite Requests','Permintaan Sopan','Tata bahasa',[["please","/pliːz/","kata seru","tolong","Water, please.","Air, tolong."],["sorry","/ˈsɑːri/","kata seru","maaf","Sorry, teacher.","Maaf, Bu Guru."],["excuse me","/ɪkˈskjuːz miː/","ungkapan","permisi","Excuse me, may I pass?","Permisi, boleh lewat?"],["may I","/meɪ aɪ/","ungkapan","bolehkah saya","May I have some water?","Bolehkah saya minta air?"]],[
+["Kamu ingin lewat. Kamu berkata…",["Excuse me.","Good night.","Thank you.","Goodbye."],0,"“Excuse me” = permisi","Dipakai untuk meminta jalan atau perhatian."],
+["Meminta dengan sopan:",["Give me water.","Water now!","May I have some water, please?","I want water."],2,"“May I… , please?”","May I + please membuat permintaan sopan."],
+["Kamu menabrak temanmu. Kamu berkata…",["Please.","Sorry.","Hello.","Welcome."],1,"“Sorry” = maaf","Ucapkan sorry saat berbuat salah."]],
+["May I have some water, please?","Boleh saya minta air, tolong?","please","/pliːz/"])]),
+U('u4','pink','ink-pink','My Family','Keluargaku',[
+L('u4l1','Family Members','Anggota Keluarga','Kosa kata',[["mother","/ˈmʌðər/","kata benda","ibu","My mother cooks rice.","Ibuku memasak nasi."],["father","/ˈfɑːðər/","kata benda","ayah","My father is tall.","Ayahku tinggi."],["brother","/ˈbrʌðər/","kata benda","saudara laki-laki","I have two brothers.","Saya punya dua saudara laki-laki."],["sister","/ˈsɪstər/","kata benda","saudara perempuan","My sister is Sinta.","Kakakku bernama Sinta."]],[
+["“Ayah” dalam bahasa Inggris…",["father","mother","brother","uncle"],0,"“father” = ayah","Ayah = father, ibu = mother."],
+["Lengkapi: “I ___ two brothers.”",["has","have","haves","having"],1,"“I have…”","Setelah I kita memakai have, bukan has."],
+["“Adik laki-lakiku” adalah…",["my little sister","my little brother","my mother","my father"],1,"“my little brother”","little brother = adik laki-laki."]],
+["I have two brothers.","Saya punya dua saudara laki-laki.","brothers","/ˈbrʌðərz/"]),
+L('u4l2','This Is My…','Ini Adalah…','Ucapan',[["grandmother","/ˈɡrænmʌðər/","kata benda","nenek","This is my grandmother.","Ini nenekku."],["grandfather","/ˈɡrænfɑːðər/","kata benda","kakek","My grandfather is kind.","Kakekku baik hati."],["uncle","/ˈʌŋkl/","kata benda","paman","This is my uncle.","Ini pamanku."],["aunt","/ænt/","kata benda","bibi","My aunt is a doctor.","Bibiku seorang dokter."]],[
+["“This is my grandmother.” artinya…",["Ini nenekku.","Itu kakekku.","Ini ibuku.","Ini bibiku."],0,"“This is my…”","This is dipakai untuk memperkenalkan satu orang."],
+["Lengkapi: “___ is my uncle.”",["This","These","Those","They"],0,"“This is…”","This untuk satu benda atau orang yang dekat."],
+["Menunjuk dua kakak: “These ___ my sisters.”",["is","am","are","be"],2,"“These are…”","Untuk jumlah banyak kita memakai are."]],
+["This is my grandmother.","Ini nenekku.","grandmother","/ˈɡrænmʌðər/"]),
+L('u4l3','Jobs','Pekerjaan','Tata bahasa',[["teacher","/ˈtiːtʃər/","kata benda","guru","My teacher is kind.","Guruku baik hati."],["doctor","/ˈdɑːktər/","kata benda","dokter","She is a doctor.","Dia seorang dokter."],["farmer","/ˈfɑːrmər/","kata benda","petani","My father is a farmer.","Ayahku seorang petani."],["driver","/ˈdraɪvər/","kata benda","sopir","He is a bus driver.","Dia sopir bus."]],[
+["Orang yang mengajar di kelas adalah…",["driver","teacher","farmer","doctor"],1,"“teacher” = guru","teacher mengajar di sekolah."],
+["Lengkapi: “She ___ a doctor.”",["am","are","is","be"],2,"“She is…”","She memakai is."],
+["“Ayahku seorang petani.”",["My father is a farmer.","My father is a driver.","My mother is a farmer.","My father are farmer."],0,"“a farmer”","Sebelum nama pekerjaan kita pakai a."]],
+["My father is a farmer.","Ayahku seorang petani.","farmer","/ˈfɑːrmər/"])]),
+U('u5','mint','ink-mint','Animals & Weather','Hewan & Cuaca',[
+L('u5l1','Farm Animals','Hewan Ternak','Kosa kata',[["cow","/kaʊ/","kata benda","sapi","The cow is big.","Sapinya besar."],["goat","/ɡoʊt/","kata benda","kambing","The goat eats grass.","Kambing makan rumput."],["chicken","/ˈtʃɪkɪn/","kata benda","ayam","The chicken is white.","Ayamnya putih."],["duck","/dʌk/","kata benda","bebek","The duck says quack.","Bebek berbunyi kwek."]],[
+["“sapi” adalah…",["goat","cow","duck","hen"],1,"“cow” = sapi","Sapi berbunyi moo."],
+["Hewan yang berbunyi “quack” adalah…",["duck","cow","goat","cat"],0,"“duck” = bebek","Bebek berbunyi quack."],
+["Lengkapi: “The goats ___ eating grass.”",["is","am","are","be"],2,"“goats are…”","Kata benda jamak memakai are."]],
+["The cow is big.","Sapi itu besar.","cow","/kaʊ/"]),
+L('u5l2','Wild Animals','Hewan Liar','Ucapan',[["elephant","/ˈelɪfənt/","kata benda","gajah","An elephant is big.","Gajah itu besar."],["tiger","/ˈtaɪɡər/","kata benda","harimau","The tiger is fast.","Harimau itu cepat."],["monkey","/ˈmʌŋki/","kata benda","monyet","The monkey eats a banana.","Monyet makan pisang."],["snake","/sneɪk/","kata benda","ular","The snake is long.","Ularnya panjang."]],[
+["Lengkapi: “An elephant is ___ than a goat.”",["big","bigger","biggest","more big"],1,"“bigger than” = lebih besar dari","Tambahkan -er pada kata sifat pendek untuk membandingkan.","",["bigger · lebih besar","biggest · paling besar"],[["lebih besar","bigger",true],["paling besar","biggest",false]]],
+["Hewan yang punya belalai adalah…",["tiger","elephant","snake","monkey"],1,"“elephant” = gajah","Gajah punya belalai (trunk)."],
+["Lengkapi: “The tiger is ___ than the monkey.”",["stronger","strongest","more strong","strong"],0,"“stronger than”","strong + er = stronger."]],
+["An elephant is bigger than a goat.","Gajah lebih besar daripada kambing.","bigger","/ˈbɪɡər/"]),
+L('u5l3','Weather','Cuaca','Tata bahasa',[["sunny","/ˈsʌni/","kata sifat","cerah","It is sunny today.","Hari ini cerah."],["rainy","/ˈreɪni/","kata sifat","hujan","It is rainy today.","Hari ini hujan."],["cloudy","/ˈklaʊdi/","kata sifat","berawan","It is cloudy.","Cuacanya berawan."],["windy","/ˈwɪndi/","kata sifat","berangin","It is windy today.","Hari ini berangin."]],[
+["“How is the weather?” artinya…",["Jam berapa sekarang?","Bagaimana cuacanya?","Siapa itu?","Berapa harganya?"],1,"“How is the weather?”","Dipakai untuk menanyakan cuaca."],
+["Kamu butuh payung. Cuacanya…",["sunny","rainy","windy","hot"],1,"“rainy” = hujan","Saat rainy, bawalah payung."],
+["Lengkapi: “It is ___ today. Let's fly a kite!”",["rainy","windy","cold","dark"],1,"“windy” = berangin","Layangan terbang saat windy."]],
+["It is sunny today.","Hari ini cerah.","sunny","/ˈsʌni/"])]),
+U('u6','coral','ink-coral','At School','Di Sekolah',[
+L('u6l1','Classroom Things','Benda di Kelas','Kosa kata',[["book","/bʊk/","kata benda","buku","Open your book.","Buka bukumu."],["pencil","/ˈpensl/","kata benda","pensil","This is my pencil.","Ini pensilku."],["ruler","/ˈruːlər/","kata benda","penggaris","I need a ruler.","Saya butuh penggaris."],["desk","/desk/","kata benda","meja","Put it on the desk.","Taruh di atas meja."]],[
+["Alat untuk mengukur garis adalah…",["pencil","ruler","desk","book"],1,"“ruler” = penggaris","ruler dipakai untuk mengukur dan membuat garis lurus."],
+["“Taruh bukumu di atas meja.”",["Put your book on the desk.","Put your desk on the book.","Pick your book in the desk.","Put you book under desk."],0,"“on the desk”","on = di atas."],
+["Lengkapi: “This ___ my pencil.”",["are","am","is","be"],2,"“This is…”","This memakai is."]],
+["Open your book, please.","Buka bukumu, ya.","open","/ˈoʊpən/"]),
+L('u6l2','My Timetable','Jadwal Pelajaran','Ucapan',[["Monday","/ˈmʌndeɪ/","kata benda","hari Senin","We have English on Monday.","Kami ada pelajaran Inggris hari Senin."],["Tuesday","/ˈtuːzdeɪ/","kata benda","hari Selasa","Maths is on Tuesday.","Matematika hari Selasa."],["timetable","/ˈtaɪmteɪbl/","kata benda","jadwal pelajaran","This is my timetable.","Ini jadwal pelajaranku."],["subject","/ˈsʌbdʒɪkt/","kata benda","mata pelajaran","English is my subject.","Bahasa Inggris adalah mata pelajaranku."]],[
+["Lengkapi: “We have English ___ Monday.”",["in","on","at","to"],1,"“on Monday”","Pakai on untuk hari, at untuk jam.","",["pada hari Senin · on Monday","pukul tujuh · at seven"],[["pada hari Senin","on Monday",true],["pada pukul tujuh","at seven",false]]],
+["“Hari Selasa” dalam bahasa Inggris…",["Tuesday","Thursday","Sunday","Saturday"],0,"“Tuesday” = Selasa","Tuesday mirip Thursday, hati-hati."],
+["Lengkapi: “School starts ___ seven o'clock.”",["on","at","in","to"],1,"“at seven”","Untuk jam kita memakai at."]],
+["We have English on Monday.","Kami ada pelajaran Inggris hari Senin.","Monday","/ˈmʌndeɪ/"]),
+L('u6l3','Asking for Help','Meminta Bantuan','Tata bahasa',[["help","/help/","kata kerja","membantu","Can you help me?","Bisakah kamu membantuku?"],["understand","/ˌʌndərˈstænd/","kata kerja","mengerti","I understand.","Saya mengerti."],["repeat","/rɪˈpiːt/","kata kerja","mengulang","Can you repeat, please?","Bisakah kamu mengulang?"],["question","/ˈkwestʃən/","kata benda","pertanyaan","I have a question.","Saya punya pertanyaan."]],[
+["Kamu tidak paham penjelasan guru. Kamu berkata…",["I don't understand.","I don't like you.","I am hungry.","I am fine."],0,"“I don't understand”","Ini cara sopan memberi tahu guru bahwa kamu belum paham."],
+["Kamu ingin guru mengulang. Kamu berkata…",["Stop it, please.","Can you repeat, please?","Give me a pencil.","Where is the door?"],1,"“Can you repeat?”","repeat = mengulang."],
+["“Bolehkah saya bertanya?”",["May I ask a question?","May I eat a question?","Can I ask a answer?","Do I ask question?"],0,"“May I ask…?”","May I untuk meminta izin dengan sopan."]],
+["Can you help me, please?","Bisakah kamu membantuku?","help","/help/"])])
+];
+const LANGKAH=[];KURIKULUM.forEach((u,ui)=>u.l.forEach(l=>LANGKAH.push(Object.assign({u:ui},l))));
+const PAPAN_KELAS=[['Nurul Izzati',2410],['Kumaran Raja',2180],['__SAYA__',1940],['Tan Wei Ling',1725],['Muhammad Firdaus',1510],['Siti Khadijah',1320]];
+const HARI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'],BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HARI_EN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],BULAN_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const langkahBerjalan=()=>LANGKAH.find(x=>!S.selesai[x.id])||LANGKAH[LANGKAH.length-1];
+const hariIdx=()=>(new Date().getDay()+6)%7;
+const peringkat=()=>PAPAN_KELAS.map(p=>p[0]==='__SAYA__'?{n:S.nama,xp:S.xp,saya:true}:{n:p[0],xp:p[1]}).sort((a,b)=>b.xp-a.xp);
+
+/* maskot */
+const RAD={bulat:k=>'50%',kotak:k=>26*k+'px',tetes:k=>`50% 50% ${26*k}px 50%`,tag:k=>`${22*k}px ${22*k}px ${22*k}px ${6*k}px`,daun:k=>`50% 50% 50% ${14*k}px`,kartu:k=>`${36*k}px ${36*k}px ${8*k}px ${36*k}px`,ekor:k=>`${30*k}px ${30*k}px ${30*k}px ${8*k}px`};
+function maskot(n,o){const w=o.w||64,k=w/64,m=o.m||{};
+n.className='mas';n.style.width=n.style.height=w+'px';n.style.background='var(--'+(o.bg||'mint')+')';n.style.borderRadius=RAD[o.bentuk||'bulat'](k);
+const ey=o.mata==='garis'?`<i style="width:${m.mw||12*k}px;height:${m.mh||4*k}px;border-radius:99px"></i>`:`<i style="width:${m.mw||9*k}px;height:${m.mh||9*k}px;border-radius:50%"></i>`;
+const bw=m.bw||3*k,uw=m.uw||24*k,uh=m.uh||12*k,t='var(--tinta)';let mu;
+switch(o.mulut||'senyum'){
+case 'sedih':mu=`<i style="width:${uw}px;height:${uh}px;border:${bw}px solid ${t};border-bottom:0;border-radius:${uw}px ${uw}px 0 0"></i>`;break;
+case 'garis':mu=`<i style="width:${uw}px;height:${bw*1.3}px;background:${t};border-radius:99px"></i>`;break;
+case 'bulat':mu=`<i style="width:${uh*1.1}px;height:${uh*1.1}px;border:${bw}px solid ${t};border-radius:50%"></i>`;break;
+default:mu=`<i style="width:${uw}px;height:${uh}px;border:${bw}px solid ${t};border-top:0;border-radius:0 0 ${uw}px ${uw}px;background:${m.fill||'none'}"></i>`}
+n.innerHTML=`<div class="muka" style="gap:${m.mg||8*k}px"><div class="mata" style="gap:${m.gap||12*k}px">${ey}${ey}</div>${mu}</div>`+(o.lencana?`<span class="lenc" style="width:${w*.3}px;height:${w*.3}px">${ik('check').replace('class="ik"','class="ik" style="font-size:'+w*.18+'px"')}</span>`:'');
+return n}
+const mh=o=>maskot(document.createElement('div'),o).outerHTML;
+
+/* util */
+let tt;
+function toast(s){const e=$('#toast');e.textContent=s;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1900)}
+function konfeti(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const w=['mint','kuning','coral','lavender','langit','pink'];for(let i=0;i<34;i++){const d=document.createElement('i');d.className='kf';d.style.left=Math.random()*100+'%';d.style.background='var(--'+w[Math.floor(Math.random()*6)]+')';d.style.animationDelay=Math.random()*.4+'s';$('#ponsel').appendChild(d);setTimeout(()=>d.remove(),2100)}}
+let suara=null;
+function ucap(teks,pelan){try{const s=speechSynthesis;s.cancel();const u=new SpeechSynthesisUtterance(teks);u.lang='en-GB';u.rate=pelan?.55:.92;u.pitch=1.05;const v=s.getVoices(),p=v.find(x=>/en-GB/i.test(x.lang)&&/female|kate|serena|libby|sonia/i.test(x.name))||v.find(x=>/en-(GB|US)/i.test(x.lang));if(p)u.voice=p;s.speak(u)}catch(e){toast(T('Suara tidak tersedia','Audio unavailable'))}}
+const jam=()=>{const d=new Date();$('#jam').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')};
+const mb=(a,c)=>`<div class="mb">${a.map(v=>`<i style="height:${v}%"></i>`).join('')}</div>`;
+const nyawaH=()=>`<span class="baris g6" style="color:var(--coral);font:800 16px var(--fig)">${ik('favorite')}<b style="color:var(--tinta)">${ses.nyawa}</b></span>`;
+const bar=p=>`<div class="bar"><i style="width:${p}%"></i></div>`;
+const topBar=(p,extra)=>`<div class="baris g12"><button class="ikon-btn" data-go="s-jalur" aria-label="${T('Tutup','Close')}">${ik('close')}</button><div class="f1">${bar(p)}</div>${extra||''}</div>`;
+const SEG=(a)=>`<div class="seg" role="group">${['ID','EN'].map(b=>`<button class="${S.bahasa===b?'on':''}" data-do="bahasa" data-arg="${b}">${b}</button>`).join('')}</div>`;
+const SUIS=(k)=>`<button class="suis${S.suis[k]?' on':''}" role="switch" aria-checked="${!!S.suis[k]}" data-do="suis" data-arg="${k}" aria-label="${k}"><i></i></button>`;
+const beda=(b,s)=>{const w=new Set(s.toLowerCase().split(/\s+/));return b.split(/\s+/).map(x=>w.has(x.toLowerCase())?x:'<mark>'+x+'</mark>').join(' ')};
+
+const RENDER_DUMMY=0;
+/* layout baru */
+const MB=['bulat','kotak','tetes','tag','daun','kartu','ekor'],MM=['senyum','bulat','garis','senyum'];
+const mt=(i,w,bg)=>mh({w,bg,bentuk:MB[i%7],mulut:MM[i%4]});
+const pola=()=>'<div class="pola" aria-hidden="true"><i style="width:130px;height:130px;border-radius:50%;left:-44px;top:30px"></i><i style="width:96px;height:48px;border-radius:96px 96px 0 0;right:-8px;top:190px"></i><i style="width:74px;height:74px;border-radius:50% 50% 50% 16px;right:26px;bottom:150px"></i><i style="width:54px;height:54px;border-radius:50%;left:30px;bottom:70px"></i></div>';
+const FLD=(ic,id,ph,type,ex)=>`<label class="fld">${ik(ic)}<input id="${id}" type="${type||'text'}" placeholder="${ph}" aria-label="${ph}" ${ex||''}></label>`;
+const terkunci=x=>!S.selesai[x.id]&&LANGKAH.indexOf(x)>LANGKAH.indexOf(langkahBerjalan());
+const SHORT=[['Sapaan','Greetings'],['Angka','Numbers'],['Kantin','Canteen'],['Keluarga','Family'],['Hewan','Animals'],['Sekolah','School']];
+const WARNA=['mint','lavender','kuning','langit','pink','coral'];
+const back=(g,l)=>`<button class="ikon-btn" data-go="${g}" aria-label="${l||T('Kembali','Back')}">${ik('arrow_back')}</button>`;
+const RENDER={};
+
+RENDER['s-splash']=()=>{$('#s-splash').innerHTML=`${pola()}<div class="kol tengah g16" style="align-items:center;margin-top:84px;position:relative"><div class="logo apung">${mh({w:96,bg:'mint'})}</div><h1 class="hero" style="font-size:60px">Cakap</h1><p class="sub" style="color:var(--tinta);max-width:260px">${T('Belajar Bahasa Inggris untuk Anak SD','English learning for primary kids')}</p></div><div class="kol g8 mt-auto" style="align-items:center;position:relative"><button class="bulat putih besar" data-do="mulaiApp" aria-label="${T('Mulai','Start')}">${ik('arrow_forward').replace('class="ik"','class="ik" style="font-size:36px"')}</button><span class="eyebrow" style="color:var(--tinta)">${T('Mulai','Start')}</span></div>`};
+RENDER['s-onboarding']=()=>{$('#s-onboarding').innerHTML=`<div class="rw"><span></span><button class="cip" style="background:var(--coral);box-shadow:0 4px 0 var(--bata)" data-go="s-daftar">${T('Lewati','Skip')}</button></div>
+<div class="scene" aria-hidden="true"><span class="apung" style="left:70px;top:50px">${mh({w:190,bg:'mint'})}</span><span class="apung gelembung" style="left:6px;top:6px;background:var(--pink);border-radius:22px 22px 22px 6px;animation-delay:.35s">Hello!</span><span class="apung gelembung" style="right:0;top:86px;background:var(--langit);border-radius:22px 22px 6px 22px;animation-delay:.7s">Halo!</span><span class="apung" style="right:36px;top:4px;color:var(--kuning);animation-delay:1s">${ik('star').replace('class="ik"','class="ik" style="font-size:44px"')}</span><span class="apung" style="left:0;bottom:30px;animation-delay:1.4s">${mh({w:70,bg:'lavender',bentuk:'kotak',mulut:'bulat'})}</span><span class="apung" style="right:6px;bottom:10px;animation-delay:1.7s">${mh({w:84,bg:'coral',bentuk:'kartu'})}</span></div>
+<div class="kol g12 tengah" style="align-items:center"><h1 class="tajuk" style="font-size:32px">${T('Siap Bicara Bahasa Inggris?','Ready to Speak English?')}</h1><p class="sub">${T('Belajar 10 menit sehari, dengan cara kita. Bahasa Indonesia memandu, Bahasa Inggris melatih.','Learn 10 minutes a day, our way. Indonesian guides, English trains.')}</p></div>
+<div class="kol g8 mt-auto" style="align-items:center"><button class="bulat besar" data-go="s-daftar" aria-label="${T('Mulai','Start')}">${ik('arrow_forward').replace('class="ik"','class="ik" style="font-size:36px"')}</button><span class="mini">${T('Ayo mulai','Get started')}</span></div>`};
+RENDER['s-daftar']=()=>{$('#s-daftar').innerHTML=`${pola()}<div class="baris g10" style="justify-content:center;position:relative">${mh({w:40,bg:'putih'})}<b style="font:900 26px var(--fig)">Cakap</b></div>
+<div class="kartu-form"><div class="tengah kol g6"><h2 class="tajuk" style="font-size:28px">${T('Daftar','Sign up')}</h2><span class="mini">${T('Cakap · Belajar Bahasa Inggris','Cakap · Learn English')}</span></div>
+<div class="kol g6"><span class="lbl-f">${T('Nama panggilan','Nickname')}</span>${FLD('person','in-nama',T('Contoh: Aisyah','e.g. Aisyah'),'text','maxlength="24" autocomplete="off"')}</div>
+<div class="kol g6"><span class="lbl-f">${T('Kelas','Grade')}</span><div class="baris g8" id="kls">${[1,2,3,4,5,6].map(k=>`<button class="kls${k===kelasPil?' on':''}" data-do="kelas" data-arg="${k}" aria-label="${T('Kelas','Grade')} ${k}">${k}</button>`).join('')}</div></div>
+<div class="kol g6"><span class="lbl-f">${T('Kode kelas guru (boleh kosong)','Teacher class code (optional)')}</span>${FLD('key','in-kode','5MLT-26','text','maxlength="10" autocomplete="off"')}</div>
+<button class="btn lebar" data-do="daftar">${T('Daftar','Sign up')}</button><div class="atau"><i></i>${T('atau','or')}<i></i></div>
+<div class="btns2"><button class="btn putih kecil" data-go="s-scan">${ik('qr_code_scanner')}${T('Pindai QR','Scan QR')}</button><button class="btn putih kecil" data-do="tamu">${ik('face')}${T('Tamu','Guest')}</button></div>
+<p class="mini tengah">${T('Sudah punya akun?','Have an account?')} <button class="link" data-go="s-masuk">${T('Masuk','Log in')}</button></p></div>`};
+RENDER['s-masuk']=()=>{$('#s-masuk').innerHTML=`${pola()}<div class="baris g10" style="justify-content:center;position:relative">${mh({w:40,bg:'putih'})}<b style="font:900 26px var(--fig)">Cakap</b></div>
+<div class="kartu-form"><div class="tengah kol g6"><h2 class="tajuk" style="font-size:28px">${T('Masuk','Log in')}</h2><span class="mini">${T('Selamat datang lagi!','Welcome back!')}</span></div>
+<div class="kol g6"><span class="lbl-f">${T('Nama panggilan','Nickname')}</span>${FLD('person','in-nama2',T('Contoh: Aisyah','e.g. Aisyah'),'text','maxlength="24" autocomplete="off"')}</div>
+<div class="kol g6"><span class="lbl-f">PIN</span>${FLD('lock','in-pin','••••','password','maxlength="4" inputmode="numeric" autocomplete="off"')}</div>
+<div class="rw"><label class="cek"><input type="checkbox" id="in-ingat" ${S.suis.ingat?'checked':''}>${T('Ingat saya','Remember me')}</label><button class="link" data-do="toast" data-arg="${T('Tanya gurumu untuk atur ulang PIN','Ask your teacher to reset your PIN')}">${T('Lupa PIN?','Forgot PIN?')}</button></div>
+<button class="btn lebar" data-do="masukApp">${T('Masuk','Log in')}</button><div class="atau"><i></i>${T('atau','or')}<i></i></div>
+<div class="btns2"><button class="btn putih kecil" data-go="s-scan">${ik('qr_code_scanner')}${T('Pindai QR','Scan QR')}</button><button class="btn putih kecil" data-do="tamu">${ik('face')}${T('Tamu','Guest')}</button></div>
+<p class="mini tengah">${T('Belum punya akun?','No account yet?')} <button class="link" data-go="s-daftar">${T('Daftar','Sign up')}</button></p></div>`};
+RENDER['s-pin']=()=>{$('#s-pin').innerHTML=`<div class="baris g12">${back('s-daftar')}<span class="mini">${T('Langkah 3/3','Step 3/3')}</span></div><div class="kol g8 tengah" style="align-items:center">${mh({w:70,bg:'coral',bentuk:'tetes'})}<h2 class="tajuk" style="font-size:30px">${T('Buat PIN-mu','Create your PIN')}</h2><p class="sub">${T('Pilih 4 angka yang mudah kamu ingat.','Pick 4 numbers you can remember.')}</p></div>
+<div class="dots" id="dots" aria-live="polite">${[0,1,2,3].map(i=>`<i class="${i<pinBuf.length?'on':''}"></i>`).join('')}</div>
+<div class="keypad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="key" data-do="tekan" data-arg="${n}" aria-label="${n}">${n}</button>`).join('')}<span></span><button class="key" data-do="tekan" data-arg="0" aria-label="0">0</button><button class="key" data-do="tekan" data-arg="x" aria-label="${T('Hapus','Delete')}">${ik('backspace')}</button></div>`};
+RENDER['s-berhasil']=()=>{$('#s-berhasil').innerHTML=`${pola()}<div class="kol tengah g8" style="align-items:center;margin-top:20px;position:relative;opacity:.5"><h2 class="tajuk" style="color:var(--coral)">${T('Selamat datang!','Welcome!')}</h2><p class="sub" style="color:var(--coral-muda)">${T('Akunmu sudah siap dipakai.','Your account is ready.')}</p></div>
+<div class="modal" style="margin-top:20px"><span class="baris g8" style="color:var(--kuning)">${ik('star','')}${ik('star','').replace('class="ik"','class="ik" style="font-size:40px"')}${ik('star','')}</span><span class="apung">${mh({w:110,bg:'mint',lencana:1})}</span><h2 class="tajuk" style="font-size:30px">${T('Berhasil!','Success!')}</h2><p class="sub">${T(`Halo, ${esc(S.nama.split(' ')[0])}! Kamu siap belajar Bahasa Inggris.`,`Hi, ${esc(S.nama.split(' ')[0])}! You are ready to learn English.`)}</p><button class="btn lebar coral" data-do="selesaiDaftar">${T('Selesai','Done')}</button></div>`};
+RENDER['s-home']=()=>{const l=langkahBerjalan(),st=LANGKAH.filter(x=>x.u===l.u),dn=st.filter(x=>S.selesai[x.id]).length,pct=Math.round(dn/st.length*100),nx=LANGKAH.filter(x=>!S.selesai[x.id]).slice(0,5),nm=esc(S.nama.split(' ')[0]);
+const KAT=[[T('Kosa kata','Vocabulary'),'lavender','mulaiKosa'],[T('Ucapan','Speaking'),'langit','mulaiUcap'],[T('Tata bahasa','Grammar'),'pink','mulaiTata'],[T('Menulis','Writing'),'abu','menulis']];
+$('#s-home').innerHTML=`<div class="hero-home"><div class="baris g12"><div class="f1 kol"><span class="lbl-h">${T('Kelas belajarmu','Your class')}</span><b class="baris g6" style="font:800 16px var(--fig)">${ik('location_on')}${T('5 Melati, Jakarta Pusat','5 Melati, Central Jakarta')}</b></div><span class="cip" style="background:var(--kuning);color:var(--ink-kuning)">${ik('local_fire_department')}${S.beruntun}</span><button class="avatar-btn" data-go="s-profil" aria-label="${T('Profil','Profile')}">${mh({w:46,bg:'putih'})}</button></div><h2 class="tajuk" style="font-size:30px;margin-top:14px">${T(`Halo, ${nm}! Mau belajar apa?`,`Hi, ${nm}! What shall we learn?`)}</h2></div>
+<div class="cari">${ik('search')}<input id="cari" placeholder="${T('Cari kata atau pelajaran','Search words or lessons')}" aria-label="${T('Cari','Search')}" value="${esc(pelQ)}"><button class="ikon-btn" style="background:var(--coral);box-shadow:0 3px 0 var(--bata)" data-do="cari" aria-label="${T('Cari','Search')}">${ik('arrow_forward')}</button></div>
+<div class="rw"><b class="judul-tengah">${T('Kategori','Categories')}</b><button class="link" data-go="s-pelajaran">${T('Lihat semua','See all')}</button></div>
+<div class="baris g10 gulung-x" style="padding-bottom:6px">${KAT.map((k,i)=>`<button class="kat" style="background:var(--${k[1]})" data-do="${k[2]}">${mt(i,38,'putih')}<span>${k[0]}</span></button>`).join('')}</div>
+<div class="banner"><div class="f1 kol g6"><b style="font:700 14px var(--jak)">${T('Paket Tantangan','Challenge Pack')}</b><b class="besar">${pct}%</b><span style="font:600 13px var(--jak)">${T(`Selesaikan Unit ${l.u+1} · ${KURIKULUM[l.u].en}`,`Finish Unit ${l.u+1} · ${KURIKULUM[l.u].en}`)}</span><button class="btn kecil coral" style="align-self:flex-start;margin-top:4px" data-do="mulai" data-arg="${l.id}">${T('Lanjut','Continue')}</button></div>${mh({w:104,bg:'kuning',bentuk:'kartu'})}</div>
+<div class="rw"><b class="judul-tengah">${T('Pelajaran Berikutnya','Up Next')}</b><button class="link" data-go="s-jalur">${T('Lihat jalur','See path')}</button></div>
+<div class="baris g12 gulung-x" style="padding-bottom:8px">${nx.map((x,i)=>`<button class="kartu-p" data-do="mulai" data-arg="${x.id}"><span class="blok" style="background:var(--${KURIKULUM[x.u].w})">${mt(x.u+i,64,'putih')}</span><b style="font:800 15px/1.2 var(--fig)">${x.en}</b><span class="mini">${x.idn}</span><b style="font:800 13px var(--jak);color:var(--bata)">+20 XP</b></button>`).join('')}</div>`};
+RENDER['s-kata']=()=>{const l=langkahBerjalan(),hf=l.k.filter(k=>S.hafal[k[0]]).length,sum=l.k.reduce((a,k)=>a+(tgt[k[0]]||2),0);
+$('#s-kata').innerHTML=`<div class="rw">${back('s-home')}<h2 class="judul-skrin">${T('Kata Saya','My Words')}</h2><button class="ikon-btn" data-do="ucapSemua" aria-label="${T('Dengarkan semua','Play all')}">${ik('volume_up')}</button></div>
+${l.k.map((k,i)=>`<div class="row-k"><span class="thumb" style="background:var(--${WARNA[i%6]});color:var(--tinta)">${k[0][0].toUpperCase()}</span><div class="f1 kol g6"><b style="font:800 16px/1.2 var(--fig)">${k[0]}</b><span class="mini" style="color:var(--teks3)">${k[3]} · ${k[1]}</span><span class="mini" style="color:${S.hafal[k[0]]?'var(--ink-mint)':'var(--bata)'}">${S.hafal[k[0]]?T('Sudah hafal','Memorised'):T('Belum hafal','Not yet')}</span></div><div class="step"><button data-do="step" data-arg="${i}|1" aria-label="${T('Tambah','Add')}">+</button><b>${tgt[k[0]]||2}</b><button data-do="step" data-arg="${i}|-1" aria-label="${T('Kurangi','Less')}">−</button></div></div>`).join('')}
+<div class="kol g10" style="margin-top:6px"><div class="tot"><span>${T('Kata hafal','Memorised')}</span><b>${hf}/${l.k.length}</b></div><div class="tot"><span>${T('Target ulangan','Review target')}</span><b style="color:var(--bata)">${sum}×</b></div></div>
+<button class="btn lebar mt-auto" data-do="mulai" data-arg="${l.id}">${ik('play_arrow')}${T('Latihan sekarang','Practise now')}</button>`};
+RENDER['s-pelajaran']=()=>{const cl=langkahBerjalan();let ls=LANGKAH.filter(x=>(pelUnit<0||x.u===pelUnit)&&(!pelQ||(x.en+' '+x.idn).toLowerCase().includes(pelQ.toLowerCase())));
+const tot=[...pelPilih].length;
+$('#s-pelajaran').innerHTML=`<div class="rw">${back('s-home')}<h2 class="judul-skrin">${T('Pelajaran Saya','My Lessons')}</h2><button class="ikon-btn" data-go="s-jalur" aria-label="${T('Jalur belajar','Learning path')}">${ik('route')}</button></div>
+<div class="baris g10 gulung-x" style="padding:4px 2px 8px"><button class="chipu${pelUnit<0?' on':''}" data-do="unit" data-arg="-1"><span class="bl" style="background:var(--tinta);color:var(--coral)">${ik('apps')}</span>${T('Semua','All')}</button>${KURIKULUM.map((u,i)=>`<button class="chipu${pelUnit===i?' on':''}" data-do="unit" data-arg="${i}"><span class="bl" style="background:var(--${u.w})">${mt(i,34,'putih')}</span>${SHORT[i][S.bahasa==='EN'?1:0]}</button>`).join('')}</div>
+${pelQ?`<div class="baris g8"><span class="cip" style="background:var(--coral-muda)">${ik('search')}${esc(pelQ)}<button data-do="hapusCari" aria-label="${T('Hapus','Clear')}">${ik('close')}</button></span></div>`:''}
+${ls.length?`<div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">${ls.map((x,i)=>{const k=terkunci(x),sl=S.selesai[x.id];return `<div class="kartu-g${k?' kunci':''}"><button class="kol g6" style="text-align:left" data-do="mulai" data-arg="${x.id}"><span class="blok" style="background:var(--${KURIKULUM[x.u].w})">${mt(x.u+i,64,'putih')}<span style="position:absolute;top:6px;right:6px;color:var(--tinta)">${ik(sl?'check_circle':k?'lock':'play_circle')}</span></span><b style="font:800 15px/1.2 var(--fig)">${x.en}</b><span class="mini" style="color:var(--teks3)">${x.idn}</span></button><div class="rw"><b style="font:800 14px var(--jak);color:var(--bata)">+20 XP</b><button class="plus${pelPilih.has(x.id)?' on':''}" data-do="pilihPel" data-arg="${x.id}" aria-label="${T('Pilih','Select')}" aria-pressed="${pelPilih.has(x.id)}">${ik(pelPilih.has(x.id)?'check':'add').replace('class="ik"','class="ik" style="font-size:20px"')}</button></div></div>`}).join('')}</div>`:`<p class="sub tengah" style="margin-top:30px">${T('Tidak ada pelajaran yang cocok.','No matching lessons.')}</p>`}
+${tot?`<div class="ttl"><span class="f1 kol"><span style="font:600 12px var(--jak);color:var(--abu-teks2)">${T('Dipilih','Selected')}</span><b style="font:900 18px var(--fig)">${tot} ${T('pelajaran','lessons')} · ${tot*20} XP</b></span><button class="btn coral kecil" style="margin:0" data-do="mulaiPilih">${T('Mulai','Start')}</button></div>`:''}`};
+RENDER['s-jadwal']=()=>{const J=[['wb_sunny','Pagi','Morning','06.30',T('Sebutan pagi: satu kata baru','Morning word: one new word'),0],['school','Sekolah','School','08.00',T('Kelas Bahasa Inggris 5 Melati','English class, 5 Melati'),0],['nightlight','Malam','Night','19.00',T('Pengingat belajar harian','Daily study reminder'),1]];
+$('#s-jadwal').innerHTML=`<div class="rw">${back('s-profil')}<h2 class="judul-skrin">${T('Jadwal Belajar','Study Schedule')}</h2><span style="width:44px"></span></div>
+${J.map(j=>`<div class="jd"><span class="ib" style="width:48px;height:48px;border-radius:16px">${ik(j[0])}</span><span class="f1 kol g6"><b style="font:800 17px var(--fig)">${S.bahasa==='EN'?j[2]:j[1]} · ${j[3]}</b><span class="mini">${j[4]}</span></span>${j[5]?SUIS('ingat'):`<span class="cip" style="background:var(--mint);color:var(--ink-mint);min-height:30px;padding:4px 12px;font-size:12px">${T('Aktif','On')}</span>`}</div>`).join('')}
+<button class="btn lebar coral mt-auto" data-do="toast" data-arg="${T('Jadwal baru segera hadir','New schedules coming soon')}">${T('TAMBAH JADWAL','ADD SCHEDULE')}</button>`};
+RENDER['s-jalur']=()=>{const cl=langkahBerjalan(),ci=LANGKAH.indexOf(cl),ui=lihat==null?cl.u:lihat,u=KURIKULUM[ui],st=LANGKAH.filter(x=>x.u===ui),P=[[24,12],[68,25],[30,39],[66,53]];
+const ic=x=>S.selesai[x.id]?'check':LANGKAH.indexOf(x)===ci?'':'lock';
+$('#s-jalur').innerHTML=`<div class="peta" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><rect width="100" height="100" fill="#F1E8D8"/><path d="M-5 78 C 25 70, 40 92, 70 84 S 105 80, 105 80 L105 105 L-5 105Z" fill="#A5DAF7"/><ellipse cx="86" cy="12" rx="16" ry="9" fill="#C3F0A8"/><ellipse cx="10" cy="62" rx="14" ry="7" fill="#C3F0A8"/><g fill="#fff" stroke="none"><rect x="4" y="22" width="22" height="10" rx="3"/><rect x="74" y="36" width="22" height="9" rx="3"/><rect x="40" y="56" width="22" height="9" rx="3"/><rect x="6" y="40" width="14" height="9" rx="3"/><rect x="80" y="58" width="16" height="10" rx="3"/></g><g stroke="#fff" fill="none" stroke-width="5" vector-effect="non-scaling-stroke"><path d="M-5 30 L105 20" vector-effect="non-scaling-stroke"/><path d="M45 -5 L55 105" vector-effect="non-scaling-stroke"/><path d="M-5 70 L105 62" vector-effect="non-scaling-stroke"/></g><path d="M24 12 C 72 8, 80 20, 68 25 S 26 33, 30 39 S 74 46, 66 53" fill="none" stroke="#FF9270" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 12" vector-effect="non-scaling-stroke"/></svg></div>
+<div class="atas">${back('s-home')}<span class="cip" style="background:#fff;box-shadow:0 3px 0 var(--garis);min-width:0;max-width:200px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Unit ${ui+1} · ${u.en}</span></span><button class="ikon-btn" data-do="ganti" aria-label="${T('Ganti unit','Change unit')}">${ik('tune')}</button></div>
+${st.map((x,i)=>{const gi=LANGKAH.indexOf(x),cls=S.selesai[x.id]?'selesai':gi===ci?'kini':'';return `<button class="nodo ${cls}" style="left:${P[i][0]}%;top:${P[i][1]}%" data-do="mulai" data-arg="${x.id}" aria-label="${x.en}"><span class="bl">${cls==='kini'?mh({w:36,bg:'putih'}):ik(ic(x),'')}</span><span class="tg">${i+1}. ${S.bahasa==='EN'?x.en:x.idn}</span></button>`}).join('')}
+<div class="bawah"><div class="info"><div class="baris g12"><span class="ib">${ik('timer')}</span><span class="kol"><b style="font:800 16px var(--fig)">10–15 ${T('mnt','min')}</b><span class="mini" style="color:var(--teks3)">${T('Waktu belajar','Study time')}</span></span></div><div class="baris g12"><span class="ib">${ik('location_on')}</span><span class="kol"><b style="font:800 16px var(--fig)">Unit ${ui+1} · ${u.en}</b><span class="mini" style="color:var(--teks3)">${T('Tujuan','Destination')}</span></span></div>
+<div class="bar-c">${mh({w:46,bg:'putih'})}<span class="f1 kol"><b style="font:800 15px var(--fig)">${cl.en}</b><span style="font:600 12px var(--jak)">${T('Pelajaran sekarang','Current lesson')}</span></span><button class="bulat putih" style="width:46px;height:46px;--lip:var(--bata);margin:0 0 3px" data-do="mulai" data-arg="${cl.id}" aria-label="${T('Mulai','Start')}">${ik('play_arrow')}</button></div></div></div>`};
+RENDER['s-profil']=()=>{const M=[['manage_accounts',T('Kelola Akun','Manage Account'),'nama'],['history',T('Riwayat Belajar','Study History'),'go:s-kemajuan'],['emoji_events',T('Papan Peringkat','Leaderboard'),'go:s-papan'],['event',T('Jadwal Belajar','Study Schedule'),'go:s-jadwal'],['qr_code_scanner',T('Gabung Kelas','Join a Class'),'go:s-scan'],['bookmark',`${T('Kata Tersimpan','Saved Words')} (${S.simpan.length})`,'toast:'+T('Soal tersimpan muncul di ulangan unit','Saved questions appear in unit reviews')],['grid_view',T('Lihat Semua Layar','See All Screens'),'galeri']];
+const R=(m)=>{const a=m[2].split(':');const at=a[0]==='go'?`data-go="${a[1]}"`:a[0]==='toast'?`data-do="toast" data-arg="${esc(a[1])}"`:`data-do="${a[0]}"`;return `<button class="menu-r" ${at}><span class="ib">${ik(m[0])}</span><span class="f1">${m[1]}</span>${ik('chevron_right')}</button>`};
+$('#s-profil').innerHTML=`<div class="rw"><h2 class="judul-skrin">${T('Profil Saya','My Profile')}</h2><button class="ikon-btn" data-do="nama" aria-label="${T('Ubah nama','Edit name')}">${ik('edit')}</button></div>
+<div class="kartu baris g14" style="background:var(--coral);box-shadow:0 5px 0 var(--bata)">${mh({w:64,bg:'putih'})}<div class="f1 kol g6"><b style="font:900 22px var(--fig)">${esc(S.nama)}</b><span style="font:600 13px var(--jak)">SDN 03 Menteng · ${T('Kelas','Grade')} ${S.kelas||5} Melati</span><span class="baris g6"><span class="cip" style="background:var(--tinta);color:var(--coral);min-height:28px;padding:4px 12px;font-size:12px">${T('Tingkat','Level')} ${S.level}</span><span class="cip" style="background:#fff;min-height:28px;padding:4px 12px;font-size:12px">${fmt(S.xp)} XP</span></span></div></div>
+<div class="kol g10">${M.map(R).join('')}
+<div class="menu-r"><span class="ib">${ik('translate')}</span><span class="f1">${T('Bahasa antarmuka','Interface language')}</span>${SEG()}</div>
+<div class="menu-r"><span class="ib">${ik('cloud_off')}</span><span class="f1 kol"><span>${T('Pelajaran luring','Offline lessons')}</span><span class="mini">${T('Bisa dipakai tanpa kuota','Works without data')}</span></span>${SUIS('luring')}</div>
+<button class="menu-r" data-do="reset"><span class="ib">${ik('logout')}</span><span class="f1">${T('Keluar & mulai ulang','Sign out & reset')}</span>${ik('chevron_right')}</button></div>`};
+const qrH=()=>{let h=7,o='';for(let i=0;i<81;i++){const r=Math.floor(i/9),c=i%9,f=(r<3&&c<3)||(r<3&&c>5)||(r>5&&c<3);h=(h*31+i*17+7)%97;o+=`<i class="${f||h%2?'on':''}"></i>`}return o};
+RENDER['s-scan']=()=>{$('#s-scan').innerHTML=`<div class="rw">${back(S.sudah?'s-profil':'s-daftar')}<h2 class="judul-skrin">${T('Gabung Kelas','Join a Class')}</h2><button class="ikon-btn" data-do="toast" data-arg="${T('Lampu kamera tidak tersedia','Torch unavailable')}" aria-label="${T('Lampu','Torch')}">${ik('flashlight_on')}</button></div>
+<p class="sub tengah">${T('Arahkan kamera ke kode QR dari gurumu.','Point the camera at your teacher\'s QR code.')}</p>
+<div class="scanner" aria-hidden="true"><i class="sudut a"></i><i class="sudut b"></i><i class="sudut c"></i><i class="sudut d"></i><div class="qr">${qrH()}</div><i class="gs"></i></div>
+<div class="kol g8 mt-auto"><span class="lbl-f tengah" style="display:block">${T('atau ketik kode kelas','or type the class code')}</span>${FLD('key','kode','5MLT-26','text','maxlength="10" autocomplete="off"')}<button class="btn lebar coral" data-do="gabung">${T('Gabung','Join')}</button></div>`};
+RENDER['s-selesai']=()=>{const h=ses.hasil||{xp:20,judul:'Hello & Goodbye'};$('#s-selesai').innerHTML=`${pola()}<div class="rw" style="position:relative">${back('s-jalur')}<h2 class="judul-skrin">${T('Berhasil','Success')}</h2><span style="width:44px"></span></div>
+<div class="kol g16 tengah" style="align-items:center;margin-top:34px;position:relative"><div class="lencana-b apung"><div>${ik('check_circle').replace('class="ik"','class="ik" style="font-size:96px;color:var(--coral)"')}</div></div><h2 class="tajuk" style="font-size:32px">${T('Pelajaran Selesai!','Lesson Complete!')}</h2><p class="sub" style="color:var(--tinta)">“${esc(h.judul)}”<br><b style="font:900 28px var(--fig)">+${h.xp} XP</b></p></div>
+<button class="btn lebar putih mt-auto" style="position:relative" data-go="s-jalur">${T('Lanjutkan','Continue')}</button>`};
+
+RENDER['s-card']=()=>{const l=ses.les,k=l.k[ses.kartu],n=l.k.length;
+$('#s-card').innerHTML=topBar((ses.kartu)/n*100,`<span class="mini">${ses.kartu+1}/${n}</span>`)+`<span class="eyebrow">${T('Kartu kosakata','Vocabulary card')}</span>
+<div class="kartu kol g14" style="padding:24px"><div class="baris" style="justify-content:space-between"><span class="cip" style="background:var(--lavender);color:var(--ink-lav);min-height:32px;padding:6px 14px;font-size:13px">${k[2]}</span><button class="bulat" data-do="ucap" data-arg="${k[0]}" aria-label="${T('Putar suara','Play audio')}">${ik('volume_up')}</button></div><b style="font:900 44px/1 var(--fig);letter-spacing:-.02em">${k[0]}</b><span style="font:600 18px var(--jak);color:var(--abu-teks)">${k[1]}</span><hr style="border:0;border-top:1.5px solid var(--garis2)"><span class="eyebrow">${T('Artinya dalam Bahasa Indonesia','Meaning in Indonesian')}</span><b style="font:800 26px var(--fig)">${k[3]}</b><div class="kol g6" style="background:var(--kertas);border-radius:20px;padding:16px"><span style="font:600 16px/1.4 var(--jak)">${hl(k[4],k[0])}</span><span class="mini">${k[5]}</span></div></div>
+<div class="baris g10 mt-auto"><button class="btn putih f1" data-do="kartu" data-arg="0">${T('Belum hafal','Not yet')}</button><button class="btn lime f1" data-do="kartu" data-arg="1">${T('Sudah hafal','Got it')}</button></div>`};
+RENDER['s-quiz']=()=>{const l=ses.les,q=l.q[ses.soal],pl=q.prompt.length>34;
+$('#s-quiz').innerHTML=topBar(ses.soal/l.q.length*100,`<span class="baris g6" style="color:var(--coral)">${nyawaH()}</span>`)+`<span class="eyebrow">${T(`Soal ${ses.soal+1} dari ${l.q.length}`,`Question ${ses.soal+1} of ${l.q.length}`)}</span>
+<div class="kartu kol g12" style="background:var(--putih)"><span class="mini">${q.audio?T('Pilih terjemahan yang benar','Choose the correct translation'):T('Pilih jawaban yang tepat','Choose the right answer')}</span><div class="baris g12"><b class="f1${pl?' kecil':''}" style="font:900 28px/1.15 var(--fig)">${q.prompt}</b>${q.audio?`<button class="bulat" data-do="ucap" data-arg="${q.audio}" aria-label="${T('Putar suara','Play audio')}">${ik('volume_up')}</button>`:''}</div></div>
+<div class="kol g10">${q.opts.map((o,i)=>`<button class="opsi${ses.pilih===i?' pilih':''}" data-do="pilih" data-arg="${i}"><span class="huruf">${'ABCD'[i]}</span><span class="f1">${o}</span>${ik('radio_button_checked','rad')}</button>`).join('')}</div>
+<div class="kol g10 mt-auto"><span class="mini tengah" style="display:flex">${T('Belum yakin? Dengarkan dulu suaranya.','Not sure? Listen first.')}</span><button class="btn lebar" ${ses.pilih<0?'disabled':''} data-do="periksa">${T('Periksa jawaban','Check answer')}</button></div>`};
+RENDER['s-betul']=()=>{const q=ses.les.q[ses.soal],ak=S.jawab?Math.round(S.benar/S.jawab*100):92;
+$('#s-betul').innerHTML=`<div class="kol g12 tengah" style="align-items:center;padding-top:8px">${mh({w:138,bg:'putih',mata:'garis',lencana:1,m:{mw:14,mh:6,gap:26,uw:52,uh:26,bw:5,fill:'var(--pink)',mg:12}})}<b style="font:900 44px var(--fig);color:var(--tinta)">${T('Benar!','Correct!')}</b><span style="font:700 20px var(--jak);color:var(--ink-mint)">That's correct — well done.</span></div>
+<div class="kartu kol g10" style="background:var(--kertas)"><span class="eyebrow">${T('Catatan','Note')}</span><b style="font:800 19px var(--fig)">${q.note.title}</b><p style="font:500 15px/1.45 var(--jak);color:var(--teks2)">${q.note.body}</p><div class="baris g8" style="flex-wrap:wrap">${q.note.chips.map(c=>`<span class="cip" style="background:var(--lavender);color:var(--ink-lav);min-height:32px;padding:6px 14px;font-size:13px">${c}</span>`).join('')}</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="kartu kol g6" style="background:var(--kertas)"><span class="mini">${T('Hadiah','Reward')}</span><b style="font:900 24px var(--fig)">+15 XP</b></div><div class="kartu kol g6" style="background:var(--tinta);color:var(--kertas);border:0"><span class="mini" style="color:var(--abu-teks2)">${T('Ketepatan','Accuracy')}</span><b style="font:900 24px var(--fig)">${ak}%</b></div></div>
+<div class="baris g10 mt-auto"><button class="btn f1" data-do="lanjut">${T('Lanjutkan','Continue')}</button><button class="bulat" style="background:var(--putih)" data-do="bookmark" aria-label="${T('Simpan','Save')}">${ik('bookmark')}</button></div>`};
+RENDER['s-salah']=()=>{const l=ses.les,q=l.q[ses.soal],bn=q.opts[q.a],js=q.opts[ses.pilih]||'';
+$('#s-salah').innerHTML=topBar(ses.soal/l.q.length*100,nyawaH())+`<div class="kartu kol g12"><div class="baris g12">${mh({w:64,bg:'putih',mulut:'sedih',m:{mw:8,mh:8,gap:14,uw:22,uh:11,bw:3}}).replace('class="mas"','class="mas" style="border:2px solid var(--tinta)"')}<div class="kol"><b style="font:900 28px var(--fig)">${T('Belum tepat','Not quite')}</b><span class="mini">Not quite — try again.</span></div></div>
+<div class="kol g6" style="background:var(--kertas);border-radius:18px;padding:14px"><span class="eyebrow">${T('Jawabanmu','Your answer')}</span><span style="font:600 17px var(--jak);text-decoration:line-through;color:var(--abu-teks)">${js}</span></div>
+<div class="kol g6" style="background:var(--lime);border-radius:18px;padding:14px;color:var(--ink-mint)"><span class="eyebrow" style="color:inherit">${T('Jawaban benar','Correct answer')}</span><span style="font:700 17px var(--jak)">${beda(bn,js)}</span></div>
+<div class="kol g8" style="background:var(--kertas);border-radius:18px;padding:14px"><span class="baris g8"><span style="color:var(--ungu)">${ik('lightbulb')}</span><b style="font:800 16px var(--fig)">${T('Kenapa?','Why?')}</b></span><p style="font:500 14px/1.45 var(--jak);color:var(--teks2)">${q.note.body}</p>${q.why.rows.map(r=>`<div class="baris g8 mini"><span class="f1">${r[0]}</span>${ik('arrow_forward')}<b style="color:var(--tinta)">${r[2]?'<mark>'+r[1]+'</mark>':r[1]}</b></div>`).join('')}</div></div>
+<div class="kol g10 mt-auto"><button class="btn lebar" data-do="coba">${T('Coba lagi','Try again')}</button><button class="btn lebar putih" data-do="simpanUlang">${T('Simpan ke ulangan','Save for review')}</button></div>`};
+const POLA=[30,60,85,45,100,70,35,55,25,65,40,20];
+RENDER['s-sebut']=()=>{if(!ses.les)ses.les=langkahBerjalan();const s=ses.les.s,ws=s[0].split(' ');
+$('#s-sebut').innerHTML=`<div class="baris g12"><button class="ikon-btn" data-go="s-jalur" aria-label="${T('Kembali','Back')}">${ik('arrow_back')}</button><h2 class="judul-skrin f1">${T('Latihan Ucapan','Speaking Practice')}</h2><button class="ikon-btn" data-do="toast" data-arg="${T('Tekan dan tahan mikrofon, lalu ucapkan kalimatnya','Press and hold the mic, then say the sentence')}" aria-label="${T('Bantuan','Help')}">${ik('help')}</button></div>
+<div class="kartu kol g12" style="background:var(--langit);color:var(--ink-langit);border:0"><span class="eyebrow" style="color:inherit">${T('Ucapkan setelah saya','Repeat after me')}</span><b style="font:900 30px/1.12 var(--fig)">${s[0]}</b><span style="font:600 15px var(--jak)">${s[1]}</span><div class="gel" id="gel">${POLA.map(p=>`<i style="height:${p}%"></i>`).join('')}</div></div>
+<span class="eyebrow">${T('Kata yang perlu diperbaiki','Words to improve')}</span><div class="baris g8" style="flex-wrap:wrap">${ws.map(w=>{const f=w.toLowerCase().replace(/[^a-z']/g,'')===s[2].toLowerCase();return f?`<span class="cip" style="background:var(--kuning);color:var(--ink-kuning);border:2px solid var(--tinta)">${w.replace(/[!?.,]/g,'')} <span style="font-weight:600">${s[3]}</span></span>`:`<span class="cip" style="background:var(--lime);color:var(--ink-mint)">${w.replace(/[!?.,]/g,'')} ✓</span>`}).join('')}</div>
+<div class="kol g14 mt-auto" style="align-items:center"><span class="mini">${T('Tekan dan tahan untuk merekam','Press and hold to record')}</span><button class="bulat besar mik" id="mik" aria-label="${T('Rekam','Record')}">${ik('mic').replace('class="ik"','class="ik" style="font-size:38px"')}</button><div class="baris g10"><button class="btn putih" data-do="pelan">${ik('slow_motion_video')}${T('Pelan','Slow')}</button><button class="btn putih" data-do="lewati">${ik('skip_next')}${T('Lewati','Skip')}</button></div></div>`};
+RENDER['s-papan']=()=>{const pr=peringkat(),mu=perPapan?4:1,ip=pr.findIndex(x=>x.saya),col=['lavender','langit','mint'],ink=['ink-lav','ink-langit','ink-mint'];
+$('#s-papan').innerHTML=`<div class="baris g12"><h2 class="judul-skrin f1">${T('Papan Peringkat','Leaderboard')}</h2><button class="cip" style="background:var(--putih);border:1.5px solid var(--garis)" data-do="periode">${perPapan?T('Bulanan','Monthly'):T('Mingguan','Weekly')}${ik('expand_more')}</button></div>
+<div class="kartu baris g12" style="background:var(--kuning);color:var(--ink-kuning);border:0">${ik('emoji_events').replace('class="ik"','class="ik" style="font-size:36px"')}<span class="kol g6"><b style="font:800 18px var(--fig)">${T('Kelas 5 Melati','Class 5 Melati')}</b><span style="font:500 14px var(--jak)">${T('3 hari lagi sebelum minggu berakhir','3 days left before the week ends')}</span></span></div>
+${pr.map((r,i)=>{const top=i<3;return `<div class="rank" style="${top?`background:var(--${col[i]});color:var(--${ink[i]});border-color:transparent`:''}${r.saya?';border:2.5px solid var(--tinta)':''}"><b class="n">${i+1}</b>${r.saya?mh({w:38}):`<span style="width:38px;height:38px;border-radius:50%;background:var(--abu);display:grid;place-items:center;font:800 14px var(--fig);color:var(--teks2);flex:none">${r.n[0]}</span>`}<span class="f1 kol"><b style="font:700 15px var(--jak)">${r.saya?T('Kamu','You'):r.n}</b>${r.saya?`<span style="font:600 12px var(--jak)">${i===0?T('Kamu di puncak!','You are on top!'):T(`${fmt(pr[i-1].xp-r.xp+1)} XP lagi untuk naik`,`${fmt(pr[i-1].xp-r.xp+1)} XP to move up`)}</span>`:''}</span><b style="font:800 16px var(--fig)">${fmt(r.xp*mu)}</b></div>`}).join('')}
+<button class="kartu baris g12 mt-auto" style="background:var(--tinta);color:var(--kertas);border:0" data-do="ajak">${ik('group_add')}<span class="f1 kol g6"><b style="font:800 17px var(--fig)">${T('Ajak teman sekelas','Invite classmates')}</b><span style="font:500 13px var(--jak);color:var(--abu-teks2)">${T('Bagikan kode kelas 5MLT-26','Share class code 5MLT-26')}</span></span></button>`};
+RENDER['s-kemajuan']=()=>{const hm=S.hariMenit,mx=Math.max(...hm),sum=perKm===0?S.menit:perKm===1?S.menit*4:S.menit*48,hi=hariIdx(),D=['Sen','Sel','Rab','Kam','Jum','Sab','Min'],DE=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],per=[[T('Minggu','Week'),T('minggu ini','this week')],[T('Bulan','Month'),T('bulan ini','this month')],[T('Tahun','Year'),T('tahun ini','this year')]],ak=S.jawab?Math.round(S.benar/S.jawab*100):88;
+$('#s-kemajuan').innerHTML=`<div class="baris g12"><h2 class="judul-skrin f1">${T('Kemajuanku','My Progress')}</h2><button class="ikon-btn" data-go="s-papan" aria-label="${T('Papan peringkat','Leaderboard')}">${ik('emoji_events')}</button></div>
+<div class="baris g8">${per.map((p,i)=>`<button class="cip" style="${perKm===i?'background:var(--tinta);color:var(--kertas)':'background:var(--putih);border:1.5px solid var(--garis)'}" data-do="perKm" data-arg="${i}">${p[0]}</button>`).join('')}</div>
+<div class="kartu kol g12" style="background:var(--lavender);color:var(--ink-lav);border:0"><span class="mini" style="color:inherit">${T('Menit belajar '+per[perKm][1],'Study minutes '+per[perKm][1])}</span><div class="baris g10"><b style="font:900 36px var(--fig)">${sum} ${T('mnt','min')}</b><span class="cip" style="background:var(--lime);color:var(--ink-mint);min-height:28px;padding:4px 12px;font-size:13px">+22%</span></div><div class="grafik">${hm.map((v,i)=>`<div class="${i===hi?'hi':''}"><i style="height:${Math.max(8,v/mx*100)}%"></i>${T(D[i],DE[i])}</div>`).join('')}</div></div>
+<div class="grid3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${[[S.kata,T('Kata dipelajari','Words learned')],[ak+'%',T('Ketepatan kuis','Quiz accuracy')],[S.beruntun,T('Hari berturut','Day streak')]].map(x=>`<div class="kartu kol g6" style="padding:14px"><b style="font:900 24px var(--fig)">${x[0]}</b><span class="mini">${x[1]}</span></div>`).join('')}</div>
+<div class="kartu kol g12"><b style="font:800 17px var(--fig)">${T('Kemahiran','Skills')}</b>${[[T('Kosa kata','Vocabulary'),82,'lavender'],[T('Ucapan','Speaking'),64,'langit'],[T('Tata bahasa','Grammar'),71,'pink']].map(x=>`<div class="kol g6"><div class="baris" style="justify-content:space-between;font:700 14px var(--jak)"><span>${x[0]}</span><span>${x[1]}%</span></div><div class="bar tebal"><i style="width:${x[1]}%;background:var(--${x[2]});border:2px solid var(--tinta)"></i></div></div>`).join('')}</div>
+<div class="kartu baris g12" style="background:var(--coral);color:var(--ink-coral);border:0">${ik('target')}<span class="f1 kol g6"><b style="font:800 17px var(--fig)">${T('Fokus tata bahasa minggu depan','Grammar focus next week')}</b><span style="font:500 14px var(--jak)">${T('12 kesalahan berulang','12 repeated mistakes')}</span></span></div>`};
+/* navigasi */
+const TAB={'s-home':'s-home','s-kata':'s-kata','s-pelajaran':'s-pelajaran','s-jalur':'s-pelajaran','s-profil':'s-profil','s-kemajuan':'s-profil','s-papan':'s-profil'};
+const ID_LAYAR=[['s-splash','Splash'],['s-onboarding','Onboarding'],['s-daftar','Daftar'],['s-masuk','Masuk'],['s-pin','Buat PIN'],['s-berhasil','Berhasil'],['s-home','Beranda'],['s-kata','Kata Saya'],['s-pelajaran','Pelajaran'],['s-jalur','Jalur Belajar'],['s-jadwal','Jadwal'],['s-profil','Profil'],['s-scan','Gabung Kelas'],['s-selesai','Pelajaran Selesai'],['s-card','Kartu Kosakata'],['s-quiz','Kuis'],['s-betul','Jawaban Benar'],['s-salah','Jawaban Salah'],['s-sebut','Latihan Ucapan'],['s-papan','Papan Peringkat'],['s-kemajuan','Kemajuanku']];
+function pergi(id){if(id==='s-jalur'&&cur!=='s-jalur')lihat=null;if(id==='s-pin')pinBuf='';$$('.screen').forEach(s=>s.classList.remove('active'));const e=$('#'+id);e.classList.add('active');e.scrollTop=0;const c=e.dataset.st||e.dataset.bg;$('#ponsel').style.background=c?'var(--'+c+')':'';$('#tab').classList.toggle('hidden',!TAB[id]);$$('#tab button[data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===TAB[id]));cur=id;RENDER[id]&&RENDER[id]();document.documentElement.lang=S.bahasa==='EN'?'en':'id'}
+const ulang=()=>RENDER[cur]&&RENDER[cur]();
+const baru=o=>ses=Object.assign({les:langkahBerjalan(),kartu:0,soal:0,nyawa:3,betul:0,pilih:-1,solo:false,sx:0},o||{});
+function mulai(id){const l=LANGKAH.find(x=>x.id===id);if(terkunci(l)){toast(T('Selesaikan pelajaran sebelumnya dulu ya','Finish the previous lesson first'));return}baru({les:l});pergi('s-card')}
+function selesaiPelajaran(){const l=ses.les;S.selesai[l.id]=true;S.menit+=8;S.hariMenit[hariIdx()]+=8;S.xp+=20;S.xpMinggu+=20;simpan();ses.hasil={xp:20+ses.sx,judul:l.en};konfeti();pergi('s-selesai')}
+function mulaiRek(){if(rek)return;const g=$('#gel');if(!g)return;g.classList.add('rek');$('#mik').classList.add('rekam');rek={t:Date.now(),iv:setInterval(()=>[...g.children].forEach(b=>{const h=15+Math.random()*70;b.style.height=h+'%';b.classList.toggle('kuat',h>78)}),120),to:setTimeout(hentiRek,5000)}}
+function hentiRek(){if(!rek)return;clearInterval(rek.iv);clearTimeout(rek.to);const d=Date.now()-rek.t;rek=null;const g=$('#gel');if(g){g.classList.remove('rek');[...g.children].forEach((b,i)=>{b.style.height=POLA[i]+'%';b.classList.remove('kuat')})}const m=$('#mik');m&&m.classList.remove('rekam');if(d<400){toast(T('Tahan sedikit lebih lama ya','Hold a little longer'));return}
+const sk=78+Math.floor(Math.random()*21);S.xp+=10;S.xpMinggu+=10;ses.sx+=10;simpan();toast(T(`Ucapanmu ${sk}%! +10 XP`,`Your speaking: ${sk}%! +10 XP`));setTimeout(()=>ses.solo?pergi('s-home'):selesaiPelajaran(),800)}
+function galeri(){if($('#galeri'))return;const o=document.createElement('div');o.id='galeri';o.innerHTML=`<div class="g-top"><span>Cakap — ${ID_LAYAR.length} ${T('layar','screens')}</span><button class="btn kecil" data-do="tutupGaleri">${T('Tutup','Close')}</button></div><div class="g-grid"></div>`;const g=o.querySelector('.g-grid');
+ID_LAYAR.forEach((x,i)=>{const f=document.createElement('figure');if(i%2)f.style.marginTop='34px';f.innerHTML=`<div class="g-fr"><iframe title="${x[1]}" loading="lazy"></iframe></div><figcaption>${String(i+1).padStart(2,'0')} · ${x[1]}</figcaption>`;f.querySelector('iframe').srcdoc='<!DOCTYPE html>'+SRC.replace('</head>','<script>window.LAYAR="'+x[0]+'"<\/script></head>');g.appendChild(f)});document.body.appendChild(o)}
+const AKSI={
+bahasa:a=>{S.bahasa=a;simpan();document.documentElement.lang=a==='EN'?'en':'id';ulang()},
+suis:a=>{S.suis[a]=!S.suis[a];simpan();ulang()},
+toast:a=>toast(a),
+mulaiApp:()=>pergi(S.sudah?'s-home':'s-onboarding'),
+kelas:a=>{kelasPil=+a;$$('#kls .kls').forEach(b=>b.classList.toggle('on',b.dataset.arg===a))},
+daftar:()=>{const n=($('#in-nama').value||'').trim();if(!n){toast(T('Tulis nama panggilanmu dulu ya','Please type your nickname'));$('#in-nama').focus();return}S.nama=n.slice(0,24);S.kelas=kelasPil;S.level=kelasPil<=2?'A1':kelasPil<=4?'A2':'B1';simpan();pergi('s-pin')},
+masukApp:()=>{const n=($('#in-nama2').value||'').trim(),p=$('#in-pin').value;if(!n){toast(T('Tulis nama panggilanmu dulu ya','Please type your nickname'));return}if(p.length<4){toast(T('PIN terdiri dari 4 angka','PIN has 4 digits'));return}S.nama=n.slice(0,24);S.suis.ingat=$('#in-ingat').checked;S.sudah=true;simpan();toast(T('Selamat datang kembali!','Welcome back!'));pergi('s-home')},
+tamu:()=>{S.sudah=true;simpan();pergi('s-home')},
+tekan:a=>{if(a==='x')pinBuf=pinBuf.slice(0,-1);else if(pinBuf.length<4)pinBuf+=a;$$('#dots i').forEach((d,i)=>d.classList.toggle('on',i<pinBuf.length));if(pinBuf.length===4){setTimeout(()=>{if(cur==='s-pin'){konfeti();pergi('s-berhasil')}},300)}},
+selesaiDaftar:()=>{S.sudah=true;simpan();pergi('s-home')},
+cari:()=>{pelQ=($('#cari').value||'').trim();pelUnit=-1;pergi('s-pelajaran')},
+hapusCari:()=>{pelQ='';ulang()},
+menulis:()=>toast(T('Menulis akan hadir di pembaruan berikutnya','Writing is coming in the next update')),
+unit:a=>{pelUnit=+a;ulang()},
+pilihPel:a=>{pelPilih.has(a)?pelPilih.delete(a):pelPilih.add(a);ulang()},
+mulaiPilih:()=>{const x=LANGKAH.find(y=>pelPilih.has(y.id)&&!terkunci(y));if(!x){toast(T('Pelajaran terpilih masih terkunci','Selected lessons are locked'));return}pelPilih.delete(x.id);mulai(x.id)},
+step:a=>{const [i,d]=a.split('|'),k=langkahBerjalan().k[+i][0];tgt[k]=Math.max(1,Math.min(5,(tgt[k]||2)+ +d));ulang()},
+ucapSemua:()=>ucap(langkahBerjalan().k.map(k=>k[0]).join('. ')),
+gabung:()=>{const v=($('#kode').value||'').trim().toUpperCase();if(v==='5MLT-26'){S.sudah=true;simpan();konfeti();pergi('s-berhasil')}else toast(T('Kode kelas tidak ditemukan','Class code not found'))},
+galeri:()=>galeri(),tutupGaleri:()=>{const g=$('#galeri');g&&g.remove()},
+mulai:a=>mulai(a),
+mulaiKosa:()=>mulai(langkahBerjalan().id),
+mulaiUcap:()=>{baru({solo:true});pergi('s-sebut')},
+mulaiTata:()=>{baru({solo:true});pergi('s-quiz')},
+ganti:()=>{const cl=langkahBerjalan();lihat=((lihat==null?cl.u:lihat)+1)%KURIKULUM.length;ulang()},
+ucap:a=>ucap(a),
+pelan:()=>{if(!ses.les)ses.les=langkahBerjalan();ucap(ses.les.s[0],true)},
+kartu:a=>{const l=ses.les;if(a==='1'){S.hafal[l.k[ses.kartu][0]]=true;S.kata=412+Object.keys(S.hafal).length;simpan()}ses.kartu++;if(ses.kartu>=l.k.length){ses.soal=0;ses.pilih=-1;pergi('s-quiz')}else ulang()},
+pilih:a=>{ses.pilih=+a;ulang()},
+periksa:()=>{const q=ses.les.q[ses.soal];S.jawab++;if(ses.pilih===q.a){S.benar++;ses.betul++;S.xp+=15;S.xpMinggu+=15;simpan();konfeti();pergi('s-betul')}else{ses.nyawa--;simpan();pergi('s-salah')}},
+lanjut:()=>{ses.soal++;ses.pilih=-1;if(ses.soal>=ses.les.q.length){ses.soal=0;ses.solo?pergi('s-home'):pergi('s-sebut')}else pergi('s-quiz')},
+bookmark:()=>{const q=ses.les.q[ses.soal];if(!S.simpan.includes(q.prompt))S.simpan.push(q.prompt);simpan();toast(T('Disimpan ke ulangan','Saved for review'))},
+coba:()=>{if(ses.nyawa<=0){ses.nyawa=3;ses.soal=0;toast(T('Nyawa habis — ulang dari soal 1','Out of lives — back to question 1'))}ses.pilih=-1;pergi('s-quiz')},
+simpanUlang:()=>{const q=ses.les.q[ses.soal];if(!S.simpan.includes(q.prompt))S.simpan.push(q.prompt);simpan();toast(T('Disimpan ke ulangan','Saved for review'));AKSI.coba()},
+lewati:()=>{if(ses.solo||!ses.les)pergi('s-home');else selesaiPelajaran()},
+periode:()=>{perPapan=perPapan?0:1;ulang()},
+perKm:a=>{perKm=+a;ulang()},
+ajak:()=>{try{navigator.clipboard.writeText('5MLT-26')}catch(e){}toast(T('Kode kelas 5MLT-26 disalin','Class code 5MLT-26 copied'))},
+nama:()=>{const n=prompt(T('Nama kamu:','Your name:'),S.nama);if(n&&n.trim()){S.nama=n.trim().slice(0,24);simpan();ulang()}},
+reset:()=>{if(confirm(T('Mulai ulang semua kemajuan?','Reset all progress?'))){S=JSON.parse(JSON.stringify(AWAL));simpan();baru();tgt={};pelPilih.clear();pelQ='';pelUnit=-1;pergi('s-splash')}}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-go],[data-do]');if(!el)return;if(el.dataset.go){const t=el.dataset.go;if($('#galeri')&&!LAYAR)AKSI.tutupGaleri();pergi(t)}else{const f=AKSI[el.dataset.do];f&&f(el.dataset.arg,el)}});
+document.addEventListener('pointerdown',e=>{if(e.target.closest('#mik')){e.preventDefault();mulaiRek()}});
+['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,hentiRek));
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='cari')AKSI.cari();if(e.key==='Escape')AKSI.tutupGaleri()});
+window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.id==='mik'&&!rek){e.preventDefault();mulaiRek()}});
+window.addEventListener('keyup',e=>{if(e.code==='Space'&&e.target.id==='mik')hentiRek()});
+jam();setInterval(jam,20000);
+try{speechSynthesis.getVoices()}catch(e){}
+if(LAYAR){document.documentElement.classList.add('gal');const l=LANGKAH[0];baru({les:l});const D={'s-card':{kartu:1},'s-quiz':{pilih:1},'s-betul':{pilih:1},'s-salah':{pilih:0,nyawa:2},'s-selesai':{hasil:{xp:20,judul:l.en}}};Object.assign(ses,D[LAYAR]||{});pergi(LAYAR)}else pergi('s-splash');
+</script>
+</body>
+</html>

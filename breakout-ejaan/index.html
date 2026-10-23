@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Breakout Ejaan</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+body{background:#0c1a33;background:linear-gradient(#10244a,#081226);display:grid;place-items:center}
+#cv{margin-top:50px;border-radius:14px;box-shadow:0 0 0 3px #2a4a86,0 20px 60px rgba(0,0,0,.5);touch-action:none}
+#word{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:30;display:flex;gap:6px;align-items:center;background:rgba(255,250,240,.95);padding:8px 14px;border-radius:16px}
+#word small{font-size:13px;color:#7a6452;margin-right:6px}
+#word span{width:34px;height:40px;border-radius:8px;background:#efe2c9;display:grid;place-items:center;font:700 22px 'Space Mono',monospace;color:#2a1a10}
+#word span.f{background:#3ecf8e;color:#fff;animation:eduFlash .3s}
+#word span.n{outline:3px solid #FD5E2B}
+</style></head><body>
+<canvas id="cv"></canvas><div id="word"></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Breakout Ejaan: remake javascript-breakout (jakesgordon, MIT). Kode ditulis ulang; bata berisi huruf. */
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),CW,CH,COLS=9,ROWS=4;
+var G={bricks:[],ball:null,pad:null,word:'',meaning:'',idx:0,score:0,lives:3,run:false,parts:[],done:0};
+var RC=['#ff5d73','#ffb347','#ffe066','#5fe3a1','#4fc3f7'];
+EDU.hud({title:'Breakout Ejaan',lives:true,credit:'Remake javascript-breakout · Jake Gordon (MIT)'});
+function size(){CW=Math.min(innerWidth-20,860);CH=Math.min(innerHeight-150,560);cv.width=CW;cv.height=CH}
+size();
+function newWord(){var v=EDU.pick(EDU.VOCAB.filter(function(v){return v[0].length<=6&&v[0]!==G.word.toLowerCase()}));G.word=v[0].toUpperCase();G.meaning=v[1];G.idx=0;
+  var letters=G.word.split(''),AZ='ABCDEFGHIJKLMNOPRSTUWY';while(letters.length<COLS*ROWS)letters.push(AZ[EDU.rand(0,AZ.length-1)]);letters=EDU.shuffle(letters);
+  var bw=(CW-40)/COLS,bh=Math.min(44,CH*.075);G.bricks=letters.map(function(l,i){return {l:l,x:20+(i%COLS)*bw,y:60+Math.floor(i/COLS)*(bh+8),w:bw-8,h:bh,c:RC[Math.floor(i/COLS)%RC.length],alive:true,flash:0}});
+  EDU.setQ('Eja: '+G.meaning+' → ?');drawWord()}
+function drawWord(){EDU.$('#word').innerHTML='<small>'+G.meaning+' =</small>'+G.word.split('').map(function(l,i){return '<span class="'+(i<G.idx?'f':i===G.idx?'n':'')+'">'+(i<G.idx?l:'')+'</span>'}).join('')}
+function need(){return G.word.slice(G.idx)}
+function resetBall(){G.pad={w:Math.max(110,CW*.16),x:CW/2,y:CH-26};G.ball={x:CW/2,y:CH-46,vx:3.2,vy:-5,r:9,stuck:true};setTimeout(function(){G.ball.stuck=false},EDU.demo?300:900)}
+function hit(b){
+  var l=b.l;if(l===G.word[G.idx]){b.alive=false;G.idx++;G.score+=10;EDU.setScore(G.score);EDU.sfx('ok');burst(b,'#5fe3a1');EDU.floatText(cv.getBoundingClientRect().left+b.x+b.w/2,cv.getBoundingClientRect().top+b.y,l,true);drawWord();
+    if(G.idx>=G.word.length){G.done++;G.score+=30;EDU.setScore(G.score);EDU.sfx('win');EDU.toast('✔ '+G.word+' = '+G.meaning,true);setTimeout(function(){newWord();resetBall()},700)}}
+  else{b.alive=false;burst(b,b.c);EDU.sfx('pop');
+    if(need().indexOf(l)>=0)setTimeout(function(){var d=EDU.shuffle(G.bricks.filter(function(z){return !z.alive}))[0];if(d){d.alive=true;d.l=l;d.flash=12}},900)}
+  if(!G.bricks.some(function(z){return z.alive&&z.l===G.word[G.idx]})&&G.idx<G.word.length){var d=G.bricks.find(function(z){return !z.alive});if(d){d.alive=true;d.l=G.word[G.idx]}}
+}
+function burst(b,c){for(var i=0;i<14;i++)G.parts.push({x:b.x+b.w/2,y:b.y+b.h/2,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,l:30,c:c})}
+function step(){
+  var b=G.ball,p=G.pad;if(!G.run)return;
+  if(EDU.demo)aim();
+  if(b.stuck){b.x=p.x;b.y=p.y-20;return}
+  b.x+=b.vx;b.y+=b.vy;
+  if(b.x<b.r||b.x>CW-b.r){b.vx*=-1;b.x=Math.max(b.r,Math.min(CW-b.r,b.x))}
+  if(b.y<b.r){b.vy=Math.abs(b.vy)}
+  if(b.y>p.y-10&&b.y<p.y+8&&Math.abs(b.x-p.x)<p.w/2+b.r&&b.vy>0){var off=(b.x-p.x)/(p.w/2),sp=Math.hypot(b.vx,b.vy),a=off*1.05;b.vx=sp*Math.sin(a);b.vy=-sp*Math.cos(a);EDU.sfx('tick')}
+  if(b.y>CH+20){G.lives--;EDU.setLives(G.lives);EDU.sfx('bad');if(G.lives<=0)return over();resetBall()}
+  for(var i=0;i<G.bricks.length;i++){var k=G.bricks[i];if(!k.alive)continue;
+    if(b.x>k.x-b.r&&b.x<k.x+k.w+b.r&&b.y>k.y-b.r&&b.y<k.y+k.h+b.r){var ox=Math.min(b.x-(k.x-b.r),k.x+k.w+b.r-b.x),oy=Math.min(b.y-(k.y-b.r),k.y+k.h+b.r-b.y);if(ox<oy)b.vx*=-1;else b.vy*=-1;hit(k);break}}
+}
+/* demo: arahkan pantulan ke bata huruf berikutnya */
+function aim(){var b=G.ball,p=G.pad,t=G.bricks.find(function(z){return z.alive&&z.l===G.word[G.idx]});var px=b.x;
+  if(t&&b.vy>0){var tx=t.x+t.w/2,ty=t.y+t.h/2,ang=Math.atan2(tx-b.x,(p.y-ty));var off=Math.max(-.85,Math.min(.85,ang/1.05));px=b.x-off*p.w/2}
+  p.x+=(px-p.x)*.25}
+function draw(){
+  x.clearRect(0,0,CW,CH);var g=x.createLinearGradient(0,0,0,CH);g.addColorStop(0,'#13284f');g.addColorStop(1,'#0a1730');x.fillStyle=g;x.fillRect(0,0,CW,CH);
+  G.bricks.forEach(function(k){if(!k.alive)return;var sh=k.flash>0?Math.sin(k.flash--)*3:0;x.fillStyle=k.c;x.beginPath();x.roundRect(k.x+sh,k.y,k.w,k.h,8);x.fill();x.fillStyle='rgba(255,255,255,.3)';x.fillRect(k.x+sh+4,k.y+3,k.w-8,4);
+    x.fillStyle='#1b1030';x.font='700 '+Math.round(k.h*.62)+'px Space Mono';x.textAlign='center';x.textBaseline='middle';x.fillText(k.l,k.x+k.w/2+sh,k.y+k.h/2+1)});
+  G.parts=G.parts.filter(function(q){q.x+=q.vx;q.y+=q.vy;q.vy+=.15;x.globalAlpha=q.l/30;x.fillStyle=q.c;x.fillRect(q.x,q.y,5,5);x.globalAlpha=1;return --q.l>0});
+  var p=G.pad,b=G.ball;if(!p)return;x.fillStyle='#FD5E2B';x.beginPath();x.roundRect(p.x-p.w/2,p.y,p.w,14,7);x.fill();
+  x.fillStyle='#fff';x.shadowColor='#9fd8ff';x.shadowBlur=14;x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill();x.shadowBlur=0;
+}
+function loop(){step();step();draw();requestAnimationFrame(loop)}
+cv.addEventListener('pointermove',function(e){if(!G.pad||EDU.demo)return;var r=cv.getBoundingClientRect();G.pad.x=Math.max(G.pad.w/2,Math.min(CW-G.pad.w/2,(e.clientX-r.left)*CW/r.width))});
+document.addEventListener('keydown',function(e){if(!G.pad)return;if(e.key==='ArrowLeft')G.pad.x=Math.max(G.pad.w/2,G.pad.x-40);if(e.key==='ArrowRight')G.pad.x=Math.min(CW-G.pad.w/2,G.pad.x+40)});
+function start(){G.score=0;G.lives=3;G.done=0;G.run=true;G.word='';EDU.setScore(0);EDU.setLives(3);newWord();resetBall()}
+function over(){G.run=false;EDU.end({key:'breakout',score:G.score,max:200,head:'Bola habis',note:'<p>'+G.done+' kata selesai dieja.</p>'},start)}
+requestAnimationFrame(loop);
+EDU.title({key:'breakout',title:'Breakout Ejaan',mapel:'Bahasa Inggris · SD Kelas 3–6',desc:'Pecahkan bata huruf sesuai urutan ejaan kata Inggris.',how:['Gerakkan papan dengan mouse/jari atau panah.','Kena huruf berikutnya = huruf terisi (+10).','Huruf pengecoh pecah tanpa poin. Selesaikan katanya untuk bonus.']},start);
+</script></body></html>

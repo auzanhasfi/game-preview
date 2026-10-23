@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Pac-Jawab Ibu Kota</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>body{background:#000;display:grid;place-items:center}#cv{margin-top:52px}</style></head><body>
+<canvas id="cv"></canvas>
+<div class="edu-pad touch" style="left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,62px);gap:6px"><span></span><button data-d="0">▲</button><span></span><button data-d="3">◀</button><button data-d="2">▼</button><button data-d="1">▶</button></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Pac-Jawab: remake pacman (mumuy/pacman, MIT). Kode ditulis ulang: makan jawaban yang benar. */
+var MAP=['###################','#........#........#','#.##.###.#.###.##.#','#.................#','#.##.#.#####.#.##.#','#....#...#...#....#','####.###.#.###.####','#.......G.G.......#','####.#.#####.#.####','#....#...#...#....#','#.##.###.#.###.##.#','#..#.....P.....#..#','##.#.#.#####.#.#.##','#....#...#...#....#','###################'];
+var IK=[['Jawa Barat','Bandung'],['Jawa Tengah','Semarang'],['Jawa Timur','Surabaya'],['Bali','Denpasar'],['Sumatera Utara','Medan'],['Sulawesi Selatan','Makassar'],['Kalimantan Timur','Samarinda'],['Papua','Jayapura'],['Aceh','Banda Aceh'],['Riau','Pekanbaru'],['NTB','Mataram'],['Sumatera Barat','Padang'],['Kalimantan Barat','Pontianak'],['Lampung','Bandar Lampung']];
+var W=19,H=15,CS,cv=EDU.$('#cv'),x=cv.getContext('2d'),D=[[0,-1],[1,0],[0,1],[-1,0]];
+var G={dots:{},ans:[],q:null,pac:null,gh:[],score:0,lives:3,run:false,benar:0,salah:0,inv:0,mouth:0};
+EDU.hud({title:'Pac-Jawab Ibu Kota',lives:true,credit:'Remake Pac-Man HTML5 · mumuy (MIT)'});
+function size(){CS=Math.floor(Math.min((innerWidth-20)/W,(innerHeight-120)/H));cv.width=CS*W;cv.height=CS*H}size();
+function wall(c,r){return r<0||r>=H||c<0||c>=W||MAP[r][c]==='#'}
+function ent(c,r,sp){return {c:c,r:r,d:-1,nd:-1,t:0,sp:sp}}
+function newQ(){var p=EDU.pick(IK.filter(function(k){return !G.q||k[0]!==G.q[0]}));G.q=p;EDU.setQ('Ibu kota '+p[0]+'?');
+  var opts=[p[1]].concat(EDU.shuffle(IK.filter(function(k){return k!==p})).slice(0,3).map(function(k){return k[1]}));
+  var cells=[];MAP.forEach(function(row,r){row.split('').forEach(function(ch,c){if(ch!=='#'&&Math.abs(c-G.pac.c)+Math.abs(r-G.pac.r)>7)cells.push([c,r])})});
+  var pick=[];EDU.shuffle(cells).forEach(function(p){if(pick.length<4&&pick.every(function(q){return Math.abs(q[0]-p[0])+Math.abs(q[1]-p[1])>5}))pick.push(p)});
+  G.ans=EDU.shuffle(opts).map(function(o,i){return {c:pick[i][0],r:pick[i][1],t:o,ok:o===p[1]}})}
+function bfs(fc,fr,tc,tr,avoid){var Q=[[fc,fr]],prev={},k=function(c,r){return c+','+r};prev[k(fc,fr)]=null;
+  while(Q.length){var cur=Q.shift();if(cur[0]===tc&&cur[1]===tr)break;for(var d=0;d<4;d++){var nc=cur[0]+D[d][0],nr=cur[1]+D[d][1];if(wall(nc,nr)||k(nc,nr) in prev)continue;if(avoid&&avoid(nc,nr))continue;prev[k(nc,nr)]=[cur[0],cur[1],d];Q.push([nc,nr])}}
+  var s=k(tc,tr);if(!(s in prev))return -1;var dir=-1;while(prev[s]){dir=prev[s][2];s=k(prev[s][0],prev[s][1])}return dir}
+function move(e,dt,choose){
+  if(e.t===0){var d=choose(e);if(d>=0&&!wall(e.c+D[d][0],e.r+D[d][1]))e.d=d;else if(e.d<0||wall(e.c+D[e.d][0],e.r+D[e.d][1])){e.d=-1;return}}
+  e.t+=e.sp*dt;if(e.t>=1){e.c+=D[e.d][0];e.r+=D[e.d][1];e.t=0;return true}}
+function pos(e){return [(e.c+(e.d>=0?D[e.d][0]*e.t:0)+.5)*CS,(e.r+(e.d>=0?D[e.d][1]*e.t:0)+.5)*CS]}
+function reset(){MAP.forEach(function(row,r){row.split('').forEach(function(ch,c){if(ch==='P')G.pac=ent(c,r,6.2)})});G.gh=[];MAP.forEach(function(row,r){row.split('').forEach(function(ch,c){if(ch==='G')G.gh.push(ent(c,r,4.2))})})}
+function start(){G.dots={};MAP.forEach(function(row,r){row.split('').forEach(function(ch,c){if(ch==='.')G.dots[c+','+r]=1})});G.score=0;G.lives=3;G.benar=0;G.salah=0;reset();newQ();G.run=true;G.inv=1.5;EDU.setScore(0);EDU.setLives(3)}
+function hurt(msg){G.lives--;EDU.setLives(G.lives);EDU.sfx('bad');EDU.toast(msg,false);G.inv=1.6;if(G.lives<=0){G.run=false;setTimeout(function(){EDU.end({key:'pac',score:G.score,benar:G.benar,salah:G.salah,max:400,head:'Pac tertangkap!'},start)},500)}}
+var last=0;
+function loop(t){var dt=Math.min(.05,(t-last)/1000);last=t;if(G.run)update(dt);if(G.pac)draw();requestAnimationFrame(loop)}
+function update(dt){
+  G.inv=Math.max(0,G.inv-dt);G.mouth+=dt*10;
+  var p=G.pac;
+  if(move(p,dt,function(e){if(EDU.demo)e.nd=demoDir();return e.nd})){
+    var k=p.c+','+p.r;if(G.dots[k]){delete G.dots[k];G.score+=1;EDU.setScore(G.score);if(!Object.keys(G.dots).length)MAP.forEach(function(row,r){row.split('').forEach(function(ch,c){if(ch==='.')G.dots[c+','+r]=1})})}
+    var a=G.ans.find(function(a){return a.c===p.c&&a.r===p.r});
+    if(a){if(a.ok){G.score+=50;G.benar++;EDU.setScore(G.score);EDU.sfx('ok');EDU.toast('✔ Ibu kota '+G.q[0]+' = '+G.q[1],true);newQ()}else{G.salah++;G.ans=G.ans.filter(function(z){return z!==a});hurt('✘ '+a.t+' bukan ibu kota '+G.q[0])}}}
+  G.gh.forEach(function(g,i){move(g,dt,function(e){var opts=[0,1,2,3].filter(function(d){return !wall(e.c+D[d][0],e.r+D[d][1])&&(e.d<0||d!==(e.d+2)%4)});if(!opts.length)return (e.d+2)%4;
+    if(Math.random()<(i?.45:.3))return EDU.pick(opts);var d=bfs(e.c,e.r,p.c,p.r);return opts.indexOf(d)>=0?d:EDU.pick(opts)});
+    var a=pos(g),b=pos(p);if(G.inv<=0&&Math.hypot(a[0]-b[0],a[1]-b[1])<CS*.7){hurt('Kena hantu!');reset()}});
+}
+function demoDir(){var p=G.pac,t=G.ans.find(function(a){return a.ok});if(!t)return p.d;
+  var d=bfs(p.c,p.r,t.c,t.r,function(c,r){return G.gh.some(function(g){return Math.abs(g.c-c)+Math.abs(g.r-r)<2})});return d>=0?d:bfs(p.c,p.r,t.c,t.r)}
+function draw(){
+  x.fillStyle='#000';x.fillRect(0,0,cv.width,cv.height);
+  x.strokeStyle='#2c4bff';x.lineWidth=Math.max(2,CS*.12);x.fillStyle='#0b1450';
+  MAP.forEach(function(row,r){row.split('').forEach(function(ch,c){if(ch!=='#')return;x.beginPath();x.roundRect(c*CS+CS*.12,r*CS+CS*.12,CS*.76,CS*.76,CS*.22);x.fill();x.stroke()})});
+  x.fillStyle='#ffd7a8';Object.keys(G.dots).forEach(function(k){var p=k.split(',');x.beginPath();x.arc((+p[0]+.5)*CS,(+p[1]+.5)*CS,CS*.09,0,7);x.fill()});
+  var pulse=.8+Math.sin(G.mouth*.5)*.15;
+  G.ans.forEach(function(a){var ax=(a.c+.5)*CS,ay=(a.r+.5)*CS;x.fillStyle='#ff4fa3';x.shadowColor='#ff4fa3';x.shadowBlur=16;x.beginPath();x.arc(ax,ay,CS*.3*pulse,0,7);x.fill();x.shadowBlur=0;
+    x.font='700 '+Math.round(CS*.42)+'px Space Grotesk';var w=x.measureText(a.t).width+12;x.fillStyle='rgba(255,250,240,.95)';x.beginPath();x.roundRect(ax-w/2,ay-CS*1.05,w,CS*.55,6);x.fill();x.fillStyle='#2a1a10';x.textAlign='center';x.textBaseline='middle';x.fillText(a.t,ax,ay-CS*.77)});
+  var p=pos(G.pac),m=Math.abs(Math.sin(G.mouth))*.7,ang=[-Math.PI/2,0,Math.PI/2,Math.PI][G.pac.d<0?1:G.pac.d];
+  if(!(G.inv>0&&Math.floor(G.inv*10)%2)){x.fillStyle='#ffe600';x.beginPath();x.moveTo(p[0],p[1]);x.arc(p[0],p[1],CS*.42,ang+m/2,ang-m/2+Math.PI*2);x.fill()}
+  ['#ff3b3b','#4fe3ff'].forEach(function(col,i){var g=G.gh[i];if(!g)return;var q=pos(g),r=CS*.42;x.fillStyle=col;x.beginPath();x.arc(q[0],q[1]-r*.1,r,Math.PI,0);x.lineTo(q[0]+r,q[1]+r*.8);
+    for(var j=0;j<4;j++)x.lineTo(q[0]+r-(j+.5)*r/2,q[1]+r*(j%2?.8:.45));x.lineTo(q[0]-r,q[1]+r*.8);x.fill();
+    x.fillStyle='#fff';[-1,1].forEach(function(s){x.beginPath();x.arc(q[0]+s*r*.35,q[1]-r*.2,r*.25,0,7);x.fill()});x.fillStyle='#1a2bff';[-1,1].forEach(function(s){x.beginPath();x.arc(q[0]+s*r*.35+(g.d===1?2:g.d===3?-2:0),q[1]-r*.2+(g.d===2?2:g.d===0?-2:0),r*.12,0,7);x.fill()})});
+}
+document.addEventListener('keydown',function(e){var d={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3}[e.key];if(d!=null&&G.pac){e.preventDefault();G.pac.nd=d}});
+document.querySelectorAll('.edu-pad button').forEach(function(b){b.addEventListener('pointerdown',function(e){e.preventDefault();if(G.pac)G.pac.nd=+b.dataset.d})});
+requestAnimationFrame(loop);
+EDU.title({key:'pac',title:'Pac-Jawab Ibu Kota',mapel:'IPS · SD Kelas 4–6',desc:'Makan bola yang berisi ibu kota yang benar. Hindari hantu!',how:['Baca soal: "Ibu kota Jawa Barat?"','Gerakkan Pac dengan panah/tombol layar menuju jawaban benar (+50).','Jawaban salah atau kena hantu = nyawa berkurang.']},start);
+</script></body></html>

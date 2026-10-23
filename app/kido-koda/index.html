@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KIDO — Learn English for Kids</title>
+<meta name="description" content="KIDO — a bilingual (English / Bahasa Melayu) English learning app for kids. 14 screens, flat KODA-style interface.">
+<meta name="theme-color" content="#C9DE86">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2314170F'/%3E%3Ccircle cx='50' cy='55' r='28' fill='%23BEDC4E'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14170F;--lime:#BEDC4E;--mint:#E7F0D4;--paper:#FFFFFF;--flame:#FF6B35;--bg:#F6F8F0;--canvas:#C9DE86;--ink-2:#242A1B;--ink-3:#2C3320;--ink-4:#0C0F08;--moss:#4B5A2E;--olive:#8CA83A;--sage:#CBD5B8;--grey:#7C8768;--grey-2:#8E9A78;--grey-3:#9AA48A;--grey-4:#6E7A5C;--sun:#FFD166;--edge:#E9EFDD;--sans:'Plus Jakarta Sans',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{font-family:var(--sans);background:var(--canvas);color:var(--ink);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+[data-go]{cursor:pointer}
+:focus-visible{outline:3px solid var(--flame);outline-offset:2px}
+.stage{min-height:100dvh;background:var(--canvas);display:flex;align-items:center;justify-content:center;padding:24px}
+.phone{width:390px;max-width:100vw;height:844px;border-radius:44px;background:var(--bg);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 22px 44px rgba(20,23,15,.20);position:relative}
+.langbar{position:fixed;top:16px;right:16px;z-index:9;display:flex;gap:2px;background:var(--ink);border-radius:999px;padding:5px}
+.langbar button{font:700 11px var(--mono);color:var(--paper);padding:8px 12px;border-radius:999px;min-height:30px}
+.langbar button.on{background:var(--lime);color:var(--ink)}
+.kitlink{position:fixed;top:16px;left:16px;z-index:9;background:var(--ink);color:var(--paper);border-radius:999px;padding:11px 16px;font:700 12px var(--sans)}
+#screens{display:flex;flex-direction:column;flex:1;min-height:0}
+.screen{display:none;flex:1;min-height:0;flex-direction:column;background:var(--bg)}
+.screen.on{display:flex}
+.screen.dark{background:var(--ink);color:var(--paper)}
+.screen.lime{background:var(--lime)}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.pad{padding:14px 22px 26px;display:flex;flex-direction:column;gap:16px}
+.sb{display:flex;justify-content:space-between;align-items:center;padding:18px 28px 4px;font:600 13px var(--mono);flex:none}
+.bat{display:flex;gap:3px;align-items:center}
+.bat i{display:block;height:10px;border-radius:3px}
+.bat i:first-child{width:16px;border:2px solid currentColor}
+.bat i:last-child{width:22px;background:currentColor;border-radius:2px}
+.h1{font:800 32px/1.05 var(--sans);letter-spacing:-.02em}
+.h2{font:800 24px/1.12 var(--sans);letter-spacing:-.01em}
+.h3{font:700 18px/1.2 var(--sans)}
+.h4{font:700 15px/1.25 var(--sans)}
+.body{font:500 14px/1.5 var(--sans)}
+.ms{font:500 13px/1.4 var(--sans);color:var(--grey-4)}
+.mono{font-family:var(--mono)}
+.lbl{font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--grey-4)}
+.sheet .row .lbl{color:inherit}
+.dark .lbl,.card.d .lbl,.sheet .lbl{color:var(--grey-3)}
+.lime .lbl,.card.lime .lbl,.row.lime .lbl{color:var(--ink)}
+.spacer{flex:1}
+.hide{display:none}
+.w{color:var(--paper)}
+.rw{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hd{display:flex;align-items:center;gap:12px}
+.back{width:38px;height:38px;min-width:38px;border-radius:50%;background:var(--paper);display:grid;place-items:center;font:700 16px var(--sans);flex:none}
+.back.d{background:var(--ink-3);color:var(--paper)}
+.card{background:var(--paper);border-radius:26px;padding:18px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.card.d{background:var(--ink);color:var(--paper)}
+.card.d2{background:var(--ink-3);color:var(--paper)}
+.card.lime{background:var(--lime)}
+.card.mint{background:var(--mint)}
+.card.flame{background:var(--flame);color:var(--paper)}
+.row{display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px;background:var(--paper)}
+.row .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.row.d{background:var(--ink);color:var(--paper)}
+.row.lime{background:var(--lime)}
+.row.flame{background:var(--flame);color:var(--paper)}
+.row.lock{background:var(--mint);opacity:.7}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:58px;border-radius:999px;padding:0 24px;background:var(--ink);color:var(--lime);font:700 15px var(--sans);width:100%;text-align:center}
+.btn.alt{background:var(--paper);color:var(--ink);border:2px solid var(--ink)}
+.btn.lime{background:var(--lime);color:var(--ink)}
+.btn.g{background:var(--ink-3);color:var(--paper)}
+.btns{display:flex;gap:10px}
+.btns .btn{flex:1;padding:0 12px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:999px;background:var(--ink);color:var(--lime);font:700 10px/1 var(--mono);letter-spacing:.06em;white-space:nowrap;flex:none}
+.pill.l{background:var(--lime);color:var(--ink)}
+.pill.m{background:var(--mint);color:var(--ink)}
+.pill.p{background:var(--paper);color:var(--ink)}
+.pill.f{background:var(--flame);color:var(--paper)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:36px;padding:0 16px;border-radius:999px;background:var(--paper);border:1px solid var(--edge);font:700 12px var(--mono)}
+.chip.on{background:var(--ink);color:var(--lime);border-color:var(--ink)}
+.bar{height:8px;border-radius:999px;background:var(--mint);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:999px}
+.card.lime .bar{background:rgba(255,255,255,.55)}
+.bars{display:flex;gap:4px;flex:1;min-width:0}
+.bars i{display:block;height:24px;border-radius:999px;flex:0 1 auto;min-width:8px}
+.br{display:flex;align-items:center;gap:10px}
+.br .lbl{width:74px;flex:none;color:var(--ink)}
+.seg{display:flex;gap:6px;flex:1}
+.seg i{flex:1;height:6px;border-radius:999px;background:var(--sage)}
+.seg i.on{background:var(--ink)}
+.seg i.cur{background:var(--lime);outline:2px solid var(--ink)}
+.tabs{display:flex;background:var(--paper);border-radius:999px;padding:4px;gap:4px}
+.tabs button{flex:1;min-height:44px;border-radius:999px;font:700 13px var(--sans)}
+.tabs .on{background:var(--ink);color:var(--lime)}
+.nav{color:var(--ink);display:flex;align-items:center;justify-content:space-between;background:var(--paper);padding:12px 26px 22px;flex:none}
+.nv{display:flex;flex-direction:column;align-items:center;gap:5px;opacity:.4;min-width:48px;min-height:44px;font:700 10px var(--mono)}
+.nv.on{opacity:1}
+.ic{display:block;width:22px;height:22px;background:currentColor}
+.i-sq{border-radius:7px}
+.i-ring{background:none;border:3px solid currentColor;border-radius:50%}
+.i-arch{border-radius:20px 20px 0 0}
+.i-leaf{border-radius:100% 0 100% 0}
+.fab{width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--lime);font:700 28px/1 var(--sans);margin-top:-26px;display:grid;place-items:center;flex:none}
+.win{background:var(--ink-2);color:var(--paper);border-radius:20px;overflow:hidden;font:500 12.5px/1.9 var(--mono)}
+.dark .win{background:var(--ink-2);border:1px solid var(--ink-3)}
+.win .wh{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--ink-3);font-size:11px;color:var(--grey-3)}
+.win .wh i{width:9px;height:9px;border-radius:50%;background:var(--grey-4)}
+.win .wh span{margin-left:8px}
+.win .wb{padding:10px 16px 12px}
+.win p{padding:0 6px;margin:0 -6px;border-radius:6px;overflow-wrap:anywhere}
+.win p.hl{background:#3A1A10}
+.win u{text-decoration:none}
+.win .k{color:var(--lime)}.win .s{color:var(--sun)}.win .g{color:var(--grey-3)}.win .x{color:var(--flame)}
+.caret{display:inline-block;width:2px;height:14px;background:var(--lime);vertical-align:middle;margin-left:2px}
+.blob{width:44px;height:44px;flex:none;background:var(--lime)}
+.b-c{border-radius:50%}.b-l{border-radius:100% 0 100% 0}.b-a{border-radius:22px 22px 0 0}
+.b-h{height:22px;border-radius:44px 44px 0 0;align-self:center}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--lime);position:relative;overflow:hidden;flex:none}
+.avatar:before{content:"";position:absolute;width:38%;height:38%;top:20%;left:31%;border-radius:50%;background:var(--ink)}
+.avatar:after{content:"";position:absolute;width:64%;height:34%;left:18%;bottom:0;border-radius:999px 999px 0 0;background:var(--ink)}
+.avatar.a2{background:var(--mint)}.avatar.a3{background:var(--sun)}.avatar.ai{background:var(--ink)}
+.avatar.ai:before,.avatar.ai:after{background:var(--lime)}
+.avatar.big{width:64px;height:64px}
+.tick{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--lime);display:grid;place-items:center;font:700 13px var(--sans);flex:none}
+.tick.s{width:22px;height:22px;font-size:11px}
+.lockic{width:18px;height:13px;border-radius:4px;background:var(--grey-4);position:relative;flex:none;margin-top:6px}
+.lockic:before{content:"";position:absolute;left:3px;top:-7px;width:8px;height:8px;border:2px solid var(--grey-4);border-bottom:0;border-radius:8px 8px 0 0}
+.days{display:flex;justify-content:space-between;gap:4px}
+.dy{display:flex;flex-direction:column;align-items:center;gap:6px;font:700 10px var(--mono);color:var(--grey-3)}
+.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--mono);border:2px solid var(--moss)}
+.dot.y{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+.dot.k{background:var(--ink);color:var(--lime);border-color:var(--ink)}
+.dot.m{background:var(--mint);color:var(--ink);border-color:var(--mint)}
+.big{font:800 44px/1 var(--sans);letter-spacing:-.02em}
+.zoo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.zc{border-radius:22px;padding:14px 6px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
+.zc.l{background:var(--lime);color:var(--ink)}.zc.i{background:var(--ink);color:var(--paper)}.zc.f{background:var(--flame);color:var(--paper)}
+.an{width:42px;height:42px;border-radius:50%;background:currentColor;position:relative;margin:10px 0 6px}
+.an:before,.an:after{content:"";position:absolute;background:currentColor}
+.dog:before,.dog:after{width:16px;height:22px;top:-6px;border-radius:50% 50% 50% 0}
+.dog:before{left:-7px;transform:rotate(-25deg)}
+.dog:after{right:-7px;transform:rotate(25deg) scaleX(-1)}
+.hen:before{width:16px;height:9px;border-radius:16px 16px 0 0;background:var(--sun);top:-7px;left:13px}
+.hen:after{width:12px;height:8px;background:var(--sun);border-radius:0 0 12px 12px;right:-8px;top:20px}
+.fish{width:48px;height:28px;border-radius:100% 0 100% 0;transform:rotate(-20deg)}
+.fish:after{width:14px;height:20px;right:-10px;top:4px;border-radius:0 100% 0 100%}
+.tl{display:flex;gap:10px;align-items:stretch}
+.tm{width:62px;flex:none;font:700 11px var(--mono);padding-top:16px;white-space:nowrap}
+.tc{flex:1;min-width:0;border-radius:22px;padding:14px 16px;gap:0}
+.tb{width:8px;border-radius:999px;flex:none}
+.avs{display:flex;margin:10px 0 0 6px}
+.avs .avatar{width:28px;height:28px;margin-left:-6px;border:2px solid var(--paper)}
+.sheet{background:var(--ink);color:var(--paper);border-radius:28px 28px 0 0;padding:22px;margin:8px -22px -26px;display:flex;flex-direction:column;gap:12px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px 4px;text-align:center}
+.cal b{font:700 11px var(--mono);color:var(--grey-4)}
+.cal i{display:flex;align-items:center;justify-content:center;aspect-ratio:1;width:100%;max-width:40px;margin:auto;border-radius:50%;font:700 13px var(--sans)}
+.c-m{background:var(--mint)}.c-k{background:var(--ink);color:var(--lime)}.c-l{background:var(--lime)}.c-f{background:var(--flame);color:var(--paper)}
+.dt{width:52px;flex:none;display:flex;flex-direction:column;align-items:center;font:800 22px/1 var(--sans)}
+.dt small{font:700 10px var(--mono);margin-top:4px}
+.circ{width:150px;height:150px;border-radius:50%;background:var(--ink);color:var(--lime);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto;gap:2px}
+.circ b{font:800 54px/1 var(--sans)}
+.circ span{font:700 10px var(--mono);color:var(--paper);letter-spacing:.08em}
+.stat{border-radius:24px;padding:16px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.stat b{font:800 32px/1 var(--sans)}
+.bdg{border-radius:24px;padding:12px 10px;display:flex;flex-direction:column;gap:8px;min-height:146px;justify-content:space-between;overflow-wrap:anywhere}
+.bdg .lbl{letter-spacing:0}
+.bdg.l{background:var(--lime);color:var(--ink)}.bdg.f{background:var(--flame);color:var(--paper)}
+.bdg.r{border:2px solid var(--lime);color:var(--paper)}.bdg.k{background:var(--ink-3);color:var(--grey-3)}
+.bdg.f .lbl,.bdg.r .lbl{color:inherit}
+.round{width:48px;height:48px;border-radius:50%;background:var(--paper);color:var(--ink);font:700 20px var(--sans);display:grid;place-items:center;margin:0 auto}
+.key{min-height:48px;border-radius:16px;background:var(--ink-3);color:var(--paper);font:800 18px var(--sans)}
+.key.on{background:var(--lime);color:var(--ink)}
+.keys{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.opt .ob{width:34px;height:34px;border-radius:50%;background:var(--mint);display:grid;place-items:center;font:700 13px var(--mono);flex:none}
+.opt.ok{background:var(--lime)}.opt.ok .ob{background:var(--ink);color:var(--lime)}
+.mas{position:relative;width:250px;height:260px;margin:0 auto}
+.mas>*{position:absolute}
+.mas .bd{left:25px;top:50px;width:200px;height:200px;border-radius:50%;background:var(--ink)}
+.mas .lf{left:112px;top:6px;width:60px;height:60px;border-radius:100% 0 100% 0;background:var(--moss)}
+.mas .ey{top:120px;width:18px;height:18px;border-radius:50%;background:var(--lime)}
+.mas .e1{left:78px}.mas .e2{left:154px}
+.mas .sm{left:100px;top:158px;width:50px;height:26px;border:6px solid var(--lime);border-top:0;border-radius:0 0 50px 50px}
+.mas .hd{left:0;top:215px;width:90px;height:45px;border-radius:90px 90px 0 0;background:var(--sun)}
+.mas .hd2{right:0;top:215px;width:90px;height:45px;border-radius:90px 90px 0 0;background:var(--paper)}
+.start{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sbtn{width:96px;height:52px;border-radius:999px;background:var(--ink);display:grid;place-items:center;flex:none}
+.sbtn i{display:block;width:28px;height:14px;border-radius:28px 28px 0 0;background:var(--lime)}
+@media (max-width:460px){.stage{padding:0;align-items:stretch}.phone{width:100vw;height:100dvh;border-radius:0;box-shadow:none}.langbar{top:auto;bottom:96px;right:10px}.kitlink{display:none}}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="stage">
+<a class="kitlink" href="#splash" data-go="splash">UI KIT →</a>
+<div class="langbar" role="group" aria-label="Language"><button data-lang="en" class="on" aria-pressed="true">EN</button><button data-lang="ms" aria-pressed="false">BM</button></div>
+<main class="phone" id="screens"></main>
+</div>
+<script>
+const t=(e,m,c,g)=>{g=g||'span';return '<'+g+(c?' class="'+c+'"':'')+' data-ms="'+m.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">'+e+'</'+g+'>'};
+const SB='<div class="sb"><span>9:41</span><span class="bat"><i></i><i></i></span></div>';
+const NAV=a=>{const n=(k,go,ic,en,ms)=>`<button class="nv${a===k?' on':''}" data-go="${go}"><i class="ic ${ic}"></i>${t(en,ms)}</button>`;return `<nav class="nav">${n('home','home','i-sq','HOME','UTAMA')}${n('learn','topics','i-ring','LEARN','BELAJAR')}<button class="fab" data-go="wordlab" aria-label="Word Lab">+</button>${n('tasks','task','i-arch','TASKS','TUGAS')}${n('me','profile','i-leaf','ME','SAYA')}</nav>`};
+const P=(h,c)=>`<div class="scroll"><div class="pad">${h}</div></div>`;
+const BK=(g,d)=>`<button class="back${d?' d':''}" data-go="${g}" aria-label="Back">←</button>`;
+const HD=(g,en,ms,d)=>`<div class="hd">${BK(g,d)}${t(en,ms,'h2','h1')}</div>`;
+const W=(n,l)=>`<div class="win"><div class="wh"><i></i><i></i><i></i><span>${n}</span></div><div class="wb">${l.map(x=>x[0]==='!'?`<p class="hl">${x.slice(1)}</p>`:`<p>${x}</p>`).join('')}</div></div>`;
+const BR=(en,ms,s,tk)=>`<div class="br">${t(en,ms,'lbl')}<div class="bars">${s.map(x=>`<i style="width:${x[0]}px;background:var(--${x[1]})"></i>`).join('')}</div>${tk?'<span class="tick s">✓</span>':''}</div>`;
+const DAYS=[['Mon','Isn'],['Tue','Sel'],['Wed','Rab'],['Thu','Kha'],['Fri','Jum'],['Sat','Sab'],['Sun','Ahd']];
+const TB=a=>`<div class="tabs"><button class="${a?'on':''}" data-go="task">${t('Daily Task','Tugasan Harian')}</button><button class="${a?'':'on'}" data-go="progress">${t('Progress','Kemajuan')}</button></div>`;
+window.KIDO_SCREENS=[];
+const S=(id,num,flow,name,note,noteMs,html,cls)=>KIDO_SCREENS.push({id,num,flow,name,note,noteMs,html,cls:cls||''});
+
+S('splash','01','Onboarding','Splash','Mascot and start button.','Maskot dan butang mula.',
+`${SB}<div class="scroll"><div class="pad" style="min-height:100%;justify-content:space-between;padding-top:30px">
+<div style="text-align:center"><h1 style="font:800 44px/1 var(--sans);letter-spacing:-.03em">KIDO</h1>${t('Learn English for Kids','Belajar Bahasa Inggeris untuk Kanak-kanak','body')}</div>
+<div class="mas" aria-hidden="true"><i class="bd"></i><i class="lf"></i><i class="ey e1"></i><i class="ey e2"></i><i class="sm"></i><i class="hd"></i><i class="hd2"></i></div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div class="start">${t('Lets Start','Jom Mula','h1')}<button class="sbtn" data-go="home" aria-label="Start"><i></i></button></div>
+${t('By tapping Start and using KIDO you agree to our Terms and Privacy Policy.','Dengan menekan Mula, anda bersetuju dengan Terma dan Dasar Privasi KIDO.','ms','p')}
+</div></div></div>`,'lime');
+
+S('home','02','Main','Home','Daily goal, practice, streak and progress board.','Matlamat harian, latihan, rentetan dan papan kemajuan.',
+`${SB}${P(`
+<div class="hd"><button class="avatar" data-go="profile" aria-label="Profile"></button><div>${t('Welcome Back','Selamat Kembali','lbl','div')}<div class="h3">Aisyah Nur</div></div><span class="spacer"></span><button class="back" data-go="calendar" aria-label="Calendar"><i class="ic i-sq" style="width:16px;height:16px;border-radius:4px"></i></button></div>
+<div class="card d" data-go="task" role="button" tabindex="0">
+<div class="rw">${t('DAILY GOAL','MATLAMAT HARIAN','lbl')}${t('WEEK 7','MINGGU 7','pill l')}</div>
+${t('3 OF 4 TASKS DONE','3 DARIPADA 4 SIAP','h2','div')}
+<div class="days" style="margin-top:6px">${DAYS.map((d,i)=>`<div class="dy"><span class="dot${i<4?' y':''}">${i<4?'✓':''}</span>${t(d[0],d[1])}</div>`).join('')}</div></div>
+<div class="grid2">
+<div class="card lime" data-go="topics" role="button" tabindex="0" style="min-height:150px;justify-content:space-between">${t('PRACTICE','LATIHAN','lbl')}${t('12 NEW WORDS','12 PERKATAAN BARU','h3','div')}<span class="tick">→</span></div>
+<div class="card" data-go="streak" role="button" tabindex="0" style="min-height:150px;justify-content:space-between">${t('STREAK','RENTETAN','lbl')}<div><div class="big">25</div>${t('Streak Days','Hari Berturut','h4','div')}</div></div></div>
+<div class="card"><div class="rw">${t('Progress Board','Papan Kemajuan','h3','div')}<button class="pill m" data-go="calendar">08 — 20 AUG</button></div>
+<div data-go="progress" role="button" tabindex="0" style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+${BR('ALPHABET','ABJAD',[[96,'lime']])}${BR('PHONICS','FONIK',[[40,'mint'],[114,'ink']])}${BR('WORDS','PERKATAAN',[[70,'mint'],[104,'lime']])}${BR('NUMBERS','NOMBOR',[[24,'mint'],[76,'ink']])}${BR('COLOURS','WARNA',[[104,'mint'],[64,'lime']])}</div></div>
+`)}${NAV('home')}`);
+
+const HABITS=[['Read one story every day','Baca satu cerita setiap hari','25 D',72,'lime','c'],['Say 5 new words out loud','Sebut 5 perkataan baharu dengan kuat','21 D',48,'ink','l'],['Sing the ABC song with family','Nyanyi lagu ABC bersama keluarga','30 D',88,'sun','a'],['Spell two animal words','Eja dua perkataan haiwan','14 D',34,'sage','h']];
+S('topics','03','Learn','Habits & Topics','Filter chips and habit list.','Penapis dan senarai tabiat.',
+`${SB}${P(`${HD('home','Habits & Topics','Tabiat & Topik')}
+<div class="chips">${[['All','Semua'],['Words','Perkataan'],['Phonics','Fonik'],['Songs','Lagu']].map((c,i)=>`<button class="chip${i?'':' on'}" data-tog="one">${t(c[0],c[1])}</button>`).join('')}</div>
+<div class="card d" data-go="streak" role="button" tabindex="0"><div class="rw">${t('Keep It Up','Teruskan!','h3','div')}${t('25 DAYS','25 HARI','pill l')}</div>${t('Finish Animals & Colours before the Week 8 story day.','Habiskan Haiwan & Warna sebelum Hari Bercerita Minggu 8.','body','p')}</div>
+${HABITS.map(h=>`<div class="row" data-go="topic" role="button" tabindex="0"><i class="blob b-${h[5]}" style="background:var(--${h[4]})"></i><div class="t">${t(h[0],h[1],'h4','div')}<div class="bar"><i style="width:${h[3]}%"></i></div></div><div style="text-align:right"><div class="h4">${h[3]}%</div><div class="lbl">${h[2]}</div></div></div>`).join('')}
+`)}${NAV('learn')}`);
+
+const MODS=[['A B C — Letters','Huruf','8 LESSONS · DONE ✓','8 PELAJARAN · SIAP ✓','done'],['Phonics Sounds','Bunyi Fonik','6 LESSONS · DONE ✓','6 PELAJARAN · SIAP ✓','done'],['Animal Friends','Haiwan Kesayangan','4 OF 9 LESSONS','4 DARIPADA 9 PELAJARAN','act'],['Colours & Shapes','Warna & Bentuk','LOCKED','BERKUNCI','lock'],['My First Sentences','Ayat Pertama Saya','LOCKED','BERKUNCI','lock']];
+S('topic','04','Learn','Topic Detail','Starter Words module list.','Senarai modul Perkataan Asas.',
+`${SB}${P(`${HD('topics','Starter Words','Perkataan Asas')}
+<div class="card lime">${t('YEAR 1 · AGE 6–8 · LEVEL A1','TAHUN 1 · UMUR 6–8 · TAHAP A1','lbl')}${t('Animals, Colours & Numbers','Haiwan, Warna & Nombor','h2','div')}<div class="rw"><div class="bar" style="flex:1"><i style="width:52%"></i></div><b class="mono" style="font-size:12px">52%</b></div></div>
+${MODS.map((m,i)=>`<div class="row ${m[4]==='act'?'d':m[4]==='lock'?'lock':''}"${m[4]==='act'?' data-go="lesson" role="button" tabindex="0"':''}>${m[4]==='lock'?'<span class="lockic"></span>':m[4]==='act'?`<span class="tick" style="background:var(--lime);color:var(--ink)">${i+1}</span>`:'<span class="tick">✓</span>'}<div class="t">${t(m[0],m[1],'h4','div')}${t(m[2],m[3],'lbl','div')}</div>${m[4]==='act'?t('GO','JOM','pill l'):''}</div>`).join('')}
+<button class="btn" data-go="lesson">${t('Continue Module 03','Sambung Modul 03')}</button>
+`)}${NAV('learn')}`);
+
+S('lesson','05','Learn','Lesson','Animals lesson with hint.','Pelajaran haiwan dengan petunjuk.',
+`${SB}${P(`<div class="hd">${BK('topic')}<div class="bar" style="flex:1"><i style="width:40%"></i></div><b class="mono" style="font-size:12px">4/9</b></div>
+${t('LESSON 04 · ANIMALS','PELAJARAN 04 · HAIWAN','lbl','div')}
+${t('Meet the animals and say their names','Kenal haiwan dalam bahasa Inggeris','h2','div')}
+${t('A <b>cat</b> says <b>meow</b>. In Malay we say <b>kucing</b>. Point at the picture, then say the word out loud three times.','Seekor <b>cat</b> berbunyi <b>meow</b>. Dalam bahasa Melayu, <b>kucing</b>. Tunjuk gambar, kemudian sebut kuat tiga kali.','body','p')}
+${W('cat.mp3',['<u class="k">cat</u> <u class="g">=</u> <u class="s">kucing</u>','<u class="k">say</u> /kæt/','<u class="k">use</u>(<u class="s">"The cat is small."</u>)'])}
+<div class="card mint" style="flex-direction:row;gap:12px;align-items:flex-start"><span class="tick">!</span>${t('The <b>c</b> in <b>cat</b> is a hard sound, like <b>k</b> — not <b>s</b>. Try it: c–a–t.','Bunyi <b>c</b> dalam <b>cat</b> keras seperti <b>k</b> — bukan <b>s</b>. Cuba: c–a–t.','body','p')}</div>
+<div class="zoo"><div class="zc l"><i class="an dog"></i><b class="h3">dog</b>${t('anjing','anjing','mono')}</div><div class="zc i"><i class="an hen"></i><b class="h3">hen</b>${t('ayam','ayam','mono')}</div><div class="zc f"><i class="an fish"></i><b class="h3">fish</b>${t('ikan','ikan','mono')}</div></div>
+<button class="btn" data-go="wordlab">${t('Next: Try it yourself','Seterusnya: Cuba sendiri')}</button>
+`)}${NAV('learn')}`);
+
+S('wordlab','06','Practice','Word Lab','Spelling challenge.','Cabaran mengeja.',
+`${SB}${P(`${HD('lesson','Word Lab','Makmal Perkataan',1)}
+<div class="rw">${t('CHALLENGE 07 · EASY','CABARAN 07 · MUDAH','lbl')}<span class="pill l">+40 XP</span></div>
+<div class="card lime">${t('Spell the animal you hear.','Eja haiwan yang kamu dengar.','h2','div')}</div>
+${W('word_lab.py',['<u class="k">listen</u> ♪ /kæt/','<u class="k">picture</u> 🐱','<u class="k">spell</u> <u class="s">C A T</u><i class="caret"></i>','<u class="k">malay</u> kucing','<u class="k">say</u>(<u class="s">"The cat is small."</u>)','<u class="g">'+t('done in 4s · 3 of 3 letters correct','siap dalam 4 saat · 3 daripada 3 betul')+'</u>'].slice(0,5).concat(['<u class="s">C A T ✓ ★★★</u>','<u class="g">'+t('done in 4s · 3 of 3 letters correct','siap dalam 4 saat · 3 daripada 3 betul')+'</u>']))}
+<div class="keys">${['C','A','T','K','O','S'].map((k,i)=>`<button class="key${i<3?' on':''}" data-tog="many" aria-pressed="${i<3}">${k}</button>`).join('')}</div>
+<div class="btns"><button class="btn g" data-reset="1">${t('Reset','Set Semula')}</button><button class="btn lime" data-go="quiz">${t('Check & Submit','Semak & Hantar')}</button></div>
+`)}${NAV('learn')}`,'dark');
+
+const OPTS=[['A','dog'],['B','cat'],['C','cow'],['D','hen']];
+S('quiz','07','Practice','Quiz','Multiple-choice question.','Soalan aneka pilihan.',
+`${SB}${P(`<div class="hd">${BK('wordlab')}<div class="seg"><i class="on"></i><i class="on"></i><i class="cur"></i><i></i><i></i></div><span class="pill">0:42</span></div>
+${t('QUESTION 03 OF 05 · ANIMALS','SOALAN 03 DARIPADA 05 · HAIWAN','lbl','div')}
+${t('What is "kucing" in English?','Apakah "kucing" dalam bahasa Inggeris?','h2','div')}
+${W('quiz_03.py',['<u class="k">listen</u> ♪ /kæt/','<u class="k">look</u> 🐱 <u class="s">a small pet</u>'])}
+${OPTS.map(o=>`<div class="row opt${o[0]==='B'?' ok':''}"><span class="ob">${o[0]}</span><b class="h3 t">${o[1]}</b>${o[0]==='B'?'<span class="tick">✓</span>':''}</div>`).join('')}
+<div class="btns"><button class="btn alt" data-go="oops">${t('Skip','Langkau')}</button><button class="btn" data-go="home">${t('Check Answer','Semak Jawapan')}</button></div>
+`)}${NAV('learn')}`);
+
+S('oops','08','Practice','Oops Hint','Hint after a wrong spelling.','Bantuan selepas ejaan salah.',
+`${SB}${P(`${HD('quiz','Oops Hint','Bantuan')}
+<div class="card flame">${t('ATTEMPT 2 · 1 LETTER WRONG','CUBAAN 2 · 1 HURUF SALAH','pill','span')}${t('Wrong first letter','Huruf pertama tersilap','h2','div')}
+${W('oops.py',['<u class="k">listen</u> ♪ /kæt/','!<u class="k">you spelled</u> <u class="x">K</u> A T','<u class="k">answer</u> <u class="s">C A T</u>','<u class="g">// '+t('the /k/ sound is written with c here','bunyi /k/ dieja dengan huruf c di sini')+'</u>'])}</div>
+<div class="card">${t('WHAT WENT WRONG','APA YANG SILAP','lbl','div')}${t('<b>K</b> and <b>C</b> can sound the same, but <b>cat</b> always starts with <b>c</b>. Say it slowly: c – a – t.','<b>K</b> dan <b>C</b> boleh berbunyi sama, tetapi <b>cat</b> sentiasa bermula dengan <b>c</b>. Sebut perlahan: c – a – t.','body','p')}</div>
+<div class="grid2"><div class="stat card mint"><b>2</b>${t('ATTEMPTS USED','CUBAAN DIGUNA','lbl')}</div><div class="stat card d"><b style="color:var(--lime)">1</b>${t('HINT LEFT','BANTUAN BAKI','lbl')}</div></div>
+<button class="btn" data-go="wordlab">${t('Back to my word','Kembali ke perkataan saya')}</button>
+<button class="btn alt" data-go="task">${t('Ask my teacher instead','Minta bantuan cikgu')}</button>
+`)}${NAV('learn')}`);
+
+S('task','09','Plan','Daily Task','Timeline of today.','Garis masa hari ini.',
+`${SB}${P(`${TB(1)}
+<div class="tl" data-go="lesson" role="button" tabindex="0"><span class="tm">08:00 AM</span><div class="card tc">${t('English class — letters A to E. Bring your workbook and colour pencils.','Kelas Bahasa Inggeris — huruf A hingga E. Bawa buku latihan dan pensel warna.','body','p')}</div><i class="tb" style="background:var(--lime)"></i></div>
+<div class="tl" data-go="calendar" role="button" tabindex="0"><span class="tm">11:00 AM</span><div class="card tc">${t('Group story time with Aina and Wei Jie — the story "The Little Cat".','Masa bercerita berkumpulan bersama Aina dan Wei Jie — cerita "The Little Cat".','body','p')}<div class="avs"><i class="avatar"></i><i class="avatar a2"></i><i class="avatar a3"></i></div></div><i class="tb" style="background:var(--lime)"></i></div>
+<div class="tl" data-go="wordlab" role="button" tabindex="0"><span class="tm">03:00 PM</span><div class="card tc">${t('Finish Word Lab challenge 07 before bedtime.','Habiskan Cabaran 07 di Makmal Perkataan sebelum waktu tidur.','body','p')}</div><i class="tb" style="background:var(--sage)"></i></div>
+<div class="tl" data-go="topics" role="button" tabindex="0"><span class="tm">08:30 PM</span><div class="card tc">${t('Read 5 pages with mum — say every word out loud.','Baca 5 muka surat bersama ibu — sebut setiap perkataan dengan kuat.','body','p')}</div><i class="tb" style="background:var(--sage)"></i></div>
+<div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:8px"><i style="width:56px;height:28px;border-radius:56px 56px 0 0;background:var(--sun)"></i>${t('You Got It! Have a Rest.','Syabas! Masa untuk berehat.','h3','div')}</div>
+`)}${NAV('tasks')}`);
+
+S('progress','10','Plan','Progress','Skill bars and class activities.','Bar kemahiran dan aktiviti kelas.',
+`${SB}${P(`${TB(0)}
+<div style="display:flex;flex-direction:column;gap:12px">
+${BR('Alphabet','Abjad',[[150,'lime']],1)}${BR('Phonics','Fonik',[[110,'ink'],[44,'sage']])}<div class="br">${t('Words','Perkataan','lbl').replace('class="lbl"','class="lbl" style="color:var(--olive)"')}<div class="bars"><i style="width:190px;background:var(--lime)"></i></div></div>${BR('Numbers','Nombor',[[84,'ink'],[60,'sage']])}${BR('Speaking','Bertutur',[[70,'sage']])}${BR('Reading','Membaca',[[160,'lime']],1)}</div>
+<div class="sheet"><div class="rw">${t('CLASS ACTIVITIES','AKTIVITI KELAS','lbl')}<b style="font:800 28px var(--sans);color:var(--lime)">78%</b></div>
+<div class="row lime" data-go="calendar" role="button" tabindex="0" style="background:var(--lime);color:var(--ink)"><div class="t">${t('Storytelling Day (Group A)','Hari Bercerita (Kumpulan A)','h4','div')}${t('START 12.08 · DUE 26.08 · 78%','MULA 12.08 · TARIKH 26.08 · 78%','lbl','div')}</div></div>
+<div class="row" data-go="calendar" role="button" tabindex="0" style="background:var(--olive);color:var(--ink)"><div class="t">${t('Word Scrapbook','Buku Skrap Perkataan','h4','div')}${t('START 05.08 · DUE 30.08 · 54%','MULA 05.08 · TARIKH 30.08 · 54%','lbl','div')}</div></div>
+<div class="row" data-go="calendar" role="button" tabindex="0" style="background:var(--ink-3);color:var(--paper)"><div class="t">${t('Show & Tell','Tunjuk & Cerita','h4','div')}${t('START 18.08 · DUE 09.09 · 21%','MULA 18.08 · TARIKH 09.09 · 21%','lbl','div')}</div></div></div>
+`)}${NAV('tasks')}`);
+
+const EVS=[['21','AUG','OGO','Spelling Bee','Pertandingan Mengeja','9:00 AM · 20 WORDS','9:00 PAGI · 20 PERKATAAN','flame'],['26','AUG','OGO','Storytelling show','Persembahan bercerita','CLASS 1 BESTARI · GROUP OF 3','KELAS 1 BESTARI · KUMPULAN 3',''],['02','SEP','SEP','Reading check','Ujian membaca','READING ROOM · 30 MINUTES','BILIK BACAAN · 30 MINIT',''],['09','SEP','SEP','Scrapbook hand-in','Hantar buku skrap','GIVE TO TEACHER','SERAH KEPADA CIKGU','']];
+const HL={11:'m',13:'k',14:'l',18:'m',21:'f'};
+S('calendar','11','Plan','Calendar','August 2026 and upcoming events.','Ogos 2026 dan acara akan datang.',
+`${SB}${P(`${HD('task','August 2026','Ogos 2026')}
+${t('TERM 2 · WEEK 7','PENGGAL 2 · MINGGU 7','lbl','div')}
+<div class="card"><div class="cal">${'MTWTFSS'.split('').map(d=>`<b>${d}</b>`).join('')}${Array.from({length:14},(_,i)=>i+10).map(d=>`<i${HL[d]?` class="c-${HL[d]}"`:''}>${d}</i>`).join('')}</div></div>
+${EVS.map(e=>`<div class="row ${e[7]}" data-go="topics" role="button" tabindex="0"><div class="dt">${e[0]}<small>${t(e[1],e[2])}</small></div><div class="t">${t(e[3],e[4],'h4','div')}${t(e[5],e[6],'lbl','div')}</div></div>`).join('')}
+`)}${NAV('tasks')}`);
+
+const WK=['M','T','W','T','F','S','S'],WC=['k','k','y','k','y','m','m'];
+S('streak','12','Me','Streak','25-day streak and weekly habits.','Rentetan 25 hari dan tabiat mingguan.',
+`${SB}${P(`<div class="hd">${BK('home')}</div>
+<div class="circ"><b>25</b>${t('DAY STREAK','HARI BERTURUT')}</div>
+${t('Learn for at least 10 minutes to keep it alive. Longest run so far: 41 days.','Belajar sekurang-kurangnya 10 minit untuk kekalkan rentetan. Rekod terbaik: 41 hari.','body','p').replace('class="body"','class="body" style="text-align:center"')}
+<div class="card" data-go="goals" role="button" tabindex="0"><div class="rw">${t('This week','Minggu ini','h3','div')}${t('5 OF 7 DAYS','5 DARIPADA 7 HARI','lbl')}</div><div class="days" style="margin-top:4px">${WK.map((d,i)=>`<span class="dot ${WC[i]}" style="width:34px;height:34px">${d}</span>`).join('')}</div></div>
+${[['Morning word','Sebutan pagi',18,90],['One word a day','Satu perkataan sehari',12,60],['Read a picture book','Baca buku bergambar',7,35]].map(h=>`<div class="row" data-go="topics" role="button" tabindex="0"><div class="t"><div class="rw">${t(h[0],h[1],'h4','div')}<b class="h4">${h[3]}%</b></div><div class="bar"><i style="width:${h[3]}%"></i></div>${t(h[2]+' OF 20 DAYS',h[2]+' DARIPADA 20 HARI','lbl','div')}</div></div>`).join('')}
+`)}${NAV('me')}`,'lime');
+
+const BG=[['l','100 WORDS','100 PERKATAAN','Word Master','Raja Perkataan','b-c'],['f','30 DAYS','30 HARI','On Fire','Semangat Membara','b-l'],['r','NO SLIPS','TIADA SILAP','Clean Spell','Ejaan Tepat','b-a'],['k','LOCKED','BERKUNCI','Team Lead','Ketua Kumpulan',''],['k','LOCKED','BERKUNCI','Storyteller','Pencerita',''],['k','LOCKED','BERKUNCI','Spelling Bee','Juara Mengeja','']];
+S('goals','13','Me','Goals & Badges','Goal stats and badge grid.','Statistik matlamat dan lencana.',
+`${SB}${P(`<div class="hd">${BK('streak',1)}<span class="spacer"></span></div><button class="round" data-go="profile" aria-label="Class Rank">↗</button>
+${t('Goals & Badges','Matlamat & Lencana','h1','h1')}
+<div class="grid3">${[['14','FINISHED','SIAP'],['3','DOING','SEDANG'],['2','DROPPED','BERHENTI']].map(s=>`<div class="stat" style="background:var(--lime);color:var(--ink)"><b>${s[0]}</b>${t(s[1],s[2],'lbl')}</div>`).join('')}</div>
+${t('Badges','Lencana','h3','div')}
+<div class="grid3">${BG.map(b=>`<div class="bdg ${b[0]}">${t(b[1],b[2],'lbl','div')}${b[5]?`<i class="blob ${b[5]}" style="width:36px;height:36px;background:${b[0]==='l'?'var(--ink)':b[0]==='f'?'var(--paper)':'var(--lime)'}"></i>`:'<i class="lockic" style="margin:0"></i>'}${t(b[3],b[4],'h4','div')}</div>`).join('')}</div>
+`)}${NAV('me')}`,'dark');
+
+const LB=[['Tan Wei Jie','3,180',''],['Aina Sofea','2,940','a2'],['Arvind Kumar','2,610','a3'],['','2,450','ai'],['Siti Hajar','2,205','a2']];
+S('profile','14','Me','Profile & Rank','Class rank and leaderboard.','Kedudukan kelas dan papan pendahulu.',
+`${SB}${P(`${HD('home','Class Rank','Kedudukan Kelas')}
+<div class="card lime" style="flex-direction:row;align-items:center;gap:14px"><i class="avatar big ai"></i><div class="t" style="display:flex;flex-direction:column;gap:3px"><div class="h2">Aisyah Nur</div>${t('YEAR 1 BESTARI · AGE 7','TAHUN 1 BESTARI · UMUR 7','lbl','div')}${t('2,450 XP · RANK #4 OF 38','2,450 XP · TANGGA #4 DARIPADA 38','h4','div')}</div></div>
+<div class="grid3">${[['86','LESSONS','PELAJARAN'],['41','WORDS','PERKATAAN'],['12','BADGES','LENCANA']].map(s=>`<div class="stat" style="background:var(--paper)" data-go="goals" role="button" tabindex="0"><b>${s[0]}</b>${t(s[1],s[2],'lbl')}</div>`).join('')}</div>
+<div class="card"><div class="rw">${t('CLASS 1 BESTARI BOARD','PAPAN KELAS 1 BESTARI','lbl')}${t('THIS WEEK','MINGGU INI','pill m')}</div>
+${LB.map((r,i)=>`<div class="row${i===3?' d':''}" style="${i===3?'':'background:var(--bg)'}"><b class="mono" style="width:16px">${i+1}</b><i class="avatar ${r[2]}" style="width:36px;height:36px"></i><b class="h4 t">${r[0]||t('You','Kamu')}</b><b class="h4"${i===3?' style="color:var(--lime)"':''}>${r[1]}</b></div>`).join('')}</div>
+<button class="btn" data-go="quiz">${t('Challenge a classmate','Cabar rakan sekelas')}</button>
+`)}${NAV('me')}`);
+
+(function(){
+const stage=document.getElementById('screens'),st={lang:'en'};
+stage.innerHTML=KIDO_SCREENS.map(s=>'<div class="screen '+s.cls+'" id="scr-'+s.id+'">'+s.html+'</div>').join('');
+document.querySelectorAll('[data-ms]').forEach(e=>{e.dataset.en=e.innerHTML});
+document.querySelectorAll('[data-go]:not(button):not(a)').forEach(e=>{if(!e.hasAttribute('role')){e.setAttribute('role','button');e.tabIndex=0}});
+function setLang(l){st.lang=l;document.documentElement.lang=l;document.querySelectorAll('[data-ms]').forEach(e=>{e.innerHTML=l==='ms'?e.dataset.ms:e.dataset.en});document.querySelectorAll('[data-lang]').forEach(b=>{const on=b.dataset.lang===l;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});try{localStorage.setItem('kido-lang',l)}catch(e){}}
+function go(id){if(!document.getElementById('scr-'+id))id='splash';document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id==='scr-'+id));try{history.replaceState(null,'','#'+id)}catch(e){}const sc=document.querySelector('#scr-'+id+' .scroll');if(sc)sc.scrollTop=0}
+document.addEventListener('click',e=>{
+const l=e.target.closest('[data-lang]');if(l)return setLang(l.dataset.lang);
+const g=e.target.closest('[data-go]');if(g){e.preventDefault();return go(g.dataset.go)}
+const tg=e.target.closest('[data-tog]');if(tg){if(tg.dataset.tog==='one')[...tg.parentElement.children].forEach(c=>c.classList.toggle('on',c===tg));else{tg.classList.toggle('on');tg.setAttribute('aria-pressed',tg.classList.contains('on'))}return}
+if(e.target.closest('[data-reset]'))document.querySelectorAll('.key').forEach(k=>{k.classList.remove('on');k.setAttribute('aria-pressed','false')})});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-go][role=button]:not(button)')){e.preventDefault();go(e.target.dataset.go)}});
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+let l='en';try{l=localStorage.getItem('kido-lang')==='ms'?'ms':'en'}catch(e){}
+setLang(l);go(location.hash.slice(1)||'splash');
+})();
+</script>
+</body>
+</html>

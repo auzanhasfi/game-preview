@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pesawat Kertas Kosakata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Geist:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="../../kit/ink.css">
+</head><body>
+<script src="../../kit/ink.js"></script>
+<script>
+/* Pesawat Kertas Kosakata — Si Bulat naik pesawat kertas, terbang lewat gerbang berisi kata bahasa Inggris yang benar. */
+(function () {
+  'use strict';
+  var I = INK, C = I.C, W = I.W, H = I.H, LANES = [92, 156, 220], GAP = 25, TOP = 38, BOT = 262;
+  var BANK = {
+    mudah: [['kucing', 'cat'], ['anjing', 'dog'], ['burung', 'bird'], ['ikan', 'fish'], ['sapi', 'cow'], ['apel', 'apple'], ['buku', 'book'], ['meja', 'table'], ['kursi', 'chair'], ['rumah', 'house'],
+      ['bola', 'ball'], ['pintu', 'door'], ['bulan', 'moon'], ['matahari', 'sun'], ['pohon', 'tree'], ['bunga', 'flower'], ['mobil', 'car'], ['topi', 'hat'], ['susu', 'milk'], ['telur', 'egg'], ['roti', 'bread']],
+    sedang: [['merah', 'red'], ['biru', 'blue'], ['hijau', 'green'], ['kuning', 'yellow'], ['hitam', 'black'], ['putih', 'white'], ['tujuh', 'seven'], ['sepuluh', 'ten'], ['delapan', 'eight'], ['tiga', 'three'],
+      ['makan', 'eat'], ['minum', 'drink'], ['tidur', 'sleep'], ['lari', 'run'], ['membaca', 'read'], ['menulis', 'write'], ['melompat', 'jump'], ['berenang', 'swim'], ['bernyanyi', 'sing']],
+    sulit: [['big', 'small'], ['hot', 'cold'], ['fast', 'slow'], ['happy', 'sad'], ['open', 'close'], ['tall', 'short'], ['old', 'young'], ['day', 'night'], ['up', 'down'], ['full', 'empty'],
+      ['heavy', 'light'], ['early', 'late'], ['rich', 'poor'], ['strong', 'weak'], ['clean', 'dirty'], ['loud', 'quiet']]
+  };
+  var P = { x: 96, y: 156, vy: 0, t: 0, inv: 0, trail: [] }, cur = null, col = null, birds = [], stars = [], spawnIn = 0, birdIn = 2, pY = null, scroll = 0, demoWrong = false, used = [];
+  var clouds = [{ x: 40, y: 54, s: 0.9 }, { x: 250, y: 70, s: 1.2 }, { x: 420, y: 48, s: 0.8 }];
+
+  function speed() { return 92 + (I.S.diff === 'sedang' ? 10 : I.S.diff === 'sulit' ? 18 : 0) + I.S.q * 2; }
+  function makeQ() {
+    var bank = BANK[I.S.diff], pool = bank.filter(function (w) { return used.indexOf(w[0]) < 0; });
+    if (!pool.length) { used = []; pool = bank; }
+    var w = I.pick(pool); used.push(w[0]);
+    var others = I.shuffle(bank.filter(function (o) { return o[1] !== w[1]; })).slice(0, 2).map(function (o) { return o[1]; });
+    return { id: w[0], ans: w[1], options: I.shuffle([w[1]].concat(others)) };
+  }
+  function spawnCol() {
+    var live = cur.options.filter(function (o) { return cur.wrong.indexOf(o) < 0; });
+    var lanes = I.shuffle([0, 1, 2]).slice(0, live.length).sort();
+    col = { x: W + 12, opts: live.map(function (w, i) { return { w: w, lane: lanes[i], u: I.ri(1, 80) }; }), crossed: false, hit: null };
+    demoWrong = I.demo && cur.wrong.length === 0 && Math.random() < 0.18;
+  }
+  function stage() {
+    cur = makeQ(); cur.wrong = [];
+    I.setQ(I.S.diff === 'sulit' ? 'lawan kata <i>' + cur.id + '</i> → ?' : '<span class="slot">' + cur.id + '</span> → ?');
+    spawnCol(); spawnIn = 0;
+  }
+  function hurt(word) {
+    P.inv = 1.5; P.vy = -120;
+    I.bad(P.x + 6, P.y - 6, { word: word, sound: 'hurt' });
+  }
+  function update(dt) {
+    P.t += dt; if (P.inv > 0) P.inv -= dt;
+    var sp = speed(); scroll += sp * dt;
+    clouds.forEach(function (c) { c.x -= sp * 0.25 * dt; if (c.x < -70) { c.x = W + 20; c.y = I.ri(46, 80); } });
+    var dir = (I.key.D ? 1 : 0) - (I.key.U ? 1 : 0);
+    if (pY !== null && !I.demo) dir = Math.abs(pY - P.y) > 4 ? (pY > P.y ? 1 : -1) : 0;
+    if (I.state !== 'play' && I.S.hearts > 0) dir = 0;
+    P.vy = I.approach(P.vy, dir * 170, 900 * dt);
+    if (!dir) P.vy = I.approach(P.vy, Math.sin(P.t * 2.4) * 14, 300 * dt);
+    P.y = I.clamp(P.y + P.vy * dt, TOP + 10, BOT - 12);
+    P.trail.push([P.x - 18, P.y + 4]); if (P.trail.length > 26) P.trail.shift();
+    P.trail.forEach(function (p) { p[0] -= sp * dt; });
+
+    if (col) {
+      col.x -= sp * dt;
+      if (!col.crossed && col.x <= P.x && I.state === 'play') {
+        col.crossed = true;
+        var lane = 0, best = 1e9;
+        LANES.forEach(function (c, i) { if (Math.abs(P.y - c) < best) { best = Math.abs(P.y - c); lane = i; } });
+        var opt = col.opts.find(function (o) { return o.lane === lane; });
+        if (!opt || best > GAP) { if (P.inv <= 0) hurt('BRAK!'); spawnIn = 1.2; }
+        else if (opt.w === cur.ans) { col.hit = opt; opt.good = true; I.good(P.x, LANES[lane], { word: 'TING!' }); birds.forEach(function (b) { b.dead = 0.5; }); }
+        else { col.hit = opt; opt.bad = true; cur.wrong.push(opt.w); if (I.bad(P.x, LANES[lane])) spawnIn = 1.3; }
+      }
+      if (col.x < -60) col = null;
+    }
+    if (spawnIn > 0 && I.state === 'play') { spawnIn -= dt; if (spawnIn <= 0) spawnCol(); }
+    birdIn -= dt;
+    if (birdIn <= 0 && I.state === 'play' && (!col || col.crossed || col.x < 230)) {
+      birdIn = I.rf(2.2, 3.6) - Math.min(1, I.S.q * 0.08);
+      if (I.S.q >= 1 || I.S.diff !== 'mudah') birds.push({ x: W + 24, y: I.ri(TOP + 20, BOT - 26), t: 0, dead: 0, wob: I.rf(0, 6) });
+      var sy = I.ri(TOP + 30, BOT - 40);
+      for (var k = 0; k < 4; k++) stars.push({ x: W + 60 + k * 22, y: sy + Math.sin(k) * 10, got: false, t: k });
+    }
+    for (var i = birds.length - 1; i >= 0; i--) {
+      var b = birds[i]; b.t += dt; b.x -= (sp + 34) * dt; b.y += Math.sin(b.t * 3 + b.wob) * 20 * dt;
+      if (b.dead > 0) { b.dead -= dt; if (b.dead <= 0) birds.splice(i, 1); continue; }
+      if (b.x < -40) { birds.splice(i, 1); continue; }
+      if (I.state === 'play' && P.inv <= 0 && Math.abs(b.x - P.x) < 22 && Math.abs(b.y - P.y) < 18) { b.dead = 0.5; I.splat(b.x, BOT, 9); hurt('AUW!'); }
+    }
+    stars.forEach(function (s) {
+      s.x -= sp * dt; s.t += dt;
+      if (!s.got && I.state === 'play' && Math.abs(s.x - P.x) < 16 && Math.abs(s.y - P.y) < 16) { s.got = true; I.addScore(1, s.x, s.y); I.coinFx(s.x, s.y); I.sfx('coin'); }
+    });
+    stars = stars.filter(function (s) { return s.x > -20 && !s.got; });
+  }
+  function demo() {
+    I.key.U = I.key.D = false;
+    var target = P.y;
+    if (col && !col.crossed) {
+      var o = demoWrong ? col.opts.find(function (q) { return q.w !== cur.ans; }) : col.opts.find(function (q) { return q.w === cur.ans; });
+      if (o) target = LANES[o.lane];
+    }
+    birds.forEach(function (b) { if (!b.dead && b.x - P.x > -10 && b.x - P.x < 120 && Math.abs(b.y - target) < 30 && (!col || col.x - P.x > 90 || col.crossed)) target = b.y > P.y ? b.y - 46 : b.y + 46; });
+    target = I.clamp(target, TOP + 14, BOT - 16);
+    if (target > P.y + 4) I.key.D = true; else if (target < P.y - 4) I.key.U = true;
+  }
+  function pillar(x, y0, y1, u) {
+    if (y1 - y0 < 4) return;
+    var c = I.ctx(); c.fillStyle = C.paper2; c.fillRect(x - 7, y0, 14, y1 - y0);
+    I.hatch(x - 7, y0, 14, y1 - y0, 4, C.ink, 0.8, 0.45);
+    I.rect(x - 7, y0, 14, y1 - y0, u, 0.7, 1.6);
+  }
+  function drawCol() {
+    if (!col) return;
+    var x = col.x, edges = [TOP];
+    LANES.forEach(function (c, i) {
+      var open = col.opts.some(function (o) { return o.lane === i; });
+      if (open) { edges.push(c - GAP); edges.push(c + GAP); }
+    });
+    edges.push(BOT);
+    for (var k = 0; k < edges.length; k += 2) pillar(x, edges[k], edges[k + 1], k + 5);
+    col.opts.forEach(function (o) {
+      var c = LANES[o.lane], w = Math.max(56, o.w.length * 9 + 18);
+      if (o.good) I.star4(x, c, 26 + Math.sin(I.time * 12) * 3, I.time * 1.4, C.org, 1.6);
+      I.card(x - w / 2, c - 13, w, 26, o.u, { fill: o.good ? C.org : o.bad ? C.wash : C.paper2, hatch: o.bad, mark: !o.good && !o.bad, text: o.w, size: 14, col: o.good ? '#fff' : o.bad ? 'rgba(43,42,40,0.5)' : C.ink, cross: o.bad });
+    });
+  }
+  function plane(x, y, tilt, mood) {
+    var c = I.ctx();
+    c.save(); c.translate(x, y); c.rotate(tilt); c.scale(1.3, 1.3);
+    I.bulat(-2, -3, { r: 8, face: 1, mood: mood, noFeet: true, t: P.t });
+    I.trace([[24, 0], [-18, -9], [-10, 2], [-17, 9], [24, 0]]); c.fillStyle = C.paper2; c.fill(); I.stroke(1.6);
+    I.line(24, 0, -12, 2, 31, 0.4, 1.2); I.line(-10, 2, -6, 8, 32, 0.3, 1.1);
+    I.hatch(-16, 2, 14, 7, 3, C.ink, 0.7, 0.35);
+    c.restore();
+  }
+  function draw() {
+    var c = I.ctx();
+    I.paper(0.03);
+    I.sun(420, 70, 15);
+    c.globalAlpha = 0.28;
+    var pts = [];
+    for (var xx = 0; xx <= W; xx += 8) pts.push([xx, BOT - 34 - Math.sin((xx + scroll * 0.3) * 0.016 + 1) * 16 - Math.sin((xx + scroll * 0.3) * 0.04) * 4]);
+    I.trace(pts); I.stroke(1.2);
+    c.globalAlpha = 1;
+    clouds.forEach(function (cl, i) { I.cloud(cl.x, cl.y, cl.s, i * 7); });
+    I.line(0, BOT, W, BOT, 3, 1, 1.7);
+    for (var i = 0; i < 18; i++) { var tx = ((i * 30 - scroll * 0.9) % 540 + 540) % 540 - 30; I.line(tx, BOT, tx - 2.5, BOT - 5, i + 60, 0.4, 1.1); I.line(tx, BOT, tx + 3, BOT - 4.5, i + 100, 0.4, 1.1); }
+    I.drawSplats();
+    stars.forEach(function (s) { if (!s.got) I.star4(s.x, s.y + Math.sin(s.t * 4) * 2, 5, s.t, C.org, 1.6); });
+    drawCol();
+    birds.forEach(function (b) { I.blob(b.x, b.y + 10, { t: b.t, dir: -1, wings: true, dead: b.dead, s: 0.72 }); });
+    c.save(); c.setLineDash([3, 5]); c.globalAlpha = 0.45;
+    if (P.trail.length > 2) { I.trace(P.trail); I.stroke(1.2); }
+    c.restore();
+    if (!(P.inv > 0 && Math.floor(I.time * 20) % 2 === 0)) plane(P.x, P.y, P.vy * 0.0022, I.S.hearts <= 0 ? 'hurt' : P.inv > 1 ? 'wow' : 'happy');
+  }
+  function mini(t) {
+    var c = I.ctx(), y = 52 + Math.sin(t * 2) * 12;
+    I.cloud(92, 30, 0.6, 2);
+    I.line(4, 88, 146, 88, 5, 0.8, 1.4);
+    c.save(); c.setLineDash([3, 4]); c.globalAlpha = 0.5; I.line(10, 54 + Math.sin(t * 2 - 1) * 12, 52, y + 4, 8, 0.6, 1.2); c.restore();
+    I.card(104, 40, 40, 18, 4, { text: 'cat', size: 11, mark: true });
+    c.save(); c.translate(70, y); c.scale(1.2, 1.2); c.translate(-70, -y);
+    var sv = P.t; P.t = t; plane(70, y, Math.cos(t * 2) * 0.12, 'happy'); P.t = sv;
+    c.restore();
+  }
+
+  I.game({
+    id: 'pesawat-kata', title: 'Pesawat Kertas Kosakata', tag: 'Terbang · Bahasa Inggris',
+    desc: 'Si Bulat menaiki pesawat kertas. Terbang lewat gerbang yang berisi kata bahasa Inggris yang benar, hindari burung tinta.',
+    levels: [{ d: 'mudah', b: 'Mudah', s: 'Hewan & benda di sekitar' }, { d: 'sedang', b: 'Sedang', s: 'Warna, angka, kata kerja' }, { d: 'sulit', b: 'Sulit', s: 'Lawan kata (opposites)' }],
+    note: '10 kata, 3 nyawa. Kumpulkan bintang di udara!', tip: 'terbang lewat kata bahasa Inggris yang benar', unit: 'Kata',
+    pad: [{ k: 'U', label: '▲ NAIK', aria: 'Naik', main: 1 }, { k: 'D', label: '▼ TURUN', aria: 'Turun', main: 1 }],
+    keyHelp: 'Keyboard: <kbd>↑</kbd> naik, <kbd>↓</kbd> turun · atau sentuh arena',
+    winTitle: 'Pendaratan mulus',
+    start: function () { P.y = 156; P.vy = 0; P.inv = 0; P.trail = []; birds = []; stars = []; col = null; birdIn = 2.5; used = []; pY = null; },
+    stage: stage, update: update, draw: draw, demo: demo, mini: mini,
+    pointer: function (type, x, y) { pY = type === 'up' ? null : y; },
+    answer: function () { return cur ? cur.id + ' → ' + cur.ans : ''; }
+  });
+})();
+</script>
+</body></html>

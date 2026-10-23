@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Lompat Atmosfer</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>body{background:#0b1430;display:grid;place-items:center}#cv{margin-top:52px;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.5);touch-action:none}</style></head><body>
+<canvas id="cv"></canvas>
+<div class="edu-pad touch" style="left:14px"><button data-k="L">◀</button></div><div class="edu-pad touch" style="right:14px"><button data-k="R">▶</button></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Lompat Atmosfer: terinspirasi Doodle Jump (he-is-talha/html-css-javascript-games, MIT). Kode ditulis ulang. */
+var LAYER=[{n:'Troposfer',km:0,c1:'#8fd3ff',c2:'#d9f2ff',info:'Lapisan terbawah, tempat cuaca dan awan terjadi.'},{n:'Stratosfer',km:12,c1:'#4f8fe0',c2:'#8fd3ff',info:'Ada lapisan ozon yang menyerap sinar ultraviolet.'},
+  {n:'Mesosfer',km:50,c1:'#2a4fa8',c2:'#4f8fe0',info:'Meteor terbakar di lapisan ini.'},{n:'Termosfer',km:80,c1:'#151f5c',c2:'#2a4fa8',info:'Ada aurora dan stasiun luar angkasa (ISS).'},{n:'Eksosfer',km:700,c1:'#05081f',c2:'#151f5c',info:'Lapisan terluar, berbatasan dengan luar angkasa.'}];
+var QS=[{q:'Di lapisan mana cuaca dan hujan terjadi?',a:'Troposfer',b:'Mesosfer'},{q:'Lapisan ozon berada di…',a:'Stratosfer',b:'Troposfer'},{q:'Meteor terbakar di lapisan…',a:'Mesosfer',b:'Eksosfer'},{q:'Aurora terjadi di lapisan…',a:'Termosfer',b:'Stratosfer'},
+  {q:'Lapisan atmosfer paling luar adalah…',a:'Eksosfer',b:'Troposfer'},{q:'Ozon melindungi Bumi dari…',a:'Sinar ultraviolet',b:'Hujan asam'},{q:'Gas paling banyak di udara adalah…',a:'Nitrogen',b:'Oksigen'},{q:'Pesawat terbang biasanya terbang di batas…',a:'Troposfer–stratosfer',b:'Termosfer'}];
+var cv=EDU.$('#cv'),x=cv.getContext('2d'),W,H,K={},G={};var STEP=2000;/* tinggi antar-lapisan dalam piksel dunia */
+EDU.hud({title:'Lompat Atmosfer',lives:true,credit:'Terinspirasi Doodle Jump · he-is-talha (MIT)'});
+function size(){H=Math.min(innerHeight-80,820);W=Math.min(innerWidth-20,Math.round(H*.62));cv.width=W;cv.height=H}size();
+function km(h){var i=Math.min(LAYER.length-1,Math.floor(h/STEP)),f=(h-i*STEP)/STEP,a=LAYER[i].km,b=(LAYER[i+1]||{km:1000}).km;return Math.round(a+(b-a)*f)}
+function layerAt(h){return LAYER[Math.min(LAYER.length-1,Math.max(0,Math.floor(h/STEP)))]}
+function addPlat(y){var k=Math.random();G.plats.push({x:Math.random()*(W-80)+10,y:y,w:72,type:k<.12?'move':k<.2?'spring':'n',vx:(Math.random()<.5?-1:1)*1.4})}
+function quizRow(y){var q=G.qs[G.qi++%G.qs.length],left=Math.random()<.5;var w=W*.42;G.plats.push({x:W*.04,y:y,w:w,type:'q',t:left?q.a:q.b,ok:left,q:q},{x:W*.54,y:y,w:w,type:'q',t:left?q.b:q.a,ok:!left,q:q});G.pendingQ=q}
+function start(){G={p:{x:W/2,y:H-120,vx:0,vy:-12,face:1},plats:[],cam:0,top:0,score:0,lives:3,run:true,qs:EDU.shuffle(QS),qi:0,benar:0,salah:0,stars:[],layer:0,nextQ:700,parts:[]};
+  G.plats.push({x:W/2-50,y:H-60,w:100,type:'n'});for(var y=H-150;y>-H;y-=90)addPlat(y);G.lastY=-H;for(var i=0;i<90;i++)G.stars.push([Math.random()*W,Math.random()*H*3,Math.random()]);
+  EDU.setScore(0);EDU.setLives(3);EDU.setQ('Lompat naik ke luar angkasa!')}
+function update(){var p=G.p;if(EDU.demo)demo();p.vx=(K.L?-6:0)+(K.R?6:0)||p.vx*.85;if(K.L)p.face=-1;if(K.R)p.face=1;p.x+=p.vx;if(p.x<-20)p.x=W+20;if(p.x>W+20)p.x=-20;
+  p.vy+=.38;p.y+=p.vy;
+  G.plats.forEach(function(pl){if(pl.type==='move'){pl.x+=pl.vx;if(pl.x<0||pl.x+pl.w>W)pl.vx*=-1}
+    if(p.vy>0&&!pl.broken&&p.x>pl.x-12&&p.x<pl.x+pl.w+12&&p.y+22>pl.y&&p.y+22<pl.y+16+p.vy){
+      if(pl.type==='q'){if(pl.ok){p.vy=-19;G.score+=30;G.benar++;EDU.sfx('ok');EDU.toast('✔ '+pl.q.q.replace('…','')+' '+pl.t,true);G.plats.forEach(function(o){if(o.q===pl.q&&o!==pl)o.broken=true});pl.type='n';pl.done=true}
+        else{pl.broken=true;G.salah++;EDU.sfx('bad');EDU.toast('✘ Jawabannya: '+pl.q.a,false);for(var i=0;i<12;i++)G.parts.push({x:pl.x+Math.random()*pl.w,y:pl.y,vx:(Math.random()-.5)*4,vy:Math.random()*-3,l:40})}}
+      else{p.vy=pl.type==='spring'?-18:-13.2;EDU.sfx('pop')}}});
+  var h=-(p.y-(H-120));if(h>G.top){G.top=h;G.score=Math.max(G.score,0);}
+  var target=p.y-H*.42;if(target<G.cam)G.cam=target;
+  while(G.lastY>G.cam-200){G.lastY-=EDU.rand(70,100)+Math.min(40,G.top/600);var wy=-(G.lastY-(H-120));if(wy>G.nextQ){quizRow(G.lastY);G.nextQ+=1000;G.lastY-=110}else addPlat(G.lastY)}
+  G.plats=G.plats.filter(function(pl){return pl.y<G.cam+H+60});
+  var L=layerAt(G.top);if(L.n!==G.layerName){G.layerName=L.n;if(G.top>100){EDU.toast('Masuk '+L.n+' ('+L.km+' km): '+L.info);EDU.sfx('win')}}
+  var q=G.plats.find(function(o){return o.type==='q'&&!o.broken&&o.y<p.y+40&&o.y>G.cam});EDU.setQ(q?q.q.q:L.n+' · '+km(G.top)+' km');
+  EDU.setScore(Math.floor(G.top/10)+G.benar*30);
+  if(p.y>G.cam+H+40){G.lives--;EDU.setLives(G.lives);EDU.sfx('bad');if(G.lives<=0){G.run=false;return EDU.end({key:'atmosfer',score:Math.floor(G.top/10)+G.benar*30,benar:G.benar,salah:G.salah,max:2000,head:'Sampai '+km(G.top)+' km',note:'<p>Lapisan: <b>'+layerAt(G.top).n+'</b></p>'},start)}
+    var safe=G.plats.filter(function(o){return !o.broken&&o.y>G.cam+H*.4&&o.y<G.cam+H-40}).sort(function(a,b){return b.y-a.y})[0];if(safe){p.x=safe.x+safe.w/2;p.y=safe.y-30;}else{p.y=G.cam+H*.5}p.vy=-14;EDU.toast('Jatuh! Coba lagi')}}
+/* demo: arahkan ke pijakan terdekat di atas, pilih jawaban benar */
+function demo(){var p=G.p;K.L=K.R=false;var apex=p.vy<0?p.y-p.vy*p.vy/(2*.38):p.y;
+  var c=G.plats.filter(function(o){return !o.broken&&!(o.type==='q'&&!o.ok)&&o.y>apex+25&&o.y>G.cam&&o.y<G.cam+H-20&&(p.vy<0||o.y>p.y+10)});
+  var q=c.find(function(o){return o.type==='q'&&o.ok});var t=q||c.sort(function(a,b){return a.y-b.y})[0];if(!t)return;var cx=t.x+t.w/2;if(cx<p.x-8)K.L=true;else if(cx>p.x+8)K.R=true}
+function draw(){var L=Math.min(LAYER.length-1,Math.floor(G.top/STEP)),f=(G.top%STEP)/STEP,A=LAYER[L],B=LAYER[Math.min(LAYER.length-1,L+1)];
+  var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,mix(A.c1,B.c1,f));g.addColorStop(1,mix(A.c2,B.c2,f));x.fillStyle=g;x.fillRect(0,0,W,H);
+  var dark=Math.min(1,G.top/(STEP*2.2));G.stars.forEach(function(s){var sy=((s[1]-G.cam*.15)%(H*3)+H*3)%(H*3);if(sy<H){x.fillStyle='rgba(255,255,255,'+(dark*(.3+s[2]*.6))+')';x.fillRect(s[0],sy,2,2)}});
+  if(L===0){x.fillStyle='rgba(255,255,255,.75)';for(var i=0;i<4;i++){var cy=((i*260-G.cam*.4)%(H+200)+H+200)%(H+200)-100;x.beginPath();x.arc(60+i*90%W,cy,26,0,7);x.arc(90+i*90%W,cy-12,30,0,7);x.arc(122+i*90%W,cy,24,0,7);x.fill()}}
+  if(L===2){x.strokeStyle='rgba(255,200,120,.8)';x.lineWidth=2;for(var m=0;m<3;m++){var mx=(G.cam*-.7+m*170)%W,my=(m*140+(-G.cam*1.3))%H;x.beginPath();x.moveTo(mx,my);x.lineTo(mx-40,my-30);x.stroke()}}
+  if(L>=3){x.fillStyle='rgba(80,255,170,.12)';for(var a=0;a<3;a++){x.beginPath();x.ellipse(W/2+Math.sin(G.top/400+a)*40,H*.25+a*30,W*.7,40,.1*a,0,7);x.fill()}}
+  for(var k=1;k<LAYER.length;k++){var by=-(k*STEP)+(H-120)-G.cam;if(by>-30&&by<H+30){x.strokeStyle='rgba(255,255,255,.55)';x.setLineDash([10,8]);x.beginPath();x.moveTo(0,by);x.lineTo(W,by);x.stroke();x.setLineDash([]);x.fillStyle='#fff';x.font='700 15px Space Grotesk';x.textAlign='left';x.fillText('↑ '+LAYER[k].n+' · '+LAYER[k].km+' km',10,by-8)}}
+  G.plats.forEach(function(pl){if(pl.broken&&pl.type!=='q')return;var py=pl.y-G.cam;if(pl.type==='q'){if(pl.broken){x.globalAlpha=.25}x.fillStyle=pl.done?'#3ecf8e':'#fff7e6';x.beginPath();x.roundRect(pl.x,py,pl.w,26,13);x.fill();x.fillStyle='#2a1a10';x.font='700 '+Math.min(16,W/26)+'px Space Grotesk';x.textAlign='center';x.fillText(pl.t,pl.x+pl.w/2,py+18);x.globalAlpha=1;return}
+    x.fillStyle=pl.type==='move'?'#7dd3fc':'#65d26e';x.beginPath();x.roundRect(pl.x,py,pl.w,14,7);x.fill();x.fillStyle='rgba(0,0,0,.18)';x.fillRect(pl.x+6,py+9,pl.w-12,3);if(pl.type==='spring'){x.fillStyle='#FD5E2B';x.fillRect(pl.x+pl.w/2-8,py-10,16,10)}});
+  G.parts=G.parts.filter(function(q){q.x+=q.vx;q.y+=q.vy;q.vy+=.2;x.fillStyle='#fff7e6';x.fillRect(q.x,q.y-G.cam,4,4);return --q.l>0});
+  var p=G.p,py2=p.y-G.cam;x.save();x.translate(p.x,py2);x.scale(p.face,1);x.fillStyle='#FD5E2B';x.beginPath();x.ellipse(0,0,19,21,0,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(6,-6,6,0,7);x.fill();x.fillStyle='#5E1B08';x.beginPath();x.arc(8,-6,3,0,7);x.fill();
+  x.fillStyle='#ffd0a8';x.fillRect(-14,18,8,8);x.fillRect(6,18,8,8);x.fillStyle='#d9f2ff';x.beginPath();x.arc(0,-2,26,Math.PI*1.1,Math.PI*1.9);x.strokeStyle='rgba(255,255,255,.7)';x.lineWidth=3;x.stroke();x.restore();
+  x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.roundRect(W-118,10,108,48,12);x.fill();x.fillStyle='#fff';x.font='700 22px Space Mono';x.textAlign='right';x.fillText(km(G.top)+' km',W-18,40);x.font='700 11px Space Grotesk';x.fillText(layerAt(G.top).n.toUpperCase(),W-18,54)}
+function mix(a,b,f){var A=parseInt(a.slice(1),16),B=parseInt(b.slice(1),16);var r=(A>>16)+(((B>>16)-(A>>16))*f),g=((A>>8)&255)+((((B>>8)&255)-((A>>8)&255))*f),bl=(A&255)+(((B&255)-(A&255))*f);return 'rgb('+r+','+g+','+bl+')'}
+function loop(){if(G.run)update();if(G.p)draw();requestAnimationFrame(loop)}
+addEventListener('keydown',function(e){if(e.key==='ArrowLeft'||e.key==='a')K.L=true;if(e.key==='ArrowRight'||e.key==='d')K.R=true});addEventListener('keyup',function(e){if(e.key==='ArrowLeft'||e.key==='a')K.L=false;if(e.key==='ArrowRight'||e.key==='d')K.R=false});
+document.querySelectorAll('.edu-pad button').forEach(function(b){b.addEventListener('pointerdown',function(e){e.preventDefault();K[b.dataset.k]=true});['pointerup','pointerleave','pointercancel'].forEach(function(ev){b.addEventListener(ev,function(){K[b.dataset.k]=false})})});
+cv.addEventListener('pointerdown',function(e){var r=cv.getBoundingClientRect();if(e.clientX-r.left<r.width/2)K.L=true;else K.R=true});cv.addEventListener('pointerup',function(){K.L=K.R=false});
+requestAnimationFrame(loop);window.__G=function(){return G};
+EDU.title({key:'atmosfer',title:'Lompat Atmosfer',mapel:'IPA / Geografi · Lapisan atmosfer · SD Kelas 5 – SMP',desc:'Si Bulat melompat dari tanah sampai ke luar angkasa, melewati 5 lapisan atmosfer.',how:['Panah kiri/kanan (atau ketuk sisi layar) untuk bergerak.','Di pijakan soal, mendaratlah di jawaban yang benar. Jawaban salah = pijakan runtuh.','Setiap masuk lapisan baru, muncul info singkatnya.']},start);
+</script></body></html>

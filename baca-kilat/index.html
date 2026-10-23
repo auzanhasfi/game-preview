@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Baca Kilat Kosakata</title><link rel="stylesheet" href="../_kit/edu.css">
+<style>
+:root{--bg:#fafafa;--fg:#222;--mut:#888;--line:#e4e4e4;--card:#fff}
+html.dark{--bg:#17171c;--fg:#f2f2f2;--mut:#8a8a99;--line:#2c2c36;--card:#202028}
+html,body{overflow:auto}
+body{background:var(--bg);color:var(--fg);display:grid;place-items:center;min-height:100%;transition:background .3s}
+.box{width:min(560px,92vw);margin:74px 0 20px;text-align:center}
+.ctr{display:flex;justify-content:center;gap:22px;color:var(--mut);font:700 15px 'Space Mono';margin-bottom:6px}.ctr b{color:var(--fg)}
+.w{font:700 clamp(54px,13vw,104px) 'Space Grotesk';letter-spacing:-.02em;margin:10px 0 0;min-height:1.2em}
+.hint{color:var(--mut);margin-bottom:18px;font-size:15px}
+input{width:100%;font:700 24px 'Space Grotesk';text-align:center;padding:12px;border:0;border-bottom:3px solid var(--line);background:transparent;color:var(--fg);outline:0}
+input:focus{border-color:#FD5E2B}input.ok{border-color:#3ecf8e}
+.row{display:flex;gap:10px;justify-content:center;margin-top:14px}.row button{border:2px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:8px 18px;font:700 14px 'Space Grotesk';cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:20px;font-size:15px;text-align:left}th,td{padding:7px 8px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-size:12px;text-transform:uppercase}
+td.s{color:#e0a020}td.k{color:#3ecf8e}
+</style></head><body>
+<div class="box"><div class="ctr"><span>Benar <b id="cB">0</b></span><span>Lewat <b id="cL">0</b></span><span>⏱ <b id="cT">0.0</b>s</span></div>
+<div class="w" id="w">–</div><div class="hint" id="hint">ketik artinya dalam Bahasa Indonesia</div>
+<input id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Arti kata">
+<div class="row"><button id="skip">Lewati (Tab)</button><button id="theme">🌙 Tema gelap</button></div>
+<table><thead><tr><th>Kata</th><th>Arti</th><th>Hasil</th><th>Waktu</th></tr></thead><tbody id="tb"></tbody></table></div>
+<script src="../_kit/edu.js"></script>
+<script>
+/* Baca Kilat Kosakata: remake asobimashou (sglkc, MIT): latihan baca tanpa henti, hitung benar/lewat/waktu, tabel hasil, tema gelap. Kode ditulis ulang untuk kosakata Inggris. */
+var G={list:[],i:0,b:0,l:0,t0:0,tw:0,rows:[],run:false,iv:null},MAX=10,inp=EDU.$('#inp');
+EDU.hud({title:'Baca Kilat Kosakata',credit:'Remake Asobimashou · sglkc (MIT)'});EDU.$('.edu-credit').classList.add('dark');
+function show(){var v=G.list[G.i];EDU.$('#w').textContent=v[0];inp.value='';inp.className='';G.tw=Date.now();EDU.setQ('Kata '+(G.i+1)+'/'+MAX)}
+function row(v,ok){var dt=((Date.now()-G.tw)/1000).toFixed(1);G.rows.push('<tr><td><b>'+v[0]+'</b></td><td>'+v[1]+'</td><td class="'+(ok?'k':'s')+'">'+(ok?'✔ benar':'↷ lewat')+'</td><td>'+dt+'s</td></tr>');EDU.$('#tb').innerHTML=G.rows.slice().reverse().join('')}
+function next(){G.i++;if(G.i>=MAX)return finish();show()}
+inp.addEventListener('input',function(){if(!G.run)return;var v=G.list[G.i];if(inp.value.toLowerCase().trim()===v[1]){inp.className='ok';G.b++;EDU.$('#cB').textContent=G.b;EDU.setScore(G.b*10);EDU.sfx('ok');row(v,true);setTimeout(next,250)}});
+function skip(){if(!G.run)return;var v=G.list[G.i];G.l++;EDU.$('#cL').textContent=G.l;EDU.sfx('tick');EDU.toast(v[0]+' = '+v[1]);row(v,false);next()}
+EDU.$('#skip').onclick=skip;document.addEventListener('keydown',function(e){if(e.key==='Tab'){e.preventDefault();skip()}});
+EDU.$('#theme').onclick=function(){document.documentElement.classList.toggle('dark');this.textContent=document.documentElement.classList.contains('dark')?'☀️ Tema terang':'🌙 Tema gelap'};
+function start(){G.list=EDU.shuffle(EDU.VOCAB).slice(0,MAX);G.i=0;G.b=0;G.l=0;G.rows=[];G.run=true;EDU.$('#tb').innerHTML='';EDU.$('#cB').textContent=0;EDU.$('#cL').textContent=0;EDU.setScore(0);G.t0=Date.now();show();inp.focus();
+  clearInterval(G.iv);G.iv=setInterval(function(){EDU.$('#cT').textContent=((Date.now()-G.t0)/1000).toFixed(1)},100);if(EDU.demo){if(!document.documentElement.classList.contains('dark'))EDU.$('#theme').click();setTimeout(auto,500)}}
+function finish(){G.run=false;clearInterval(G.iv);var tot=(Date.now()-G.t0)/1000;EDU.end({key:'baca',score:G.b*10,benar:G.b,salah:G.l,max:MAX*10,head:'Selesai!',note:'<p>Rata-rata '+(tot/MAX).toFixed(1)+' detik per kata. Lihat tabel hasil di bawah.</p>'},start)}
+function auto(){if(!G.run)return;var v=G.list[G.i];if(Math.random()<.12&&!inp.value){setTimeout(function(){skip();setTimeout(auto,500)},700);return}
+  var i=0;(function type(){if(!G.run||G.list[G.i]!==v)return;inp.value=v[1].slice(0,++i);inp.dispatchEvent(new Event('input'));if(i<v[1].length)setTimeout(type,110);else setTimeout(auto,600)})()}
+EDU.title({key:'baca',title:'Baca Kilat Kosakata',mapel:'Bahasa Inggris · SD Kelas 4 – SMP',desc:'Baca kata Inggris, ketik artinya secepat mungkin. 10 kata per ronde.',how:['Ketik arti kata dalam Bahasa Indonesia (otomatis lanjut kalau benar).','Tidak tahu? Tekan Tab / Lewati.','Di akhir ada tabel: kata, arti, hasil, dan waktumu.']},start);
+</script></body></html>
