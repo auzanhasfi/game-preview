@@ -1,0 +1,13 @@
+[{"nama": "arena", "langkah": [
+  {"buka": "index.html"}, {"tunggu": 900}, {"tangkap": "01-menu"},
+  {"klik": "[data-uji=mula]"}, {"tunggu": 500},
+  {"nilai": "window.__game.gerak(0.7,-0.7), window.__game.langkah(9)"}, {"nilai": "window.__game.info"}, {"tangkap": "02-lorong"},
+  {"nilai": "window.__game.gerak(0.7,-0.7), window.__game.langkah(8), window.__game.gerak(0,0), window.__game.langkah(10)"}, {"nilai": "window.__game.info"}, {"tangkap": "03-perang"},
+  {"nilai": "window.__game.skill(0), window.__game.skill(1), window.__game.skill(2), window.__game.langkah(0.3)"}, {"tangkap": "04-skill"},
+  {"nilai": "window.__game.soalan(), window.__game.langkah(0.1)"}, {"tunggu": 500}, {"jangka": "window.__game.keadaan === 'soalan'"}, {"tangkap": "05-soalan"},
+  {"nilai": "window.__game.jawabUji(true)"}, {"tunggu": 1600}, {"jangka": "window.__game.keadaan === 'main'"},
+  {"nilai": "window.__game.cedera(99999)"}, {"tunggu": 1300}, {"tangkap": "06-tumbang"}, {"nilai": "window.__game.jawabUji(false)"}, {"tunggu": 2200},
+  {"nilai": "window.__game.langkah(12)"}, {"nilai": "window.__game.info"},
+  {"nilai": "window.__game.runtuh(2), window.__game.ke(1560, 520), window.__game.langkah(1.5)"}, {"tunggu": 300}, {"tangkap": "07-boss"},
+  {"nilai": "window.__game.pukulBoss(99999)"}, {"nilai": "window.__game.langkah(2)"}, {"tunggu": 1800}, {"jangka": "window.__game.keadaan === 'menang'"}, {"tangkap": "08-menang"}
+]}]

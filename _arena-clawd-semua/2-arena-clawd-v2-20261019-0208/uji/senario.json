@@ -1,0 +1,30 @@
+[{"nama": "pahlawan", "langkah": [
+  {"buka": "index.html"}, {"tunggu": 900}, {"tangkap": "01-menu"},
+  {"klik": "[data-uji=mula]"}, {"tunggu": 400},
+  {"nilai": "window.__game.ke(560,700), window.__game.langkah(0.5), window.__game.monster('kelomang')"},
+  {"nilai": "window.__game.langkah(6), window.__game.info"}, {"tangkap": "02-kelomang"},
+  {"nilai": "window.__game.ke(560,1000), window.__game.langkah(0.3), window.__game.skill(1), window.__game.langkah(0.15)"}, {"tangkap": "03-pusing-biru"},
+  {"nilai": "window.__game.langkah(10), window.__game.info"},
+  {"nilai": "window.__game.xp(600), window.__game.info"}, {"nilai": "window.__game.naik(0)"},
+  {"nilai": "window.__game.ke(900,1100), window.__game.gerak(0.7,-0.7), window.__game.langkah(8), window.__game.gerak(0,0), window.__game.langkah(3)"},
+  {"nilai": "window.__game.skill(2), window.__game.langkah(0.25)"}, {"tangkap": "04-ult-lompat"}, {"nilai": "window.__game.langkah(0.4)"}, {"tangkap": "05-hentak"},
+  {"nilai": "window.__game.emas(2000), window.__game.kedai(), window.__game.beli('pedang'), window.__game.beli('jaket')"}, {"tunggu": 300}, {"tangkap": "06-kedai"},
+  {"nilai": "window.__game.tutupKedai(), window.__game.info"},
+  {"nilai": "window.__game.soalan(), window.__game.langkah(0.1)"}, {"tunggu": 400}, {"jangka": "window.__game.keadaan === 'soalan'"}, {"nilai": "window.__game.jawabUji(true)"}, {"tunggu": 1600},
+  {"nilai": "window.__game.runtuh(2), window.__game.ke(1560,520), window.__game.langkah(1.5)"}, {"tunggu": 300}, {"tangkap": "07-boss"},
+  {"nilai": "window.__game.pukulBoss(99999), window.__game.langkah(2)"}, {"tunggu": 1800}, {"jangka": "window.__game.keadaan === 'menang'"}, {"tangkap": "08-menang"}
+]},
+{"nama": "sihir", "langkah": [
+  {"buka": "index.html"}, {"tunggu": 500}, {"klik": "[data-uji=hero-sihir]"}, {"klik": "[data-uji=spell-hukuman]"}, {"tunggu": 200}, {"tangkap": "01-pilih"}, {"klik": "[data-uji=mula]"}, {"tunggu": 300},
+  {"nilai": "window.__game.gerak(0.7,-0.7), window.__game.langkah(5.5), window.__game.gerak(0,0), window.__game.langkah(9), window.__game.info"},
+  {"nilai": "window.__game.skill(1), window.__game.langkah(0.08)"}, {"tangkap": "02-kilat"},
+  {"nilai": "window.__game.skill(0), window.__game.langkah(0.35)"}, {"tangkap": "03-bola"},
+  {"nilai": "window.__game.ke(1480,1000), window.__game.langkah(0.3), window.__game.spell(), window.__game.langkah(0.1)"}, {"tangkap": "04-hukuman-merah"},
+  {"nilai": "window.__game.langkah(6), window.__game.info"}
+]},
+{"nama": "pemanah", "langkah": [
+  {"buka": "index.html"}, {"tunggu": 500}, {"klik": "[data-uji=hero-pemanah]"}, {"klik": "[data-uji=mula]"}, {"tunggu": 300},
+  {"nilai": "window.__game.gerak(0.7,-0.7), window.__game.langkah(5.5), window.__game.gerak(0,0), window.__game.langkah(9), window.__game.xp(500)"},
+  {"nilai": "window.__game.skill(0), window.__game.skill(2), window.__game.langkah(0.4)"}, {"tangkap": "01-panah"},
+  {"nilai": "window.__game.langkah(3), window.__game.info"}
+]}]
