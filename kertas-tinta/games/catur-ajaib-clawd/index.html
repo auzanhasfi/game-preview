@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Catur Ajaib Clawd</title>
+<meta name="description" content="Game catur otomatis gaya Magic Chess: Go Go untuk anak: 8 komandan, 20 hero Clawd, gabung bintang, sinergi, kartu Go Go, Kotak Go Go, dan soal matematika yang memberi emas.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' fill='%23efebe2' stroke='%232e2620' stroke-width='2'/%3E%3Cpath d='M3 16h26M16 3v26' stroke='%232e2620' stroke-width='1.2'/%3E%3Crect x='8' y='9' width='16' height='10' fill='%23d8714f' stroke='%232e2620' stroke-width='1.6'/%3E%3Crect x='12' y='12' width='2' height='4' fill='%232e2620'/%3E%3Crect x='18' y='12' width='2' height='4' fill='%232e2620'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Geist:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="css/dasar.css">
+<link rel="stylesheet" href="css/papan.css">
+</head>
+<body>
+<main id="app">
+  <section id="menu" class="card" aria-labelledby="ttl">
+    <div class="lang" role="group" aria-label="Bahasa">
+      <button data-lang="id" data-uji="id">Indonesia</button><button data-lang="ms" data-uji="ms">Melayu</button>
+    </div>
+    <div class="brand">
+      <canvas id="heroCv" width="440" height="300" aria-hidden="true"></canvas>
+      <div>
+        <p class="tag" data-t="tag"></p>
+        <h1 id="ttl" data-t="judul"></h1>
+        <p data-t="desk"></p>
+        <p class="note" data-t="catatan"></p>
+      </div>
+    </div>
+    <div class="step"><h3><i>01</i> <span data-t="s1"></span></h3><div class="kmd" id="kmdPick"></div></div>
+    <div class="step two">
+      <div><h3><i>02</i> <span data-t="s2"></span></h3><div class="seg" id="diffPick"></div></div>
+      <div><h3><i>03</i> <span data-t="s3"></span></h3><div class="seg" id="modePick"></div></div>
+    </div>
+    <div class="how" id="how"></div>
+    <div class="start">
+      <button class="primary" id="bStart" data-uji="mula"></button>
+      <span class="best" id="best"></span>
+    </div>
+  </section>
+
+  <section id="game" hidden aria-label="Permainan">
+    <header class="bar">
+      <div class="rd"><b id="lbRonde"></b><span id="lbFase"></span></div>
+      <div class="timer"><i id="lbTimer"></i><b id="lbT"></b></div>
+      <div class="chip hp" id="lbHp"></div>
+      <div class="chip gold" id="lbEmas"></div>
+      <div class="chip lv" id="lbLv"></div>
+      <div class="tools"><button id="bSpeed" data-uji="cepat" aria-label="Kecepatan">×1</button><button id="bMute" aria-label="Bunyi"></button><button id="bPause" data-uji="jeda" aria-label="Jeda"></button></div>
+    </header>
+    <div class="wrap">
+      <aside class="kiri">
+        <div class="panel"><h4 data-t="lawanT"></h4><div id="lawanList" class="lawan"></div></div>
+        <div class="panel"><h4 data-t="sinergiT"></h4><div id="sinergi" class="sin"></div></div>
+      </aside>
+      <div class="tengah">
+        <div class="stage" id="stage">
+          <canvas id="cv" aria-label="Papan catur ajaib"></canvas>
+          <button id="bKmd" class="kmdBtn" data-uji="kmd" hidden></button>
+          <div class="banner" id="banner" hidden></div>
+          <div class="toast" id="toast" hidden></div>
+        </div>
+      </div>
+      <aside class="kanan">
+        <div class="panel soalP" id="soalP"></div>
+        <div class="panel" id="info"></div>
+        <div class="panel"><h4 data-t="itemT"></h4><div id="itemBar" class="items"></div></div>
+      </aside>
+    </div>
+    <footer class="toko" id="toko">
+      <div class="tokoBtns">
+        <button id="bRoll" data-uji="segar"></button>
+        <button id="bXp" data-uji="xp"></button>
+        <button id="bLock" data-uji="kunci"></button>
+        <button id="bReady" class="primary" data-uji="siap"></button>
+      </div>
+      <div class="shop" id="shop"></div>
+    </footer>
+  </section>
+</main>
+
+<div class="sheet" id="sheet" hidden><div class="paper" id="paper" role="dialog" aria-modal="true"></div></div>
+
+<script src="js/00-ikon.js"></script>
+<script src="js/01-teks.js"></script>
+<script src="js/02-data.js"></script>
+<script src="js/03-soal.js"></script>
+<script src="js/04-bunyi.js"></script>
+<script src="js/05-tinta.js"></script>
+<script src="js/06-keadaan.js"></script>
+<script src="js/07-lawan.js"></script>
+<script src="js/08-tempur.js"></script>
+<script src="js/09-ronde.js"></script>
+<script src="js/10-lukis.js"></script>
+<script src="js/11-hud.js"></script>
+<script src="js/12-input.js"></script>
+<script src="js/13-skrin.js"></script>
+<script src="js/99-mula.js"></script>
+</body>
+</html>
