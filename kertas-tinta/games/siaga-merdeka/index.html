@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Siaga Merdeka</title>
+<meta name="description" content="Game strategi waktu nyata tentang perang kemerdekaan Indonesia melawan Belanda dan Jepang, dengan soal sejarah dan matematika di medan perang.">
+<meta name="theme-color" content="#14170f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/dasar.css">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- LAYAR JUDUL -->
+  <section id="layar-judul" class="layar">
+    <canvas id="judul-bg"></canvas>
+    <div class="judul-isi">
+      <p class="kicker">Strategi waktu nyata · Perang Kemerdekaan 1945–1949</p>
+      <h1 class="judul-besar">Siaga<br>Merdeka</h1>
+      <p class="judul-sub">Bangun pangkalan, panen rempah, latih laskar, dan pertahankan Republik dari NICA dan tentara Jepang. Setiap kiriman logistik dan kekuatan khusus dibuka dengan menjawab soal sejarah atau matematika.</p>
+      <nav class="menu-utama">
+        <button class="tombol utama besar" data-ke="layar-kampanye"><svg class="svgi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg> Kampanye sejarah</button>
+        <button class="tombol" data-ke="layar-bebas">Pertempuran bebas</button>
+        <button class="tombol" data-ke="layar-belajar">Belajar sejarah</button>
+        <button class="tombol" data-ke="layar-cara">Cara main</button>
+        <button class="tombol" data-ke="layar-atur">Pengaturan</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- KAMPANYE -->
+  <section id="layar-kampanye" class="layar halaman">
+    <header class="hal-kepala"><button class="tombol ikon" data-ke="layar-judul" aria-label="Kembali"><svg class="svgi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18 9 12l6-6"/></svg></button><div><p class="kicker">Kampanye</p><h1>Jalan Menuju Kedaulatan</h1></div></header>
+    <p class="hal-lead">Lima pertempuran nyata dari Oktober 1945 sampai Maret 1949. Baca pelajaran sejarahnya di setiap briefing, lalu pimpin pasukan.</p>
+    <div id="daftar-misi"></div>
+  </section>
+
+  <!-- BRIEFING -->
+  <section id="layar-briefing" class="layar halaman"><div id="briefing-isi" class="briefing"></div></section>
+
+  <!-- BEBAS -->
+  <section id="layar-bebas" class="layar halaman">
+    <header class="hal-kepala"><button class="tombol ikon" data-ke="layar-judul" aria-label="Kembali"><svg class="svgi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18 9 12l6-6"/></svg></button><div><p class="kicker">Pertempuran bebas</p><h1>Atur Medan Perang</h1></div></header>
+    <div class="atur-grup"><h3>Lawan</h3><div class="pilihan-baris">
+      <button class="pil" data-bebas-musuh="nl"><b>Belanda (NICA)</b><small>Tank Stuart dan Sherman, Bren Carrier, serangan pesawat pembom.</small></button>
+      <button class="pil" data-bebas-musuh="jp"><b>Jepang</b><small>Tank Ha-Go dan Chi-Ha, penembak jitu, serbuan infanteri.</small></button>
+    </div></div>
+    <div class="atur-grup"><h3>Tingkat kesulitan</h3><div class="pilihan-baris tiga">
+      <button class="pil" data-bebas-lvl="0"><b>Mudah</b><small>Musuh lambat membangun.</small></button>
+      <button class="pil" data-bebas-lvl="1"><b>Sedang</b><small>Seimbang.</small></button>
+      <button class="pil" data-bebas-lvl="2"><b>Sulit</b><small>Gelombang besar dan cepat.</small></button>
+    </div></div>
+    <div class="atur-grup"><h3>Jenis soal</h3><div class="pilihan-baris tiga">
+      <button class="pil" data-soal="sejarah"><b>Sejarah</b></button><button class="pil" data-soal="mtk"><b>Matematika</b></button><button class="pil" data-soal="campur"><b>Campuran</b></button>
+    </div></div>
+    <button class="tombol utama besar" id="bebas-mulai">Mulai pertempuran</button>
+  </section>
+
+  <!-- BELAJAR -->
+  <section id="layar-belajar" class="layar halaman">
+    <header class="hal-kepala"><button class="tombol ikon" data-ke="layar-judul" aria-label="Kembali"><svg class="svgi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18 9 12l6-6"/></svg></button><div><p class="kicker">Belajar sejarah</p><h1>Garis Waktu 1942–1949</h1></div></header>
+    <div class="belajar-grid"><div id="daftar-pelajaran"></div><div id="latihan"></div></div>
+  </section>
+
+  <!-- CARA MAIN -->
+  <section id="layar-cara" class="layar halaman">
+    <header class="hal-kepala"><button class="tombol ikon" data-ke="layar-judul" aria-label="Kembali"><svg class="svgi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18 9 12l6-6"/></svg></button><div><p class="kicker">Cara main</p><h1>Buku Saku Komandan</h1></div></header>
+    <div class="cara-grid">
+      <div class="cara"><h3>1. Ekonomi</h3><p>Bangun <b>Pembangkit Listrik</b>, lalu <b>Gudang Rempah</b>. Truk Rempah gratis memanen ladang rempah oranye dan membawanya ke gudang menjadi Dana. Jaga daya listrik: jika kurang, produksi melambat, radar mati, dan Meriam Benteng berhenti.</p></div>
+      <div class="cara"><h3>2. Membangun</h3><p>Pilih tab <b>Bangunan</b> atau <b>Pertahanan</b> di panel kanan. Saat tulisannya <b>SIAP</b>, klik lagi lalu klik tempat kosong di dekat bangunanmu. Klik kanan atau Esc untuk batal.</p></div>
+      <div class="cara"><h3>3. Pasukan</h3><p>Klik unit atau seret kotak untuk memilih. Klik tanah untuk bergerak, klik musuh untuk menyerang. Tekan <b>A</b> lalu klik untuk mode serbu. <b>Q</b> memilih semua pasukan. <b>Ctrl+1..9</b> menyimpan grup.</p></div>
+      <div class="cara"><h3>4. Lawan yang tepat</h3><p>Laskar dan Penembak unggul melawan prajurit. Regu Granat, Tank, dan Meriam Benteng unggul melawan kendaraan. Meriam Gunung menembak sangat jauh. Sarang Senapan menahan serbuan infanteri.</p></div>
+      <div class="cara"><h3>5. Soal di medan perang</h3><p><b>Soal Logistik</b> datang tiap 70 detik: jawab benar untuk +400 Dana, makin besar jika benar berturut-turut. <b>Pusat Siasat</b> membuka Serangan Umum dan Hujan Mortir yang dilepas dengan menjawab soal.</p></div>
+      <div class="cara"><h3>6. Di layar sentuh</h3><p>Ketuk untuk memilih dan memberi perintah. Geser satu jari untuk menggulir peta. <b>Tahan lalu geser</b> untuk kotak pilih. Cubit dua jari untuk memperbesar. Ketuk dua kali unit untuk memilih semua yang sejenis.</p></div>
+      <div class="cara"><h3>Tombol cepat</h3><p><b>H</b> ke markas · <b>Spasi</b> ke lokasi yang diserang · <b>S</b> berhenti · <b>L</b> soal logistik · <b>P</b> jeda · roda tetikus untuk zoom · klik kanan geser untuk menggulir.</p></div>
+    </div>
+  </section>
+
+  <!-- PENGATURAN -->
+  <section id="layar-atur" class="layar halaman">
+    <header class="hal-kepala"><button class="tombol ikon" data-ke="layar-judul" aria-label="Kembali"><svg class="svgi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18 9 12l6-6"/></svg></button><div><p class="kicker">Pengaturan</p><h1>Markas Pengaturan</h1></div></header>
+    <div class="atur-grup"><h3>Jenis soal di medan perang</h3><div class="pilihan-baris tiga">
+      <button class="pil" data-soal="sejarah"><b>Sejarah</b><small>Soal peristiwa 1942–1949.</small></button><button class="pil" data-soal="mtk"><b>Matematika</b><small>Hitungan bertema perang.</small></button><button class="pil" data-soal="campur"><b>Campuran</b><small>Bergantian.</small></button>
+    </div></div>
+    <div class="atur-grup"><h3>Lainnya</h3><div class="pilihan-baris tiga">
+      <button class="pil saklar" data-atur="musik"><b>Musik mars</b></button><button class="pil saklar" data-atur="tepi"><b>Gulir di tepi layar</b></button><button class="pil saklar" data-atur="cepat"><b>Laju permainan cepat</b></button>
+    </div></div>
+  </section>
+
+  <!-- PERMAINAN -->
+  <section id="layar-game" class="layar">
+    <div id="arena">
+      <canvas id="kanvas"></canvas>
+      <div id="atas">
+        <div id="tujuan"></div>
+        <button id="btn-logistik" class="logistik"></button>
+        <button id="btn-semua" class="tombol ikon kecil" aria-label="Pilih semua pasukan" title="Pilih semua pasukan (Q)"></button>
+        <button id="btn-suara" class="tombol ikon kecil" aria-label="Suara"></button>
+        <button id="btn-jeda" class="tombol ikon kecil" aria-label="Jeda"></button>
+      </div>
+      <div id="pesan"></div>
+    </div>
+    <aside id="sisi">
+      <div class="sisi-atas">
+        <div id="dana"></div>
+      </div>
+      <div class="sisi-tengah">
+        <div id="radar-box"><canvas id="mini"></canvas><div id="radar-mati"><span>RADAR MATI</span><small>Bangun Pos Radio Pengintai</small></div></div>
+        <div id="daya" title="Daya listrik: pakai / hasil"><div class="daya-bar"><i id="daya-isi"></i><b id="daya-pakai"></b></div><small id="daya-teks"></small></div>
+      </div>
+      <div id="tab-prod"></div>
+      <div id="grid-prod"></div>
+      <div id="kuasa"></div>
+      <div id="info"></div>
+    </aside>
+    <div id="modal-soal" class="modal"></div>
+    <div id="modal-jeda" class="modal">
+      <div class="kartu-jeda">
+        <p class="kicker">Jeda</p><h2>Medan perang dihentikan</h2>
+        <div class="pilihan-baris">
+          <button class="pil saklar" data-atur="musik"><b>Musik</b></button><button class="pil saklar" data-atur="cepat"><b>Laju cepat</b></button><button class="pil saklar" data-atur="tepi"><b>Gulir tepi</b></button>
+        </div>
+        <div class="pilihan-baris tiga">
+          <button class="pil" data-soal="sejarah"><b>Sejarah</b></button><button class="pil" data-soal="mtk"><b>Matematika</b></button><button class="pil" data-soal="campur"><b>Campuran</b></button>
+        </div>
+        <button class="tombol utama" id="j-lanjut">Lanjutkan</button>
+        <button class="tombol" id="j-ulang">Ulangi misi</button>
+        <button class="tombol" id="j-keluar">Keluar ke menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HASIL -->
+  <section id="layar-hasil" class="layar halaman"><div id="hasil-isi" class="hasil"></div></section>
+</div>
+
+<script src="js/00-ikon.js"></script>
+<script src="js/01-data.js"></script>
+<script src="js/02-soal.js"></script>
+<script src="js/03-peta.js"></script>
+<script src="js/04-bunyi.js"></script>
+<script src="js/05-entitas.js"></script>
+<script src="js/06-ai.js"></script>
+<script src="js/07-efek.js"></script>
+<script src="js/08-lukis.js"></script>
+<script src="js/09-hud.js"></script>
+<script src="js/10-input.js"></script>
+<script src="js/11-misi.js"></script>
+<script src="js/12-layar.js"></script>
+<script src="js/99-mulai.js"></script>
+</body>
+</html>
