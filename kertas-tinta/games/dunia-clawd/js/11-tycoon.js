@@ -181,5 +181,5 @@ export const TYCOON = {
   statistik() { return [{ k: t('Wang', 'Cash', 'Uang'), v: '$' + nombor(S.x.tycoon.wang) }, { k: t('Barang', 'Items', 'Barang'), v: S.x.tycoon.beli.length }]; },
   statistikBot(b) { return ['$' + nombor(b.statistik.wang || 0), Math.min(12, Math.floor((b.statistik.wang || 0) / 300) + 1)]; },
   keluar() { E.ui.info?.(''); },
-  uji: { senarai: SENARAI, pengumpul: () => pengumpul, kutip, cubaBeli: (i) => { const u = padUI.find((x) => x.i === i); return cubaBeli(u.it, u.p); }, mesinSoal: () => mesinSoal({}) }
+  uji: { pasang: (id) => { S.x.tycoon.beli.push(id); pasang(id, true); segarPad(); }, senarai: SENARAI, pengumpul: () => pengumpul, kutip, cubaBeli: (i) => { const u = padUI.find((x) => x.i === i); return cubaBeli(u.it, u.p); }, mesinSoal: () => mesinSoal({}) }
 };

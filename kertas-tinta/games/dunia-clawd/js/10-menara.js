@@ -173,5 +173,5 @@ export const MENARA = {
   statistik() { return [{ k: t('Tingkat', 'Floor', 'Lantai'), v: lantai + 1 }, { k: t('Terbaik', 'Best', 'Terbaik'), v: S.x.menara.terbaik + 1 }]; },
   statistikBot(b) { return [b.statistik.aras || 1, b.nama.length % 6 + 2]; },
   keluar() { E.ui.info?.(''); },
-  uji: { titik: () => titik, lantai: () => lantai, pad: () => pad, lava: () => lavaY, bukaSoal: (n) => bukaSoal(n, pad[n]), naik: (n) => { pad[n].naik = true; }, puncak: sampaiPuncak }
+  uji: { setLava: (y) => { lavaY = y; tMula = 0; }, titik: () => titik, lantai: () => lantai, pad: () => pad, lava: () => lavaY, bukaSoal: (n) => bukaSoal(n, pad[n]), naik: (n) => { pad[n].naik = true; }, puncak: sampaiPuncak }
 };

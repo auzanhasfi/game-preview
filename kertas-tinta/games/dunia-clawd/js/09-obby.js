@@ -120,7 +120,7 @@ function ketuk(P, i) {
 /* ---------- pembina peringkat ---------- */
 function bina(d) {
   D = d; cek = {}; jambatan = []; pintu = []; spinner = []; titik = []; lawat = 0; nyawaStage = 0; stage = 0;
-  d.lantaiMati = -32; d.awan(26);
+  d.lantaiMati = -28; d.awan(26);
   // laut dakwat di bawah (jatuh = mati)
   d.kotak({ x: 0, y: -30, z: -300, w: 1800, h: 4, d: 1800, warna: '#2c6fb0', neon: false, hiasan: true });
 

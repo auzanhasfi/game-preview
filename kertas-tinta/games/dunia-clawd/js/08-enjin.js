@@ -194,7 +194,7 @@ function langkahPemain(dt) {
 }
 export function lantaiDi(x, y, z) {
   let t = -Infinity; for (const s of E.dunia.solid) if (s.aktif && !s.tembus && x > s.min.x && x < s.max.x && z > s.min.z && z < s.max.z && s.max.y <= y + 1 && s.max.y > t) t = s.max.y;
-  return t === -Infinity ? E.dunia.lantaiMati - 40 : t;
+  return t === -Infinity ? E.dunia.lantaiMati - 2 : t;
 }
 export function bunuhPemain() {
   const P = E.P; if (!P || P.mati) return;
