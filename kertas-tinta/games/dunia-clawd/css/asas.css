@@ -1,0 +1,53 @@
+/* Dunia Clawd: token gaya Arena Clawd Pro. Warna solid: biru malam + emas lembut + 3 netral. Judul serif, label mono, garis tipis. */
+:root {
+  --bg: #0c1526; --s1: #121d33; --s2: #182641; --s3: #22324f; --ln: #2c3c5c; --ln2: #3d4f74;
+  --gold: #d9b25f; --gold-d: #b48f42; --gold-t: rgba(217,178,95,.14);
+  --t0: #efe6d2; --t1: #a9b4c9; --t2: #8492ad;
+  --clawd: #e08a66; --ok: #8fc987; --bad: #e07a6a;
+  --r: 12px;
+  --ui: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif; --serif: "Source Serif 4", Georgia, serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--t0); font: 400 15px/1.5 var(--ui); overflow: hidden; overscroll-behavior: none; }
+[hidden] { display: none !important; }
+button, input { font: inherit; color: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+h1, h2, h3, p { margin: 0; }
+img { display: block; }
+#kanvas { position: fixed; inset: 0; touch-action: none; }
+#kanvas canvas { display: block; touch-action: none; }
+.svgi { flex: none; vertical-align: -0.18em; }
+
+.pn { background: var(--s1); border: 1px solid var(--ln); border-radius: var(--r); }
+.ttl { font: 500 11px/1.2 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--t2); }
+.dim { color: var(--t1); } .fine { font-size: 12.5px; color: var(--t2); }
+.gbtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 22px; background: var(--gold); color: #1a1408; font-weight: 700; border-radius: 10px; }
+.gbtn:hover { background: #e4c070; }
+.bbtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 16px; border: 1px solid var(--ln2); border-radius: 10px; font-weight: 600; }
+.bbtn:hover:not(:disabled) { border-color: var(--gold); }
+.bbtn:disabled { opacity: .55; cursor: default; }
+.bbtn[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); }
+.xbtn { display: inline-grid; place-items: center; min-width: 46px; min-height: 46px; border: 1px solid var(--ln2); border-radius: 10px; }
+.xbtn:hover { border-color: var(--gold); color: var(--gold); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--ln); border-radius: 999px; font-size: 13px; white-space: nowrap; color: var(--t1); }
+.chip b { font: 600 13px var(--mono); color: var(--t0); } .chip .svgi { color: var(--gold); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { min-height: 40px; padding: 6px 12px; border: 1px solid var(--ln2); border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--t1); }
+.seg button:hover { border-color: var(--t2); }
+.seg button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: #1a1408; font-weight: 700; }
+.goyang { animation: goyang .35s; } @keyframes goyang { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+/* logo: blok Clawd kecil */
+.lg { display: inline-block; width: 28px; height: 22px; background: var(--clawd); position: relative; transform: rotate(-9deg); border-radius: 3px; flex: none; }
+.lg::before, .lg::after { content: ""; position: absolute; top: 6px; width: 4px; height: 9px; background: #1c1612; }
+.lg::before { left: 6px; } .lg::after { right: 6px; }
+.lg.besar { width: 76px; height: 58px; border-radius: 6px; animation: pusingLg 1.6s cubic-bezier(.6,0,.3,1) infinite; }
+.lg.besar::before, .lg.besar::after { top: 16px; width: 10px; height: 24px; } .lg.besar::before { left: 16px; } .lg.besar::after { right: 16px; }
+@keyframes pusingLg { 0% { transform: rotate(-9deg); } 50% { transform: rotate(171deg); } 100% { transform: rotate(351deg); } }
+@media (prefers-reduced-motion: reduce) { .lg.besar { animation: none; } }
+
+#memuat { position: fixed; inset: 0; z-index: 60; background: var(--bg); display: grid; place-items: center; text-align: center; padding: 16px; }
+.lm { display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 440px; }
+.lm h2 { font: 700 34px/1.1 var(--serif); margin-top: 22px; }
+.lm .fine { margin-top: 24px; font-size: 14px; color: var(--t1); }

@@ -1,0 +1,87 @@
+/* Dunia Clawd: HUD dalam dunia + soalan + menu */
+#hud { position: fixed; inset: 0; z-index: 20; pointer-events: none; user-select: none; -webkit-user-select: none; }
+#hud button, #hud input, #hud .h-chat, #hud .h-senarai { pointer-events: auto; }
+.h-kiri { position: absolute; left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); display: flex; gap: 6px; }
+.h-btn { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: rgba(12,21,38,.72); color: var(--t0); }
+.h-btn:hover { background: var(--s3); color: var(--gold); }
+
+.h-chat { position: absolute; left: max(12px, env(safe-area-inset-left)); top: 62px; width: min(340px, 42vw); display: flex; flex-direction: column; background: rgba(12,21,38,.6); border-radius: 10px; overflow: hidden; }
+.h-chat.tutup { display: none; }
+.h-log { height: 136px; overflow-y: auto; padding: 8px 10px; font-size: 13px; line-height: 1.4; scrollbar-width: thin; color: #fff; }
+.h-log b { color: var(--gold); font-weight: 600; } .h-log em { color: var(--t1); font-style: normal; }
+.h-chat input { width: 100%; height: 34px; background: rgba(12,21,38,.75); border: 0; padding: 0 10px; font-size: 13px; color: #fff; outline: 0; }
+.h-chat input::placeholder { color: var(--t1); }
+
+.h-tengah { position: absolute; left: 50%; top: max(12px, env(safe-area-inset-top)); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: min(46vw, 460px); text-align: center; }
+.h-banner { padding: 6px 16px; border-radius: 8px; background: rgba(12,21,38,.78); font: 600 14px var(--ui); color: var(--gold); white-space: nowrap; }
+.h-info { padding: 4px 12px; border-radius: 8px; background: rgba(12,21,38,.62); font: 500 13px var(--ui); color: #fff; }
+.h-soal { padding: 8px 20px; border-radius: 10px; background: var(--bg); border: 1px solid var(--gold); } .h-soal small { display: block; font: 500 11px var(--ui); color: var(--t1); } .h-soal b { font: 700 25px/1.2 var(--mono); color: var(--t0); white-space: nowrap; }
+
+.h-senarai { position: absolute; right: max(10px, env(safe-area-inset-right)); top: max(10px, env(safe-area-inset-top)); width: min(292px, 44vw); background: rgba(12,21,38,.66); border-radius: 10px; overflow: hidden; font-size: 13px; }
+.h-senarai.tutup { display: none; }
+.h-tajuk, .h-baris { display: grid; grid-template-columns: minmax(0, 1fr) 62px 62px; gap: 4px; padding: 5px 10px; align-items: center; }
+.h-tajuk { background: rgba(12,21,38,.75); font: 600 11px var(--ui); color: var(--t1); } .h-tajuk span:not(:first-child), .h-baris span:not(:first-child) { text-align: right; overflow: hidden; white-space: nowrap; }
+.h-baris { color: #fff; } .h-baris span:not(.n) { font: 500 12px var(--mono); }
+.h-baris .n { display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap; } .h-baris .n .svgi { color: var(--t1); }
+.h-baris.saya { background: var(--gold-t); color: var(--gold); font-weight: 600; }
+
+.h-toast { position: absolute; left: 50%; top: 26%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; width: min(92vw, 520px); }
+.tt { padding: 8px 16px; border-radius: 9px; background: rgba(12,21,38,.88); color: #fff; font-weight: 500; font-size: 14px; text-align: center; animation: timbul .18s ease-out; }
+.tt.ok { color: var(--ok); } .tt.emas { color: var(--gold); border: 1px solid var(--gold-d); } .tt.amaran { color: #ffc9a8; }
+.tt.cara { background: var(--bg); border: 1px solid var(--bad); display: flex; flex-direction: column; gap: 2px; } .tt.cara b { font: 700 19px var(--mono); color: var(--ok); } .tt.cara span { color: var(--t1); font-size: 13.5px; } .tt.cara span b { font-size: 13.5px; color: var(--ok); }
+@keyframes timbul { from { transform: translateY(8px); opacity: 0; } }
+
+.h-bawah { position: absolute; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.h-beg { display: flex; gap: 6px; }
+.h-alat { position: relative; width: 54px; height: 54px; display: grid; place-items: center; background: rgba(12,21,38,.72); border: 2px solid transparent; border-radius: 9px; color: var(--t0); }
+.h-alat small { position: absolute; left: 5px; top: 1px; font: 500 10px var(--mono); color: var(--t1); } .h-alat.on { border-color: var(--gold); color: var(--gold); }
+.h-hp { width: 180px; height: 8px; background: rgba(12,21,38,.72); border-radius: 4px; overflow: hidden; } .h-hp i { display: block; height: 100%; background: var(--ok); transition: width .2s; }
+
+.h-joy { position: fixed; width: 112px; height: 112px; margin: -56px 0 0 -56px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); background: rgba(12,21,38,.25); display: grid; place-items: center; }
+.h-joy i { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.55); }
+.h-lompat { position: absolute; right: max(22px, env(safe-area-inset-right)); bottom: max(26px, env(safe-area-inset-bottom)); width: 84px; height: 84px; display: grid; place-items: center; border-radius: 50%; background: rgba(12,21,38,.5); border: 2px solid rgba(255,255,255,.5); color: #fff; touch-action: none; }
+.h-lompat:active { background: var(--gold); color: #1a1408; border-color: var(--gold); }
+.h-aksi { position: absolute; right: max(22px, env(safe-area-inset-right)); bottom: 124px; min-width: 104px; min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 0 14px; border-radius: 12px; background: var(--gold); color: #1a1408; font-weight: 700; touch-action: none; } .h-aksi small { font: 600 10px var(--mono); padding: 1px 4px; border: 1px solid #1a1408; border-radius: 3px; }
+@media (pointer: fine) { .h-aksi { bottom: 26px; } }
+
+.h-lenc { position: absolute; right: 14px; bottom: 90px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg); border: 1px solid var(--gold); border-radius: 12px; animation: timbul .25s ease-out; }
+.h-lenc .i { color: var(--gold); } .h-lenc small { display: block; font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--t2); } .h-lenc b { display: block; font: 700 17px var(--serif); } .h-lenc em { font: 600 12px var(--mono); color: var(--gold); font-style: normal; }
+.h-fx { position: absolute; inset: 0; overflow: hidden; }
+.ap { position: absolute; right: 16%; top: 42%; font: 700 17px var(--ui); color: var(--gold); animation: apung 1s ease-out forwards; }
+@keyframes apung { to { transform: translateY(-46px); opacity: 0; } }
+.cf { position: absolute; top: -14px; width: 9px; height: 13px; animation: jatuh 2.4s ease-in forwards; }
+@keyframes jatuh { to { transform: translate(var(--x), 106vh) rotate(720deg); } }
+@media (prefers-reduced-motion: reduce) { .cf { display: none; } }
+
+/* soalan */
+.soalbox, .menubox { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(8,14,26,.62); overflow: auto; }
+.sb { width: min(520px, 100%); padding: 20px; background: var(--s1); border: 1px solid var(--ln2); border-radius: 16px; display: flex; flex-direction: column; gap: 10px; text-align: center; animation: timbul .16s ease-out; }
+.sb-t { font: 500 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.sb-q { font: 700 clamp(36px, 8vw, 54px)/1.1 var(--mono); padding: 6px 0; } .sb-q.kecil { font: 700 26px var(--serif); }
+.sb-n { color: var(--t1); font-size: 14px; }
+.sb-j { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 6px; }
+.j { position: relative; min-height: 64px; background: var(--s3); border: 1px solid var(--ln2); border-radius: 10px; font: 700 25px var(--mono); }
+.j:hover:not(:disabled) { border-color: var(--gold); background: var(--s2); } .j small { position: absolute; left: 9px; top: 5px; font: 500 11px var(--mono); color: var(--t2); }
+.j:disabled { cursor: default; } .j.ok { background: #2c5a38; border-color: var(--ok); } .j.no { background: #6a2f2a; border-color: var(--bad); }
+.sb-c { margin-top: 6px; padding: 12px 14px; text-align: left; background: var(--bg); border-radius: 10px; display: flex; flex-direction: column; gap: 6px; }
+.sb-c > b { font: 600 14px var(--ui); color: var(--gold); } .sb-c ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: 15px; word-break: break-word; } .sb-c li b { color: var(--ok); }
+.sb-b { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 6px; }
+
+/* menu */
+.mb { width: min(760px, 100%); max-height: min(620px, 92vh); display: flex; flex-direction: column; background: var(--s1); border: 1px solid var(--ln2); border-radius: 16px; overflow: hidden; }
+.mb-tab { display: flex; border-bottom: 1px solid var(--ln); flex: none; } .mb-tab button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; color: var(--t1); font-weight: 500; border-bottom: 2px solid transparent; } .mb-tab button[aria-pressed="true"] { color: var(--gold); border-color: var(--gold); }
+.mb-isi { flex: 1; overflow: auto; padding: 8px 18px; min-height: 180px; }
+.mp { display: flex; align-items: center; gap: 10px; min-height: 42px; border-bottom: 1px solid var(--ln); } .mp b { flex: 1; font-weight: 500; } .mp small { color: var(--t2); }
+.kw { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 20px; margin: 10px 0; } .kw dt { font: 500 13px var(--mono); color: var(--gold); } .kw dd { margin: 0; color: var(--t1); }
+.mb-bawah { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px; border-top: 1px solid var(--ln); flex: none; } .mb-bawah button { min-height: 48px; font-size: 14px; padding: 6px; } kbd { font: 500 10px var(--mono); padding: 1px 5px; border: 1px solid currentColor; border-radius: 3px; opacity: .7; }
+
+@media (max-width: 720px) {
+  .h-btn { width: 40px; height: 40px; }
+  .h-tengah { top: 56px; max-width: 92vw; }
+  .h-senarai { top: 56px; }
+  .h-chat { width: min(300px, 70vw); top: 56px; }
+  .h-chat:not(.tutup) ~ .h-tengah { top: 256px; }
+  .mb-bawah kbd { display: none; } .mb-bawah button { font-size: 13px; }
+  .h-bawah { left: 50%; bottom: 8px; } .h-hp { width: 120px; }
+  .h-lenc { right: 8px; left: 8px; bottom: 124px; }
+}
