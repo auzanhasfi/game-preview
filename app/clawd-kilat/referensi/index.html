@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Referensi Clawd Kilat</title>
+<meta name="description" content="Bank referensi desain untuk Clawd Kilat: sumber tentang Sonic Dash dan genre lari 3 lajur, game feel, three.js, dan desain game matematika.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='8' width='24' height='14' fill='%23d8714f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=Geist:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="referensi.css">
+</head>
+<body>
+<header class="hero">
+  <p class="ttl">Bank referensi · 31 Oktober 2026</p>
+  <h1>Clawd Kilat</h1>
+  <p class="lead">Sebelum membuat game lari kilat matematika, kami mengumpulkan <b id="nTotal">0</b> referensi: <b id="nSumber">0</b> sumber yang dibaca (Sonic Dash, ulasan, game feel, three.js, desain game matematika) dan <b id="nCatatan">0</b> catatan desain yang masing-masing sudah diterjemahkan menjadi fitur di game.</p>
+  <div class="cta"><a class="gbtn" href="../">Main Clawd Kilat</a><a class="bbtn" href="#catatan">Lihat catatan desain</a></div>
+  <p class="fine">Clawd Kilat adalah game asli: tokoh Clawd, Si Comot, dan Raja Comot dari Arena Clawd Pro. Tidak memakai gambar, musik, nama, atau aset Sonic. Sonic Dash hanya dipelajari sebagai contoh genre.</p>
+</header>
+
+<section class="papan" aria-label="Papan suasana">
+  <div class="zona z1"><span class="ttl">Zona 1</span><b>Lembah Hijau</b><i>pagi cerah, bukit, air terjun</i></div>
+  <div class="zona z2"><span class="ttl">Zona 2</span><b>Pantai Senja</b><i>langit jingga, pasir, ombak</i></div>
+  <div class="zona z3"><span class="ttl">Zona 3</span><b>Kota Tinta</b><i>malam neon, menara, jurang</i></div>
+  <div class="zona z4"><span class="ttl">Tiap 1200 m</span><b>Raja Comot</b><i>kapal udara, bom tinta, bola jawaban</i></div>
+</section>
+
+<section id="sumber" class="blok">
+  <div class="kepala"><h2>Sumber yang dibaca</h2><input id="cari" type="search" placeholder="Cari referensi…" aria-label="Cari referensi"></div>
+  <div class="filter" id="fSumber" role="group" aria-label="Kategori sumber"></div>
+  <ol class="daftar" id="lSumber"></ol>
+</section>
+
+<section id="catatan" class="blok">
+  <div class="kepala"><h2>Catatan desain → fitur game</h2></div>
+  <div class="filter" id="fCatatan" role="group" aria-label="Kategori catatan"></div>
+  <div class="tabel" id="lCatatan"></div>
+</section>
+
+<footer class="kaki"><a href="../">Kembali ke game</a><span>Clawd Kilat · EduGame Labs</span></footer>
+<script src="data.js"></script>
+<script src="referensi.js"></script>
+</body></html>

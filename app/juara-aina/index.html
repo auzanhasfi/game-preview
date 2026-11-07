@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Juara Matematik Aina — Matematik PPKI (MBPK)</title>
+<meta name="description" content="Aplikasi Matematik untuk Program Pendidikan Khas Integrasi (PPKI): 12 modul KSSR Pendidikan Khas, makmal konkrit, kuiz tiga aras, bacaan suara Bahasa Melayu, panel guru dan laporan RPI.">
+<meta name="theme-color" content="#ECE5FF">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMTIiIGZpbGw9IiMxRTg4RTUiLz48Y2lyY2xlIGN4PSIyNCIgY3k9IjIwIiByPSI5IiBmaWxsPSIjRkJCRjI0Ii8+PHBhdGggZD0iTTEwIDQwYzItOCA3LTEyIDE0LTEyczEyIDQgMTQgMTIiIGZpbGw9IiNGQkJGMjQiLz48L3N2Zz4=" type="image/svg+xml">
+<meta property="og:title" content="Juara Matematik Aina — Matematik PPKI">
+<meta property="og:description" content="Matematik konkrit, ceria dan mesra MBPK untuk kelas Program Pendidikan Khas Integrasi.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   JUARA MATEMATIK AINA — SISTEM REKA BENTUK
+   Sumber reka bentuk : BLOOMVILLE-UI-ANALYSIS-DETAILED.md
+     • Palet hibrid "Educational Game" (biru soalan · hijau betul ·
+       oren cuba-lagi · ungu pencapaian · emas ganjaran)
+     • Grid 8px · kad radius 18px · butang radius 12px
+     • Sempadan 6px kad / 3px butang · bayang lembut + glow
+     • Tipografi Montserrat (tajuk) + Poppins (badan)
+
+   Penyesuaian PPKI / MBPK (Murid Berkeperluan Pendidikan Khas)
+     • Sasaran sentuh minimum 64px (motor halus terhad)
+     • Maklum balas salah TIDAK merah menyerang — guna oren "cuba lagi"
+     • Satu tugasan satu skrin, arahan pendek, ikon + teks berpasangan
+     • Mod Tenang: buang animasi, gradien dan warna kuat
+     • Mod Teks Besar untuk murid rabun / disleksia
+     • Semua soalan boleh dibaca kuat (Text-to-Speech Bahasa Melayu)
+   ============================================================ */
+:root{
+  /* Biru — arahan, soalan, elemen utama */
+  --blue-d:#1565C0; --blue:#1E88E5; --blue-l:#42A5F5; --blue-x:#90CAF9;
+  /* Hijau — betul, kejayaan, kemajuan */
+  --green-d:#2E7D32; --green:#43A047; --green-l:#66BB6A; --green-x:#A5D6A7;
+  /* Oren — "cuba lagi", amaran lembut, tenaga (ganti merah utk MBPK) */
+  --amber-d:#E65100; --amber:#FB8C00; --amber-l:#FFA726; --amber-x:#FFE0B2;
+  /* Merah — hanya untuk tindakan memadam / bahaya */
+  --red-d:#C62828; --red:#E53935; --red-l:#EF5350;
+  /* Ungu — pencapaian, lencana, panel guru */
+  --purple-d:#6A1B9A; --purple:#7E57C2; --purple-l:#9575CD;
+  /* Merah jambu — modul istimewa */
+  --pink-d:#AD1457; --pink:#EC407A; --pink-l:#F48FB1;
+  /* Teal — ukuran, alat, makmal */
+  --teal-d:#00695C; --teal:#00897B; --teal-l:#4DB6AC;
+  /* Indigo — pilihan jawapan neutral */
+  --indigo-d:#283593; --indigo:#3949AB; --indigo-l:#5C6BC0;
+  /* Emas — mata ganjaran, bintang, stiker */
+  --gold-d:#F59E0B; --gold:#FBBF24; --gold-l:#FDE68A;
+
+  /* Latar & teks */
+  --bg:#ECE5FF; --bg-2:#DDD2FB; --bg-3:#F7F3FF;
+  --ink:#221B45; --ink-2:#544C82; --ink-3:#8E86B8;
+  --line:rgba(34,27,69,.12);
+  --white:#FFFFFF;
+
+  /* Bentuk */
+  --r-card:18px; --r-btn:12px; --r-pill:999px; --r-sm:8px;
+  --bw-card:6px; --bw-btn:3px;
+
+  /* Sasaran sentuh MBPK */
+  --tap:64px; --tap-sm:52px;
+
+  /* Bayang */
+  --sh-card:0 8px 24px rgba(34,27,69,.18);
+  --sh-pop:0 12px 32px rgba(34,27,69,.28);
+  --sh-in:inset 0 2px 0 rgba(255,255,255,.28);
+
+  /* Taip */
+  --f-d:'Montserrat',system-ui,'Segoe UI',sans-serif;
+  --f-b:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+
+  /* Ruang (grid 8px) */
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  min-height:100dvh;
+  font-family:var(--f-b);
+  color:var(--ink);
+  background:var(--bg);
+  background-image:
+    radial-gradient(700px 380px at 12% -6%, #FFE6F4 0%, transparent 62%),
+    radial-gradient(620px 340px at 96% 4%, #D6EEFF 0%, transparent 60%),
+    radial-gradient(700px 420px at 50% 108%, #D9FBE7 0%, transparent 62%);
+  background-attachment:fixed;
+  overscroll-behavior-y:none;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+ul{list-style:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:4px solid var(--blue-d);outline-offset:3px;border-radius:8px}
+
+/* ---------- MOD TENANG (low-stimulus) ---------- */
+body.calm{background-image:none;background:#F4F2F8}
+body.calm .card::after,body.calm .glow{display:none}
+body.calm .stage{filter:saturate(.7)}
+body.calm *{animation:none !important;transition:none !important}
+body.calm .card,body.calm .tcard,body.calm .btn,body.calm .panel,body.calm .opt{
+  box-shadow:0 2px 8px rgba(34,27,69,.12) !important;
+}
+/* ---------- MOD TEKS BESAR ---------- */
+body.big .q-text{font-size:clamp(24px,6.4vw,32px)}
+body.big .opt{min-height:76px;font-size:20px}
+body.big .lead,body.big .klist li,body.big .step{font-size:16px}
+body.big .btn{min-height:64px;font-size:17px}
+body.big .tcard .nm{font-size:13px}
+
+/* ---------- rangka aplikasi ---------- */
+.app{
+  width:100%;max-width:460px;margin:0 auto;
+  min-height:100dvh;position:relative;
+  display:flex;flex-direction:column;
+}
+.stage{flex:1;padding:var(--s2) var(--s2) 112px;position:relative;z-index:1}
+.screen{display:none;animation:fadeUp .34s ease both}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- bar atas ---------- */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  display:flex;align-items:center;gap:var(--s1);
+  padding:10px var(--s2);
+  background:linear-gradient(135deg,#1565C0 0%,#1E88E5 100%);
+  border-bottom:4px solid var(--blue-l);
+  box-shadow:0 6px 18px rgba(21,101,192,.34);
+}
+.topbar[hidden]{display:none}
+.ava{
+  width:44px;height:44px;border-radius:var(--r-pill);flex:none;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--amber) 100%);
+  border:3px solid #FFF3C4;display:grid;place-items:center;
+  font-size:22px;line-height:1;
+  box-shadow:0 4px 12px rgba(0,0,0,.22);
+}
+.who{min-width:0;flex:1}
+.who b{display:block;font-family:var(--f-d);font-weight:800;font-size:14px;color:#fff;letter-spacing:.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{display:block;font-size:11.5px;font-weight:600;color:#D9EBFF}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;
+  border-radius:var(--r-pill);font-family:var(--f-d);font-weight:800;font-size:13px;
+  border:2px solid rgba(255,255,255,.55);
+}
+.chip.gold{background:linear-gradient(135deg,var(--gold) 0%,var(--amber) 100%);color:#4A2D00;border-color:#FFE7A3;
+  box-shadow:0 0 14px rgba(251,191,36,.5)}
+.icon-btn{
+  width:38px;height:38px;flex:none;border-radius:var(--r-pill);
+  background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.5);
+  display:grid;place-items:center;color:#fff;
+}
+.icon-btn.off{opacity:.5}
+.icon-btn.tiny{width:32px;height:32px}
+
+/* ---------- ikon ---------- */
+.ic{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:3;
+  stroke-linecap:round;stroke-linejoin:round}
+.ic-sm{width:17px;height:17px}
+.ic-lg{width:30px;height:30px}
+.ic-xl{width:40px;height:40px}
+.fill{fill:currentColor;stroke:none}
+
+/* ---------- tipografi ---------- */
+.h1{font-family:var(--f-d);font-weight:900;font-size:clamp(26px,7vw,34px);line-height:1.1;letter-spacing:-.5px}
+.h2{font-family:var(--f-d);font-weight:900;font-size:21px;line-height:1.2}
+.h3{font-family:var(--f-d);font-weight:800;font-size:16.5px;line-height:1.25}
+.lead{font-size:14.5px;font-weight:500;color:var(--ink-2);line-height:1.65}
+.eyebrow{font-family:var(--f-d);font-weight:800;font-size:11px;letter-spacing:1.6px;
+  text-transform:uppercase;color:var(--ink-3)}
+.on-dark{color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.28)}
+.on-dark-2{color:#E8F1FF}
+.mut{color:var(--ink-3);font-size:12px;font-weight:600}
+
+/* ---------- kad ---------- */
+.card{
+  position:relative;overflow:hidden;
+  border-radius:var(--r-card);
+  border:var(--bw-card) solid var(--blue-l);
+  background:linear-gradient(135deg,var(--blue-d) 0%,var(--blue) 100%);
+  box-shadow:var(--sh-card),var(--sh-in);
+  padding:var(--s2);color:#fff;
+}
+.card + .card{margin-top:var(--s2)}
+.card::after{
+  content:"";position:absolute;inset:-40% 55% 55% -20%;
+  background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);
+  pointer-events:none;
+}
+.c-blue  {border-color:var(--blue-l);  background:linear-gradient(135deg,#1565C0,#1E88E5)}
+.c-green {border-color:var(--green-l); background:linear-gradient(135deg,#2E7D32,#43A047)}
+.c-purple{border-color:var(--purple-l);background:linear-gradient(135deg,#6A1B9A,#7E57C2)}
+.c-amber {border-color:var(--amber-l); background:linear-gradient(135deg,#E65100,#FB8C00)}
+.c-pink  {border-color:var(--pink-l);  background:linear-gradient(135deg,#AD1457,#EC407A)}
+.c-teal  {border-color:var(--teal-l);  background:linear-gradient(135deg,#00695C,#00897B)}
+.c-indigo{border-color:var(--indigo-l);background:linear-gradient(135deg,#283593,#3949AB)}
+.c-gold  {border-color:#FFE08A;        background:linear-gradient(135deg,#F59E0B,#FBBF24);color:#4A2D00}
+.c-paper {border-color:#fff;background:linear-gradient(135deg,#FFFFFF,#F4EEFF);color:var(--ink);
+  box-shadow:var(--sh-card)}
+.c-gold .lead,.c-paper .lead{color:inherit;opacity:.92}
+
+/* ---------- lencana / pill ---------- */
+.badge{
+  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;
+  border-radius:var(--r-pill);font-family:var(--f-d);font-weight:800;font-size:12px;
+  background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.45);color:#fff;
+}
+.badge.solid-gold{background:linear-gradient(135deg,var(--gold),var(--amber));color:#4A2D00;border-color:#FFE7A3;
+  box-shadow:0 0 14px rgba(251,191,36,.45)}
+.badge.solid-green{background:linear-gradient(135deg,var(--green),var(--green-l));border-color:var(--green-x);color:#fff}
+.badge.solid-amber{background:linear-gradient(135deg,var(--amber),var(--amber-l));border-color:var(--amber-x);color:#4A2D00}
+.badge.ghost{background:rgba(34,27,69,.06);border-color:var(--line);color:var(--ink-2)}
+.badge.aras{background:rgba(255,255,255,.9);border-color:#fff;color:var(--ink)}
+
+/* ---------- butang ---------- */
+.btn{
+  width:100%;min-height:var(--tap);padding:12px 18px;
+  border-radius:var(--r-btn);border:var(--bw-btn) solid rgba(255,255,255,.6);
+  font-family:var(--f-d);font-weight:800;font-size:16px;letter-spacing:.2px;
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+  box-shadow:0 6px 16px rgba(46,125,50,.34),var(--sh-in);
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 8px rgba(0,0,0,.24)}
+.btn:disabled{filter:grayscale(.6);opacity:.55;cursor:not-allowed}
+.btn.blue  {background:linear-gradient(135deg,var(--blue-d),var(--blue));  box-shadow:0 6px 16px rgba(21,101,192,.36),var(--sh-in)}
+.btn.gold  {background:linear-gradient(135deg,var(--gold-d),var(--gold));  color:#4A2D00;border-color:#FFF0BF;
+  box-shadow:0 6px 16px rgba(245,158,11,.42),0 0 18px rgba(251,191,36,.32),var(--sh-in)}
+.btn.purple{background:linear-gradient(135deg,var(--purple-d),var(--purple));box-shadow:0 6px 16px rgba(106,27,154,.36),var(--sh-in)}
+.btn.amber {background:linear-gradient(135deg,var(--amber-d),var(--amber));box-shadow:0 6px 16px rgba(230,81,0,.36),var(--sh-in)}
+.btn.teal  {background:linear-gradient(135deg,var(--teal-d),var(--teal));  box-shadow:0 6px 16px rgba(0,105,92,.34),var(--sh-in)}
+.btn.red   {background:linear-gradient(135deg,var(--red-d),var(--red));    box-shadow:0 6px 16px rgba(198,40,40,.32),var(--sh-in)}
+.btn.ghost {background:rgba(255,255,255,.92);color:var(--ink);border-color:#fff;box-shadow:var(--sh-card)}
+.btn.sm{min-height:var(--tap-sm);font-size:14px;padding:8px 14px}
+.btn.xs{min-height:40px;font-size:12.5px;padding:6px 12px;width:auto;border-width:2px}
+.btn-row{display:flex;gap:var(--s1)}
+.btn-row .btn{flex:1}
+.btn-row.wrap{flex-wrap:wrap}
+
+/* ---------- bar kemajuan ---------- */
+.bar{height:20px;border-radius:var(--r-btn);overflow:hidden;
+  background:rgba(34,27,69,.35);border:3px solid rgba(255,255,255,.5)}
+.bar > i{display:block;height:100%;width:0;border-radius:inherit;
+  background:linear-gradient(90deg,var(--green),var(--green-l));
+  box-shadow:0 0 12px rgba(102,187,106,.55),inset 0 1px 2px rgba(255,255,255,.35);
+  transition:width .5s cubic-bezier(.22,1,.36,1)}
+.bar.gold > i{background:linear-gradient(90deg,var(--gold-d),var(--gold));box-shadow:0 0 12px rgba(251,191,36,.6)}
+.bar.dark{background:rgba(34,27,69,.14);border-color:rgba(34,27,69,.12)}
+.bar.thin{height:13px;border-width:2px}
+.bar-wrap{display:flex;align-items:center;gap:var(--s1)}
+.bar-wrap .bar{flex:1}
+.bar-lbl{font-family:var(--f-d);font-weight:800;font-size:12.5px}
+
+/* ---------- hero ---------- */
+.hero{padding:var(--s3) var(--s2) var(--s2);text-align:center}
+.hero-art{margin:0 auto var(--s2);width:200px;max-width:62%}
+.ribbon{
+  display:inline-block;padding:7px 18px;border-radius:var(--r-pill);
+  background:linear-gradient(135deg,var(--pink-d),var(--pink));
+  border:3px solid var(--pink-l);color:#fff;
+  font-family:var(--f-d);font-weight:900;font-size:12px;letter-spacing:1.3px;text-transform:uppercase;
+  box-shadow:0 6px 18px rgba(173,20,87,.34);
+}
+.dots{display:flex;gap:8px;justify-content:center;margin-top:var(--s2)}
+.dots i{width:9px;height:9px;border-radius:var(--r-pill);background:rgba(34,27,69,.2)}
+.dots i.on{width:26px;background:linear-gradient(90deg,var(--blue),var(--blue-l))}
+
+/* ---------- kepala seksyen ---------- */
+.sec-head{display:flex;align-items:center;gap:var(--s1);margin:var(--s3) 0 var(--s2)}
+.sec-head h2{flex:1}
+.sec-head .rule{height:4px;flex:1;border-radius:var(--r-pill);
+  background:linear-gradient(90deg,rgba(34,27,69,.16),transparent)}
+
+/* ---------- papan pilihan modul ---------- */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tcard{
+  position:relative;border-radius:var(--r-card);padding:12px 8px 12px;
+  border:4px solid var(--blue-l);min-height:118px;
+  background:linear-gradient(160deg,var(--blue-d),var(--blue));
+  color:#fff;box-shadow:var(--sh-card),var(--sh-in);
+  display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.tcard:active{transform:translateY(3px) scale(.98)}
+.tcard .no{
+  position:absolute;top:-2px;left:-2px;min-width:26px;height:23px;padding:0 6px;
+  border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(0,0,0,.32);
+  font-family:var(--f-d);font-weight:900;font-size:11px;display:grid;place-items:center;
+}
+.tcard .lv{
+  position:absolute;top:6px;right:6px;height:20px;padding:0 7px;border-radius:var(--r-pill);
+  background:rgba(255,255,255,.92);color:var(--ink);
+  font-family:var(--f-d);font-weight:900;font-size:10px;display:grid;place-items:center;
+}
+.tcard .glyph{
+  width:46px;height:46px;border-radius:var(--r-pill);display:grid;place-items:center;
+  background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);margin-top:4px;
+}
+.tcard .nm{font-family:var(--f-d);font-weight:800;font-size:11.5px;line-height:1.3;min-height:30px}
+.stars{display:flex;gap:3px}
+.stars i{width:16px;height:16px;display:block;opacity:.3;color:var(--gold)}
+.stars i.on{opacity:1;filter:drop-shadow(0 0 6px rgba(251,191,36,.85))}
+.tcard .stars i{width:12px;height:12px;opacity:.35}
+.tcard .stars i.on{opacity:1;filter:drop-shadow(0 0 5px rgba(251,191,36,.9))}
+.tcard.done{border-color:var(--gold);box-shadow:0 0 18px rgba(251,191,36,.45),var(--sh-card)}
+.tcard.done::before{
+  content:"";position:absolute;bottom:6px;right:6px;width:18px;height:18px;border-radius:var(--r-pill);
+  background:linear-gradient(135deg,var(--green),var(--green-l));border:2px solid #fff;
+}
+
+/* ---------- kedai stiker ---------- */
+.shop-head{
+  display:flex;align-items:center;gap:10px;padding:12px var(--s2);
+  border-radius:var(--r-card);border:4px solid var(--gold-l);
+  background:linear-gradient(135deg,var(--purple-d),var(--purple));color:#fff;
+  box-shadow:var(--sh-card),var(--sh-in);
+}
+.shop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.sitem{
+  border-radius:var(--r-card);border:4px solid #fff;background:linear-gradient(160deg,#FFFFFF,#F1EAFF);
+  color:var(--ink);padding:12px 10px 10px;text-align:center;box-shadow:var(--sh-card);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.sitem .glyph{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;font-size:26px;
+  background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;border:3px solid var(--blue-l)}
+.sitem .nm{font-family:var(--f-d);font-weight:800;font-size:13px}
+.sitem .ds{font-size:11.5px;color:var(--ink-2);line-height:1.45;min-height:34px}
+.price{
+  display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:0 14px;border-radius:var(--r-pill);
+  background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#4A2D00;border:2px solid #FFF0BF;
+  font-family:var(--f-d);font-weight:900;font-size:12.5px;box-shadow:0 0 12px rgba(251,191,36,.45);
+}
+.sitem.owned{opacity:.72}
+
+/* ---------- panel pelajaran ---------- */
+.panel{
+  border-radius:var(--r-card);border:4px solid #fff;
+  background:linear-gradient(160deg,#FFFFFF,#F6F1FF);color:var(--ink);
+  box-shadow:var(--sh-card);padding:var(--s2);
+}
+.panel + .panel{margin-top:12px}
+.panel h3,.gcard h3,.lab h3{margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lab h3{margin-bottom:4px}
+.klist li{
+  display:flex;gap:10px;font-size:14px;line-height:1.65;color:var(--ink-2);font-weight:500;
+  padding:9px 0;border-bottom:1px dashed var(--line);
+}
+.klist li:last-child{border-bottom:0}
+.klist .k{
+  flex:none;width:24px;height:24px;border-radius:var(--r-pill);margin-top:1px;
+  background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;
+  font-family:var(--f-d);font-weight:900;font-size:11.5px;display:grid;place-items:center;
+}
+.step{
+  border-radius:var(--r-btn);border:3px solid var(--blue-x);background:#F0F7FF;
+  padding:11px 12px;font-size:14px;line-height:1.6;color:var(--ink);
+  display:flex;gap:10px;align-items:flex-start;
+}
+.step + .step{margin-top:8px}
+.step b{font-family:var(--f-d)}
+.step.hide{display:none}
+.step .n{flex:none;width:26px;height:26px;border-radius:var(--r-sm);
+  background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;
+  font-family:var(--f-d);font-weight:900;font-size:12.5px;display:grid;place-items:center}
+.math{font-family:var(--f-d);font-weight:800;letter-spacing:.4px}
+.tip{
+  border-radius:var(--r-btn);border:3px solid var(--gold-l);
+  background:linear-gradient(135deg,#FFF8E1,#FFF3C4);padding:11px 12px;
+  font-size:13.5px;line-height:1.65;color:#6B4A00;font-weight:500;display:flex;gap:9px;
+}
+.tip.guru{border-color:var(--purple-l);background:linear-gradient(135deg,#F3ECFF,#E9DEFF);color:#43307A}
+.tip.dsk{border-color:var(--teal-l);background:linear-gradient(135deg,#E0F2F1,#D3EDEB);color:#00483F}
+
+/* ---------- makmal konkrit ---------- */
+.lab{
+  border-radius:var(--r-card);border:4px solid var(--teal-l);
+  background:linear-gradient(160deg,var(--teal-d),var(--teal));color:#fff;
+  box-shadow:var(--sh-card),var(--sh-in);padding:var(--s2);margin-top:12px;
+}
+.lab h3{margin-bottom:4px}
+.lab .hint{font-size:12.5px;color:#CFF3EC;font-weight:500;margin-bottom:12px;line-height:1.5}
+.lab-out{
+  border-radius:var(--r-btn);border:3px solid rgba(255,255,255,.45);
+  background:rgba(0,0,0,.22);padding:12px;text-align:center;margin-top:12px;
+}
+.lab-out .big{font-family:var(--f-d);font-weight:900;font-size:clamp(24px,7.5vw,34px);letter-spacing:.5px}
+.lab-out .sub{font-size:12.5px;color:#D8F5EF;font-weight:500;margin-top:5px;line-height:1.55}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.stepper .lbl{font-family:var(--f-d);font-weight:800;font-size:13.5px}
+.stepper .ctrl{display:flex;align-items:center;gap:8px}
+.rnd{
+  width:46px;height:46px;border-radius:var(--r-pill);display:grid;place-items:center;
+  background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.55);color:#fff;
+  font-family:var(--f-d);font-weight:900;font-size:22px;line-height:1;
+}
+.rnd:active{transform:translateY(2px)}
+.val{min-width:58px;text-align:center;font-family:var(--f-d);font-weight:900;font-size:20px}
+.coins{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.coin{
+  min-height:46px;padding:0 14px;border-radius:var(--r-pill);
+  background:rgba(255,255,255,.92);color:var(--teal-d);border:3px solid #fff;
+  font-family:var(--f-d);font-weight:900;font-size:13.5px;
+}
+.coin:active{transform:translateY(2px)}
+.clock{width:170px;height:170px;margin:0 auto;display:block}
+
+/* ---------- blok visual konkrit (bantuan MBPK) ---------- */
+.viz{
+  border-radius:var(--r-btn);border:3px solid rgba(255,255,255,.4);
+  background:rgba(255,255,255,.14);padding:12px;margin-top:12px;
+}
+.viz.on-paper{border-color:var(--blue-x);background:#F3F8FF}
+.objs{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-items:center}
+.objs span{font-size:30px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+.grp{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.grp .box{
+  border-radius:14px;border:3px dashed rgba(255,255,255,.6);padding:8px 10px;
+  display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:46%;
+}
+.viz.on-paper .grp .box{border-color:var(--blue-x)}
+.grp .sgn{font-family:var(--f-d);font-weight:900;font-size:30px}
+.numline{position:relative;height:64px;margin:6px 4px 0}
+.numline .ln{position:absolute;left:0;right:0;top:26px;height:5px;border-radius:9px;background:rgba(255,255,255,.55)}
+.viz.on-paper .numline .ln{background:var(--blue-x)}
+.numline b{
+  position:absolute;top:14px;transform:translateX(-50%);
+  width:28px;text-align:center;font-family:var(--f-d);font-weight:800;font-size:12px;
+}
+.numline b i{display:block;width:5px;height:14px;margin:0 auto 3px;border-radius:3px;background:rgba(255,255,255,.7)}
+.viz.on-paper .numline b i{background:var(--blue-l)}
+.numline b.on{color:#4A2D00}
+.numline b.on i{background:var(--gold);height:22px;margin-top:-8px;box-shadow:0 0 10px rgba(251,191,36,.9)}
+.numline b.on em{display:inline-block;font-style:normal;background:var(--gold);color:#4A2D00;
+  border-radius:var(--r-pill);padding:1px 6px}
+.tens{display:flex;gap:10px;justify-content:center;align-items:flex-end;flex-wrap:wrap}
+.rod{display:grid;grid-template-rows:repeat(10,1fr);gap:2px;width:16px;height:88px}
+.rod i{background:var(--blue-l);border:1px solid rgba(255,255,255,.7);border-radius:2px}
+.unit{width:16px;height:16px;background:var(--gold);border:1px solid rgba(255,255,255,.8);border-radius:3px}
+.units{display:grid;grid-template-columns:repeat(5,16px);gap:3px}
+.frame10{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;max-width:200px;margin:0 auto}
+.frame10 i{aspect-ratio:1;border-radius:8px;border:3px solid rgba(255,255,255,.6);display:block}
+.frame10 i.on{background:var(--gold);border-color:#FFF0BF;box-shadow:0 0 10px rgba(251,191,36,.6)}
+.viz.on-paper .frame10 i{border-color:var(--blue-x)}
+.shapes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.shapes svg{width:62px;height:62px}
+.bars{display:flex;gap:12px;align-items:flex-end;justify-content:center;height:120px}
+.bars div{width:38px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--gold),var(--gold-d));
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;
+  font-family:var(--f-d);font-weight:900;font-size:12px;color:#4A2D00}
+.bars span{display:block;text-align:center;font-size:20px;margin-top:4px}
+.bcap{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.bcap span{width:38px;text-align:center;font-size:22px}
+
+/* ---------- kuiz ---------- */
+.q-card{
+  border-radius:var(--r-card);border:var(--bw-card) solid var(--blue-l);
+  background:linear-gradient(135deg,var(--blue-d) 0%,var(--blue) 100%);
+  box-shadow:0 8px 24px rgba(21,101,192,.3),var(--sh-in);
+  padding:56px var(--s2) var(--s3);color:#fff;text-align:center;position:relative;
+}
+.q-text{font-family:var(--f-d);font-size:clamp(19px,5vw,26px);font-weight:800;line-height:1.4;
+  text-shadow:1px 1px 2px rgba(0,0,0,.3)}
+.q-sub{font-size:13px;font-weight:600;color:#CFE4FF;margin-top:8px}
+.q-say{
+  position:absolute;top:10px;right:10px;
+  min-height:40px;padding:0 12px;border-radius:var(--r-pill);
+  background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.6);color:#fff;
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--f-d);font-weight:800;font-size:12px;
+}
+.q-say.speaking{background:var(--gold);color:#4A2D00;border-color:#FFF0BF}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{
+  width:100%;min-height:var(--tap);padding:12px 14px;text-align:left;
+  border-radius:var(--r-btn);border:var(--bw-btn) solid rgba(255,255,255,.55);
+  background:linear-gradient(135deg,var(--indigo-d),var(--indigo));color:#fff;
+  font-family:var(--f-b);font-weight:600;font-size:17px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 6px 14px rgba(40,53,147,.28),var(--sh-in);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.opts.two .opt{justify-content:center;text-align:center;font-size:19px;min-height:88px}
+.opt .key{
+  flex:none;width:32px;height:32px;border-radius:var(--r-sm);display:grid;place-items:center;
+  background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.5);
+  font-family:var(--f-d);font-weight:900;font-size:14px;
+}
+.opt .tx{flex:1}
+.opts.two .opt .tx{flex:none}
+.opt .pic{font-size:30px;line-height:1}
+.opt:active{transform:translateY(2px)}
+.opt.correct{
+  background:linear-gradient(135deg,#2E7D32 0%,#43A047 100%);border-color:#66BB6A;
+  box-shadow:0 8px 24px rgba(46,125,50,.3),0 0 18px rgba(102,187,106,.45);
+}
+.opt.incorrect{ /* oren lembut, bukan merah — elak reaksi negatif MBPK */
+  background:linear-gradient(135deg,#E65100 0%,#FB8C00 100%);border-color:#FFA726;
+  box-shadow:0 8px 24px rgba(230,81,0,.28);
+}
+.opt.dim{opacity:.4}
+.opt .mark{font-family:var(--f-d);font-weight:900;font-size:20px}
+.fb{margin-top:12px;border-radius:var(--r-btn);padding:13px 14px;border:3px solid;animation:fadeUp .3s ease both}
+.fb.ok{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border-color:var(--green-l)}
+.fb.no{background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-color:var(--amber-l)}
+.fb .hd{font-family:var(--f-d);font-weight:900;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;gap:8px}
+.fb.ok .hd{color:var(--green-d)}
+.fb.no .hd{color:var(--amber-d)}
+.fb p{font-size:14px;line-height:1.7;color:#3A3358;font-weight:500;margin-top:7px}
+.q-top{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.timer{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:var(--r-pill);
+  background:linear-gradient(135deg,var(--amber-d),var(--amber));color:#fff;border:2px solid var(--amber-l);
+  font-family:var(--f-d);font-weight:900;font-size:13px;box-shadow:0 0 14px rgba(251,140,0,.4);
+}
+.timer.low{background:linear-gradient(135deg,var(--red-d),var(--red));border-color:var(--red-l);animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.pips{display:flex;gap:5px;margin:0 0 12px}
+.pips i{flex:1;height:9px;border-radius:var(--r-pill);background:rgba(34,27,69,.14)}
+.pips i.ok{background:linear-gradient(90deg,var(--green),var(--green-l))}
+.pips i.no{background:linear-gradient(90deg,var(--amber),var(--amber-l))}
+.pips i.now{background:var(--blue);box-shadow:0 0 10px rgba(30,136,229,.7)}
+
+/* ---------- keputusan ---------- */
+.result{text-align:center}
+.medal{width:130px;height:130px;margin:0 auto var(--s2)}
+.stars-big{display:flex;gap:10px;justify-content:center;margin:var(--s2) 0}
+.stars-big i{width:44px;height:44px;opacity:.28;color:var(--gold)}
+.stars-big i.on{opacity:1;animation:pop .45s cubic-bezier(.2,1.6,.4,1) both;filter:drop-shadow(0 0 10px rgba(251,191,36,.85))}
+@keyframes pop{from{transform:scale(.3) rotate(-25deg)}to{transform:none}}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:var(--s2)}
+.kpi div{border-radius:var(--r-btn);border:3px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);padding:10px 4px}
+.kpi b{display:block;font-family:var(--f-d);font-weight:900;font-size:21px}
+.kpi span{font-size:10.5px;font-weight:600;opacity:.92}
+.sticker-pop{font-size:56px;line-height:1;margin:4px 0 0;animation:pop .5s cubic-bezier(.2,1.7,.4,1) both}
+
+/* ---------- papan bintang kelas ---------- */
+.row-rank{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:var(--r-btn);
+  background:rgba(255,255,255,.92);border:3px solid #fff;box-shadow:var(--sh-card);
+}
+.row-rank + .row-rank{margin-top:8px}
+.row-rank.me{background:linear-gradient(135deg,#FFF8E1,#FFE9A8);border-color:var(--gold)}
+.row-rank .pos{
+  width:34px;height:34px;flex:none;border-radius:var(--r-pill);display:grid;place-items:center;
+  font-family:var(--f-d);font-weight:900;font-size:14px;color:#fff;background:var(--ink-3);
+}
+.row-rank .pos.p1{background:linear-gradient(135deg,var(--gold-d),var(--gold));color:#4A2D00}
+.row-rank .pos.p2{background:linear-gradient(135deg,#78909C,#B0BEC5)}
+.row-rank .pos.p3{background:linear-gradient(135deg,#8D6E63,#BCAAA4)}
+.row-rank .fc{font-size:24px;flex:none}
+.row-rank .nm{flex:1;font-family:var(--f-d);font-weight:800;font-size:14px;min-width:0}
+.row-rank .nm small{display:block;font-family:var(--f-b);font-weight:500;font-size:11.5px;color:var(--ink-3)}
+.row-rank .pt{font-family:var(--f-d);font-weight:900;font-size:15px;color:var(--blue-d)}
+
+/* ---------- lencana koleksi ---------- */
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bcell{
+  border-radius:var(--r-card);border:4px solid var(--purple-l);
+  background:linear-gradient(160deg,var(--purple-d),var(--purple));color:#fff;
+  padding:12px 8px;text-align:center;box-shadow:var(--sh-card),var(--sh-in);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.bcell.lock{background:linear-gradient(160deg,#4A5568,#5D6B82);border-color:#8494AB;filter:grayscale(.35)}
+.bcell.lock .glyph{opacity:.5}
+.bcell .glyph{width:46px;height:46px;border-radius:var(--r-pill);display:grid;place-items:center;
+  background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5)}
+.bcell.win{box-shadow:0 0 22px rgba(126,87,194,.6),var(--sh-card)}
+.bcell .nm{font-family:var(--f-d);font-weight:800;font-size:11.5px;line-height:1.3}
+.bcell .ds{font-size:10px;color:#E3D9FF;line-height:1.4}
+.stikers{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.stikers div{
+  aspect-ratio:1;border-radius:14px;display:grid;place-items:center;font-size:26px;
+  background:rgba(255,255,255,.9);border:3px solid #fff;box-shadow:var(--sh-card);
+}
+.stikers div.empty{background:rgba(34,27,69,.05);border-color:var(--line);font-size:18px;opacity:.5}
+
+/* ---------- panel guru ---------- */
+.gcard{
+  border-radius:var(--r-card);border:4px solid #fff;background:#fff;color:var(--ink);
+  box-shadow:var(--sh-card);padding:var(--s2);
+}
+.gcard + .gcard{margin-top:12px}
+.field{margin-top:12px}
+.field label{display:block;font-family:var(--f-d);font-weight:800;font-size:12.5px;color:var(--ink-2);margin-bottom:6px}
+.field input[type=text],.field select,.field input[type=number]{
+  width:100%;min-height:var(--tap-sm);padding:10px 12px;border-radius:var(--r-btn);
+  border:3px solid var(--blue-x);background:#F7FAFF;font-size:15px;font-weight:600;
+}
+.avapick{display:flex;flex-wrap:wrap;gap:8px}
+.avapick button{
+  width:52px;height:52px;border-radius:var(--r-pill);font-size:26px;
+  border:3px solid var(--line);background:#F7F4FF;display:grid;place-items:center;
+}
+.avapick button.on{border-color:var(--gold);background:#FFF6DC;box-shadow:0 0 12px rgba(251,191,36,.5)}
+.swrow{
+  display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);
+}
+.swrow:last-child{border-bottom:0}
+.swrow .tx{flex:1}
+.swrow .tx b{display:block;font-family:var(--f-d);font-weight:800;font-size:14px}
+.swrow .tx span{display:block;font-size:12px;color:var(--ink-3);line-height:1.5;margin-top:2px}
+.sw{
+  width:60px;height:34px;border-radius:var(--r-pill);flex:none;position:relative;
+  background:rgba(34,27,69,.18);border:3px solid rgba(34,27,69,.1);transition:.2s;
+}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:var(--r-pill);
+  background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:.2s}
+.sw.on{background:linear-gradient(135deg,var(--green-d),var(--green));border-color:var(--green-l)}
+.sw.on::after{transform:translateX(26px)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{
+  flex:1;min-width:66px;min-height:var(--tap-sm);border-radius:var(--r-btn);
+  border:3px solid var(--line);background:#F7F4FF;color:var(--ink-2);
+  font-family:var(--f-d);font-weight:800;font-size:13.5px;
+}
+.seg button.on{background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;border-color:var(--blue-l);
+  box-shadow:0 4px 12px rgba(21,101,192,.3)}
+.mrow{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-btn);
+  border:3px solid var(--line);background:#FBF9FF;
+}
+.mrow + .mrow{margin-top:8px}
+.mrow.on{border-color:var(--gold);background:#FFF9E8;box-shadow:0 0 12px rgba(251,191,36,.35)}
+.mrow .fc{font-size:28px;flex:none}
+.mrow .nm{flex:1;min-width:0}
+.mrow .nm b{display:block;font-family:var(--f-d);font-weight:800;font-size:14.5px}
+.mrow .nm span{display:block;font-size:11.5px;color:var(--ink-3);margin-top:1px}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+.tbl th,.tbl td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line)}
+.tbl th{font-family:var(--f-d);font-weight:800;font-size:11px;text-transform:uppercase;
+  letter-spacing:.6px;color:var(--ink-3)}
+.tbl td b{font-family:var(--f-d)}
+.tbl .cen{text-align:center}
+.pill{display:inline-block;padding:3px 9px;border-radius:var(--r-pill);font-family:var(--f-d);
+  font-weight:800;font-size:10.5px}
+.pill.k{background:#E8F5E9;color:var(--green-d)}   /* kuasai */
+.pill.s{background:#FFF3E0;color:var(--amber-d)}   /* sedang */
+.pill.b{background:#F1EDFB;color:var(--ink-3)}     /* belum */
+.logline{display:flex;gap:8px;font-size:12px;padding:7px 0;border-bottom:1px dashed var(--line);color:var(--ink-2)}
+.logline time{flex:none;font-family:var(--f-d);font-weight:800;color:var(--ink-3);font-size:11px;width:92px}
+.logline span{flex:1}
+
+/* ---------- navigasi bawah ---------- */
+.nav{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:40;
+  width:calc(100% - 32px);max-width:428px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px;
+  border-radius:22px;border:4px solid #fff;
+  background:linear-gradient(135deg,#2A1F4D,#3F3070);
+  box-shadow:var(--sh-pop);
+}
+.nav[hidden]{display:none}
+.nav button{
+  border-radius:var(--r-btn);padding:7px 2px;color:#C9BEEF;min-height:54px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-family:var(--f-d);font-weight:800;font-size:9.5px;
+}
+.nav button.on{background:linear-gradient(135deg,var(--blue-d),var(--blue));color:#fff;
+  box-shadow:0 0 14px rgba(30,136,229,.55)}
+
+/* ---------- toast, konfeti, modal ---------- */
+.toast{
+  position:fixed;left:50%;bottom:104px;transform:translate(-50%,20px);z-index:60;
+  padding:13px 18px;border-radius:var(--r-pill);border:3px solid var(--green-l);
+  background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+  font-family:var(--f-d);font-weight:800;font-size:13.5px;
+  box-shadow:var(--sh-pop);opacity:0;pointer-events:none;transition:.3s;
+  max-width:88%;text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.bad{background:linear-gradient(135deg,var(--amber-d),var(--amber));border-color:var(--amber-l)}
+.conf{position:fixed;inset:0;pointer-events:none;z-index:55;overflow:hidden}
+.conf i{position:absolute;width:9px;height:14px;border-radius:2px;animation:fall 1.5s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* ---------- animasi kecil ---------- */
+.bob{animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+@media (max-width:344px){
+  .grid3{grid-template-columns:repeat(2,1fr)}
+  .stikers{grid-template-columns:repeat(4,1fr)}
+}
+
+/* ---------- cetakan laporan RPI ---------- */
+@media print{
+  body{background:#fff !important;background-image:none !important}
+  .topbar,.nav,.toast,.noprint{display:none !important}
+  .stage{padding:0}
+  .app{max-width:100%}
+  .gcard,.panel{border:1px solid #999;box-shadow:none;break-inside:avoid}
+  .screen{display:none !important}
+  .screen.active{display:block !important;animation:none}
+  a[href]:after{content:""}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- navigasi & sistem -->
+  <symbol id="i-home" viewBox="0 0 48 48"><path d="M8 22 24 8l16 14"/><path d="M12 20v18h24V20"/><path d="M20 38V27h8v11"/></symbol>
+  <symbol id="i-book" viewBox="0 0 48 48"><path d="M8 10h13a5 5 0 0 1 5 5v23a4 4 0 0 0-4-4H8Z"/><path d="M40 10H27a5 5 0 0 0-5 5v23a4 4 0 0 1 4-4h14Z"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 48 48"><path d="M27 5 12 27h10l-3 16 17-23H26Z"/></symbol>
+  <symbol id="i-medal" viewBox="0 0 48 48"><circle cx="24" cy="30" r="11"/><path d="m16 20-6-14h10l5 10M32 20l6-14H28l-5 10"/><path d="m24 25 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7Z"/></symbol>
+  <symbol id="i-teacher" viewBox="0 0 48 48"><circle cx="24" cy="14" r="7"/><path d="M9 41c1.5-8.5 7.5-13 15-13s13.5 4.5 15 13"/><path d="M35 8h9v8h-9Z"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 48 48"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="10"/></symbol>
+  <symbol id="i-star" viewBox="0 0 48 48"><path d="m24 5 5.9 12.3 13.1 1.8-9.6 9.3 2.4 13.6L24 35.6 12.2 42l2.4-13.6L5 19.1l13.1-1.8Z" class="fill"/></symbol>
+  <symbol id="i-check" viewBox="0 0 48 48"><path d="m10 25 10 10 19-21" stroke-width="5"/></symbol>
+  <symbol id="i-cross" viewBox="0 0 48 48"><path d="M13 13 35 35M35 13 13 35" stroke-width="5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 48 48"><path d="M16 9 38 24 16 39Z" class="fill"/></symbol>
+  <symbol id="i-left" viewBox="0 0 48 48"><path d="M29 10 15 24l14 14"/></symbol>
+  <symbol id="i-right" viewBox="0 0 48 48"><path d="M19 10l14 14-14 14"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 48 48"><path d="M10 19h7l10-8v26l-10-8h-7Z"/><path d="M32 18a9 9 0 0 1 0 12"/><path d="M37 13a16 16 0 0 1 0 22"/></symbol>
+  <symbol id="i-mute" viewBox="0 0 48 48"><path d="M10 19h7l10-8v26l-10-8h-7Z"/><path d="m33 19 10 10M43 19 33 29"/></symbol>
+  <symbol id="i-speak" viewBox="0 0 48 48"><path d="M8 18h8l10-8v28l-10-8H8Z"/><path d="M31 17a10 10 0 0 1 0 14"/><path d="M37 11a18 18 0 0 1 0 26"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 48 48"><circle cx="24" cy="24" r="17"/><path d="M24 13v11l8 5"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 48 48"><path d="M24 6a13 13 0 0 0-8 23v5h16v-5a13 13 0 0 0-8-23Z"/><path d="M19 40h10M21 44h6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 48 48"><rect x="11" y="21" width="26" height="20" rx="4"/><path d="M17 21v-5a7 7 0 0 1 14 0v5"/></symbol>
+  <symbol id="i-shop" viewBox="0 0 48 48"><path d="M8 15h32l-3 25H11Z"/><path d="M18 20v-6a6 6 0 0 1 12 0v6"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 48 48"><path d="M40 24a16 16 0 1 1-5-11.6"/><path d="M40 6v9h-9"/></symbol>
+  <symbol id="i-target" viewBox="0 0 48 48"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="9"/><circle cx="24" cy="24" r="2.5" class="fill"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 48 48"><path d="M24 5c8 9 13 13 13 22a13 13 0 0 1-26 0c0-5 3-8 5-11 1 3 3 5 5 5 1-6 0-11 3-16Z"/></symbol>
+  <symbol id="i-key" viewBox="0 0 48 48"><circle cx="16" cy="24" r="8"/><path d="M24 24h18M36 24v7M42 24v5"/></symbol>
+  <symbol id="i-map" viewBox="0 0 48 48"><path d="m6 12 12-5 12 5 12-5v29l-12 5-12-5-12 5Z"/><path d="M18 7v29M30 12v29"/></symbol>
+  <symbol id="i-users" viewBox="0 0 48 48"><circle cx="18" cy="16" r="7"/><path d="M5 39c1.2-7.4 6.2-11.5 13-11.5S30 31.6 31 39"/><circle cx="34" cy="18" r="5.5"/><path d="M33 28c5 .5 8.6 4 9.6 10"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 48 48"><path d="M8 40h32"/><rect x="11" y="26" width="7" height="14"/><rect x="21" y="16" width="7" height="24"/><rect x="31" y="31" width="7" height="9"/></symbol>
+  <symbol id="i-print" viewBox="0 0 48 48"><path d="M14 18V7h20v11"/><rect x="6" y="18" width="36" height="15" rx="3"/><path d="M14 28h20v13H14Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 48 48"><path d="M24 10v28M10 24h28" stroke-width="5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 48 48"><path d="M9 13h30"/><path d="M14 13v25a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V13"/><path d="M19 13V8h10v5M21 21v13M27 21v13"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 48 48"><circle cx="24" cy="24" r="7"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6M10 10l4 4M34 34l4 4M38 10l-4 4M14 34l-4 4"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 48 48"><path d="M18 26V10a3.5 3.5 0 0 1 7 0v12"/><path d="M25 22v-4a3.5 3.5 0 0 1 7 0v6"/><path d="M32 24v-2a3.5 3.5 0 0 1 7 0v12a10 10 0 0 1-10 10h-4a9 9 0 0 1-7.6-4.2L11 30a3.5 3.5 0 0 1 5.6-4Z"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 48 48"><path d="M4 24s7-12 20-12 20 12 20 12-7 12-20 12S4 24 4 24Z"/><circle cx="24" cy="24" r="6"/></symbol>
+  <symbol id="i-calm" viewBox="0 0 48 48"><path d="M6 30c6-10 12-10 18 0s12 10 18 0"/><path d="M6 18c6-10 12-10 18 0s12 10 18 0" opacity=".55"/></symbol>
+
+  <!-- ikon modul PPKI -->
+  <symbol id="m-count" viewBox="0 0 48 48"><circle cx="12" cy="14" r="5" class="fill"/><circle cx="24" cy="14" r="5" class="fill"/><circle cx="36" cy="14" r="5" class="fill"/><path d="M9 30h9v10H9ZM20 30h8v10h-8ZM31 30h8v10h-8Z"/></symbol>
+  <symbol id="m-num20" viewBox="0 0 48 48"><path d="M13 15h5v20"/><path d="M27 15h9v9h-9v11h9"/><path d="M6 40h36" opacity=".5"/></symbol>
+  <symbol id="m-add" viewBox="0 0 48 48"><path d="M24 12v24M12 24h24" stroke-width="5"/><circle cx="24" cy="24" r="19" opacity=".4"/></symbol>
+  <symbol id="m-sub" viewBox="0 0 48 48"><path d="M12 24h24" stroke-width="5"/><circle cx="24" cy="24" r="19" opacity=".4"/></symbol>
+  <symbol id="m-place" viewBox="0 0 48 48"><rect x="7" y="10" width="12" height="28" rx="2"/><path d="M10 16h6M10 22h6M10 28h6M10 34h6" opacity=".7"/><rect x="27" y="26" width="12" height="12" rx="2"/></symbol>
+  <symbol id="m-addsub100" viewBox="0 0 48 48"><path d="M13 8v12M7 14h12M29 34h12"/><circle cx="35" cy="14" r="7" opacity=".55"/><path d="M9 30h12" opacity=".55"/><path d="M15 24v12" opacity=".55"/></symbol>
+  <symbol id="m-shape" viewBox="0 0 48 48"><circle cx="14" cy="15" r="8"/><rect x="26" y="7" width="16" height="16" rx="2"/><path d="M24 42 14 27h20Z"/></symbol>
+  <symbol id="m-pattern" viewBox="0 0 48 48"><circle cx="9" cy="24" r="5" class="fill"/><rect x="18" y="19" width="10" height="10" rx="2"/><circle cx="38" cy="24" r="5" class="fill"/><path d="M4 38h40" opacity=".4"/></symbol>
+  <symbol id="m-money" viewBox="0 0 48 48"><rect x="6" y="13" width="36" height="22" rx="4"/><circle cx="24" cy="24" r="6"/><path d="M12 20v8M36 20v8" opacity=".6"/></symbol>
+  <symbol id="m-time" viewBox="0 0 48 48"><circle cx="24" cy="26" r="15"/><path d="M24 17v9l6 4"/><path d="m16 7 5 4M32 7l-5 4"/></symbol>
+  <symbol id="m-measure" viewBox="0 0 48 48"><rect x="5" y="17" width="38" height="14" rx="3"/><path d="M13 17v6M21 17v9M29 17v6M37 17v9"/></symbol>
+  <symbol id="m-data" viewBox="0 0 48 48"><path d="M8 40h32"/><rect x="11" y="22" width="7" height="18"/><rect x="21" y="13" width="7" height="27"/><rect x="31" y="29" width="7" height="11"/></symbol>
+</svg>
+
+<main class="app">
+  <!-- ================= bar atas ================= -->
+  <header class="topbar" id="topbar" hidden>
+    <button class="ava" id="avatar" aria-label="Tukar murid">🙂</button>
+    <div class="who">
+      <b id="me-name">Murid</b>
+      <span id="me-rank">Aras 1 · Pelajar Baharu</span>
+    </div>
+    <span class="chip gold"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-coin"></use></svg><b id="points">0</b></span>
+    <button class="icon-btn on" id="btn-tts" aria-pressed="true" aria-label="Hidupkan atau matikan bacaan suara">
+      <svg class="ic ic-sm" aria-hidden="true"><use href="#i-speak"></use></svg>
+    </button>
+    <button class="icon-btn on" id="btn-sound" aria-pressed="true" aria-label="Hidupkan atau matikan bunyi">
+      <svg class="ic ic-sm" aria-hidden="true"><use href="#i-sound" id="sound-glyph"></use></svg>
+    </button>
+  </header>
+
+  <div class="stage" id="stage">
+
+    <!-- ================= 1. mula ================= -->
+    <section id="s-splash" class="screen active hero" aria-label="Halaman mula">
+      <div class="hero-art bob" id="splash-art"></div>
+      <span class="ribbon">Matematik PPKI · KSSR Pendidikan Khas</span>
+      <h1 class="h1" style="margin:16px 0 10px">Juara Matematik Aina</h1>
+      <p class="lead" style="max-width:340px;margin:0 auto">
+        12 modul matematik konkrit untuk Murid Berkeperluan Pendidikan Khas.
+        Setiap soalan boleh dibaca kuat, setiap konsep ada bahan maujud di skrin.
+      </p>
+      <div class="dots"><i class="on"></i><i></i><i></i></div>
+      <div style="margin-top:22px">
+        <button class="btn gold" id="btn-start">Mula Belajar
+          <svg class="ic ic-sm" aria-hidden="true"><use href="#i-play"></use></svg>
+        </button>
+        <button class="btn purple" id="btn-guru-splash" style="margin-top:10px">Panel Guru
+          <svg class="ic ic-sm" aria-hidden="true"><use href="#i-teacher"></use></svg>
+        </button>
+      </div>
+      <div class="panel" style="margin-top:20px;text-align:left">
+        <h3 class="h3"><svg class="ic" aria-hidden="true"><use href="#i-hand"></use></svg> Untuk Guru PPKI</h3>
+        <ul class="klist">
+          <li><span class="k">1</span><span>Daftar murid, tetapkan <b>aras</b> setiap seorang, dan aplikasi akan melaraskan bilangan pilihan jawapan secara automatik.</span></li>
+          <li><span class="k">2</span><span><b>Mod Tenang</b> membuang animasi dan warna kuat untuk murid yang mudah terganggu deria.</span></li>
+          <li><span class="k">3</span><span>Rekod setiap percubaan disimpan untuk laporan <b>RPI</b> dan boleh dicetak.</span></li>
+        </ul>
+      </div>
+      <p style="font-size:11.5px;font-weight:600;color:var(--ink-3);margin-top:14px">
+        Semua data disimpan dalam peranti ini sahaja. Tiada maklumat murid dihantar ke internet.
+      </p>
+    </section>
+
+    <!-- ================= 2. utama ================= -->
+    <section id="s-home" class="screen" aria-label="Halaman utama murid"></section>
+
+    <!-- ================= skrin dinamik ================= -->
+    <section id="s-modul"  class="screen" aria-label="Papan pilihan modul"></section>
+    <section id="s-belajar" class="screen" aria-label="Pelajaran modul"></section>
+    <section id="s-kuiz"   class="screen" aria-label="Kuiz modul"></section>
+    <section id="s-latih"  class="screen" aria-label="Latih tubi"></section>
+    <section id="s-lencana" class="screen" aria-label="Lencana dan stiker"></section>
+    <section id="s-kelas"  class="screen" aria-label="Papan bintang kelas"></section>
+    <section id="s-habis"  class="screen" aria-label="Keputusan"></section>
+    <section id="s-guru"   class="screen" aria-label="Panel guru"></section>
+    <section id="s-lapor"  class="screen" aria-label="Laporan murid"></section>
+  </div>
+
+  <!-- ================= navigasi ================= -->
+  <nav class="nav" id="nav" hidden aria-label="Navigasi utama">
+    <button data-tab="home" class="on"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-home"></use></svg>Utama</button>
+    <button data-tab="modul"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-book"></use></svg>Modul</button>
+    <button data-tab="latih"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-bolt"></use></svg>Latih</button>
+    <button data-tab="lencana"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-medal"></use></svg>Ganjaran</button>
+    <button data-tab="guru"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-teacher"></use></svg>Guru</button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</main>
+<script>
+/* ============================================================
+   KURIKULUM — MATEMATIK KSSR PENDIDIKAN KHAS (PPKI)
+   12 modul · 3 aras · konsep ringkas · contoh berperingkat
+   · nota guru · makmal maujud · 6 soalan bergambar setiap modul
+
+   Setiap soalan mengandungi medan "v" = bahan bantu visual.
+   Sintaks visual (dirender oleh fungsi viz()):
+     obj:<emoji>:<bil>           → deretan objek maujud
+     grp:<emoji>:<a>:<b>:<tanda> → dua kumpulan objek + tanda operasi
+     frame:<bil>                 → bingkai sepuluh (ten frame)
+     line:<min>:<maks>:<tanda>   → garis nombor bertanda
+     ten:<nombor>                → blok puluh & sa
+     coin:<sen,sen,...>          → syiling & not Malaysia
+     jam:<jam>:<minit>           → muka jam analog
+     shape:<nama,nama,...>       → bentuk 2D
+     pola:<emoji,emoji,...>      → corak berulang (guna ? untuk kosong)
+     graf:<emoji>=<bil>,...      → graf palang bergambar
+   ============================================================ */
+const MODUL = [
+{
+  id:'bilang10', nama:'Bilang 1 hingga 10', pendek:'Bilang 1–10', ikon:'m-count', warna:'blue', aras:1,
+  dsk:'Standard Kandungan 1.1 — Membilang objek dalam lingkungan 10',
+  tagline:'Sentuh, bilang, padankan nombor dengan objek',
+  konsep:[
+    'Bilang <b>satu objek satu nombor</b>. Sentuh objek sambil menyebut nombornya.',
+    'Nombor terakhir yang disebut ialah <b>jumlah</b> objek itu.',
+    'Susunan objek tidak mengubah jumlah. 5 gula-gula tetap 5 walaupun disusun lain.',
+    'Simbol nombor: 1 2 3 4 5 6 7 8 9 10.'
+  ],
+  contoh:{ tajuk:'Bilang buah epal ini', langkah:[
+    'Sentuh epal pertama dan sebut <span class="math">satu</span>.',
+    'Sentuh epal kedua dan sebut <span class="math">dua</span>. Teruskan satu demi satu.',
+    'Nombor terakhir yang disebut ialah <span class="math">lima</span>.',
+    'Jadi jumlah epal ialah <span class="math">5</span>. Tulis simbol <span class="math">5</span>.'
+  ]},
+  tip:'Bilang perlahan-lahan. Sentuh setiap objek sekali sahaja.',
+  guru:'Mula dengan objek maujud sebenar (guli, penutup botol) sebelum skrin. Gunakan teknik <b>bantuan berperingkat</b>: bantuan fizikal → gerak isyarat → lisan → bebas. Rekod aras bantuan dalam RPI.',
+  lab:'bilang',
+  soalan:[
+    {q:'Berapa banyak epal?', v:'obj:🍎:3', o:['2','3','4','5'], a:1, h:'Bilang satu-satu: 1, 2, 3. Jumlahnya 3 biji epal.'},
+    {q:'Berapa banyak bintang?', v:'obj:⭐:5', o:['4','5','6','3'], a:1, h:'1, 2, 3, 4, 5. Ada 5 bintang.'},
+    {q:'Berapa banyak ikan?', v:'obj:🐟:7', o:['6','7','8','9'], a:1, h:'Bilang perlahan-lahan sampai habis: 7 ekor ikan.'},
+    {q:'Kumpulan mana yang lebih banyak?', v:'grp:🍬:4:6:vs', o:['Kumpulan kiri','Kumpulan kanan','Sama banyak','Tiada'], a:1, h:'Kiri ada 4, kanan ada 6. 6 lebih banyak daripada 4.'},
+    {q:'Berapa banyak bola?', v:'obj:⚽:10', o:['8','9','10','11'], a:2, h:'Bilang dua-dua baris: 5 tambah 5 jadi 10 biji bola.'},
+    {q:'Nombor manakah datang selepas 6?', v:'line:1:10:6', o:['5','7','8','6'], a:1, h:'Pada garis nombor, selepas 6 ialah 7.'}
+  ]
+},
+{
+  id:'nombor20', nama:'Nombor hingga 20', pendek:'Nombor 1–20', ikon:'m-num20', warna:'indigo', aras:1,
+  dsk:'Standard Kandungan 1.2 — Menama, menulis dan menyusun nombor hingga 20',
+  tagline:'Baca, tulis dan susun nombor sampai 20',
+  konsep:[
+    'Selepas 10 kita mula guna <b>dua digit</b>: 11, 12, 13 sehingga 20.',
+    '11 bermaksud <b>satu puluh dan satu sa</b>. 15 bermaksud satu puluh dan lima sa.',
+    'Nombor menjadi <b>lebih besar</b> apabila bergerak ke kanan pada garis nombor.',
+    'Sebelum bermaksud kurang satu. Selepas bermaksud tambah satu.'
+  ],
+  contoh:{ tajuk:'Susun nombor 14, 9, 17 dari kecil ke besar', langkah:[
+    'Lihat garis nombor. Cari kedudukan setiap nombor.',
+    '<span class="math">9</span> berada paling kiri, jadi ia paling kecil.',
+    '<span class="math">14</span> berada di tengah.',
+    '<span class="math">17</span> paling kanan, jadi paling besar. Susunan: <span class="math">9, 14, 17</span>.'
+  ]},
+  tip:'Nombor di sebelah kiri sentiasa lebih kecil.',
+  guru:'Sediakan garis nombor lantai (floor number line) di kelas PPKI supaya murid berjalan sambil membilang. Pergerakan badan membantu murid dengan masalah pembelajaran mengingati turutan.',
+  lab:'garis',
+  soalan:[
+    {q:'Nombor apakah ini?', v:'ten:13', o:['12','13','14','31'], a:1, h:'Satu blok puluh dan 3 blok sa. Jadi 13.'},
+    {q:'Nombor manakah datang sebelum 15?', v:'line:10:20:15', o:['14','16','13','15'], a:0, h:'Sebelum bermaksud kurang satu. 15 tolak 1 sama dengan 14.'},
+    {q:'Nombor manakah paling besar?', v:'line:10:20:18', o:['12','18','11','15'], a:1, h:'Pada garis nombor, 18 berada paling kanan. Jadi ia paling besar.'},
+    {q:'Berapa banyak semua bintang?', v:'grp:⭐:10:6:+', o:['15','16','17','14'], a:1, h:'Satu penuh 10, tambah 6 lagi. 10 + 6 = 16.'},
+    {q:'Lengkapkan: 16, 17, ___, 19', v:'line:15:20:18', o:['20','18','15','21'], a:1, h:'Bilang naik satu-satu: 16, 17, 18, 19.'},
+    {q:'20 ditulis sebagai berapa puluh?', v:'ten:20', o:['1 puluh','2 puluh','3 puluh','20 puluh'], a:1, h:'20 ialah dua blok puluh dan sifar sa. Jadi 2 puluh.'}
+  ]
+},
+{
+  id:'tambah10', nama:'Tambah dalam Lingkungan 10', pendek:'Tambah', ikon:'m-add', warna:'green', aras:1,
+  dsk:'Standard Kandungan 2.1 — Penambahan dua nombor hasil tambah hingga 10',
+  tagline:'Cantum dua kumpulan, bilang semua',
+  konsep:[
+    'Tambah bermaksud <b>menggabungkan</b> dua kumpulan menjadi satu.',
+    'Simbol tambah ialah <span class="math">+</span>. Simbol sama dengan ialah <span class="math">=</span>.',
+    'Cara mudah: <b>bilang terus</b> dari nombor besar. 6 + 2 → tujuh, lapan.',
+    'Tukar susunan tidak mengubah jawapan: <span class="math">3 + 5 = 5 + 3</span>.'
+  ],
+  contoh:{ tajuk:'Kira 4 + 3', langkah:[
+    'Ambil <span class="math">4</span> guli dan letak dalam bakul.',
+    'Ambil <span class="math">3</span> guli lagi dan masukkan ke dalam bakul yang sama.',
+    'Bilang semua guli dalam bakul: 1, 2, 3, 4, 5, 6, 7.',
+    'Jadi <span class="math">4 + 3 = 7</span>.'
+  ]},
+  tip:'Mula bilang dari nombor yang lebih besar supaya lebih cepat.',
+  guru:'Bagi murid yang belum kukuh, benarkan jari atau bahan maujud sepanjang aktiviti — jangan tarik sokongan terlalu awal. Catat bila murid mula boleh <i>bilang terus</i> tanpa bahan; itu petunjuk kemajuan penting untuk RPI.',
+  lab:'frame',
+  soalan:[
+    {q:'Berapa semua?', v:'grp:🍎:2:3:+', o:['4','5','6','7'], a:1, h:'2 epal tambah 3 epal. Bilang semua: 5 biji.'},
+    {q:'Berapa semua?', v:'grp:🐤:4:4:+', o:['7','8','9','6'], a:1, h:'4 tambah 4 sama dengan 8. Ini nombor berganda.'},
+    {q:'6 + 3 = ?', v:'frame:9', o:['8','9','10','7'], a:1, h:'Mula dari 6, bilang terus: tujuh, lapan, sembilan. Jawapannya 9.'},
+    {q:'Aina ada 5 gula-gula. Kakak beri 2 lagi. Berapa semua?', v:'grp:🍬:5:2:+', o:['6','7','8','5'], a:1, h:'5 tambah 2 sama dengan 7 gula-gula.'},
+    {q:'Berapa lagi diperlukan untuk cukup 10?', v:'frame:7', o:['2','3','4','1'], a:1, h:'Bingkai ada 7 penuh. Kotak kosong ada 3. Jadi 7 + 3 = 10.'},
+    {q:'1 + 9 = ?', v:'grp:⭐:1:9:+', o:['9','10','11','8'], a:1, h:'1 tambah 9 sama dengan 10. Ini pasangan cukup sepuluh.'}
+  ]
+},
+{
+  id:'tolak10', nama:'Tolak dalam Lingkungan 10', pendek:'Tolak', ikon:'m-sub', warna:'teal', aras:1,
+  dsk:'Standard Kandungan 2.2 — Penolakan dalam lingkungan 10',
+  tagline:'Buang sebahagian, bilang yang tinggal',
+  konsep:[
+    'Tolak bermaksud <b>mengambil keluar</b> daripada satu kumpulan.',
+    'Simbol tolak ialah <span class="math">−</span>. Jawapannya dipanggil <b>baki</b>.',
+    'Cara mudah: <b>bilang undur</b>. 8 − 3 → tujuh, enam, lima.',
+    'Nombor tolak dirinya sendiri sentiasa <b>sifar</b>: <span class="math">6 − 6 = 0</span>.'
+  ],
+  contoh:{ tajuk:'Kira 7 − 2', langkah:[
+    'Letak <span class="math">7</span> biji guli di atas meja.',
+    'Ambil keluar <span class="math">2</span> biji guli.',
+    'Bilang guli yang tinggal: 1, 2, 3, 4, 5.',
+    'Jadi <span class="math">7 − 2 = 5</span>.'
+  ]},
+  tip:'Tolak sentiasa menjadikan nombor lebih kecil.',
+  guru:'Gunakan cerita rutin murid (biskut dimakan, pensel dipinjam) supaya konsep tolak bermakna. Untuk murid autisme, kekalkan ayat cerita yang <b>sama struktur</b> setiap kali — hanya tukar nombor.',
+  lab:'frame2',
+  soalan:[
+    {q:'Ada 5 belon. 2 pecah. Berapa tinggal?', v:'obj:🎈:5', o:['2','3','4','5'], a:1, h:'5 tolak 2. Bilang undur: empat, tiga. Tinggal 3 belon.'},
+    {q:'8 − 3 = ?', v:'frame:8', o:['4','5','6','3'], a:1, h:'Mula dari 8, bilang undur tiga kali: tujuh, enam, lima. Jawapannya 5.'},
+    {q:'Ada 6 biskut. Aina makan semua. Berapa tinggal?', v:'obj:🍪:6', o:['6','0','1','3'], a:1, h:'Semua diambil, jadi tiada yang tinggal. 6 − 6 = 0.'},
+    {q:'10 − 4 = ?', v:'frame:10', o:['5','6','7','4'], a:1, h:'Dari bingkai 10, tutup 4 kotak. Yang terbuka tinggal 6.'},
+    {q:'Ada 9 pensel. Guru ambil 1. Berapa tinggal?', v:'obj:✏️:9', o:['7','8','9','10'], a:1, h:'Tolak 1 bermaksud nombor sebelumnya. Sebelum 9 ialah 8.'},
+    {q:'7 − 0 = ?', v:'obj:🐟:7', o:['0','7','6','1'], a:1, h:'Tiada yang diambil, jadi jumlah kekal 7.'}
+  ]
+},
+{
+  id:'nilai100', nama:'Nombor hingga 100 · Sa dan Puluh', pendek:'Sa & Puluh', ikon:'m-place', warna:'purple', aras:2,
+  dsk:'Standard Kandungan 1.3 — Nilai tempat dan nilai digit hingga 100',
+  tagline:'Ikat sepuluh jadi satu puluh',
+  konsep:[
+    'Sepuluh <b>sa</b> diikat menjadi satu <b>puluh</b>.',
+    'Dalam nombor dua digit, digit kiri ialah <b>puluh</b> dan digit kanan ialah <b>sa</b>.',
+    'Dalam <span class="math">34</span>: 3 puluh (bernilai 30) dan 4 sa (bernilai 4).',
+    'Bandingkan nombor dengan melihat <b>digit puluh dahulu</b>.'
+  ],
+  contoh:{ tajuk:'Apakah nilai digit dalam 47?', langkah:[
+    'Asingkan digit: <span class="math">4</span> dan <span class="math">7</span>.',
+    'Digit <span class="math">4</span> berada di tempat <b>puluh</b> → nilainya <span class="math">40</span>.',
+    'Digit <span class="math">7</span> berada di tempat <b>sa</b> → nilainya <span class="math">7</span>.',
+    'Cantum semula: <span class="math">40 + 7 = 47</span>.'
+  ]},
+  tip:'Blok panjang ialah puluh. Kiub kecil ialah sa.',
+  guru:'Bahan bantu paling berkesan di sini ialah <b>blok asas sepuluh</b> atau straw yang diikat getah. Murid PPKI perlu mengikat sendiri 10 straw beberapa kali sebelum memahami konsep "ikat sepuluh".',
+  lab:'puluh',
+  soalan:[
+    {q:'Nombor apakah ini?', v:'ten:34', o:['43','34','304','24'], a:1, h:'3 blok puluh dan 4 kiub sa. Jadi 34.'},
+    {q:'Berapa nilai digit 5 dalam nombor 52?', v:'ten:52', o:['5','50','52','2'], a:1, h:'Digit 5 berada di tempat puluh. Nilainya 5 × 10 = 50.'},
+    {q:'6 puluh dan 8 sa ialah nombor apa?', v:'ten:68', o:['86','68','608','78'], a:1, h:'6 puluh ialah 60, tambah 8 sa jadi 68.'},
+    {q:'Nombor manakah lebih besar?', v:'ten:71', o:['67','71','Sama','Tiada'], a:1, h:'Bandingkan puluh dahulu: 7 puluh lebih besar daripada 6 puluh. Jadi 71 lebih besar.'},
+    {q:'Nombor manakah datang selepas 39?', v:'ten:40', o:['30','40','49','38'], a:1, h:'39 tambah 1 ialah 40. Sepuluh sa penuh jadi satu puluh baharu.'},
+    {q:'Berapa nilai digit 0 dalam 90?', v:'ten:90', o:['0','9','90','10'], a:0, h:'Digit 0 berada di tempat sa. Nilainya sifar — ia hanya memegang tempat.'}
+  ]
+},
+{
+  id:'tamtol100', nama:'Tambah dan Tolak hingga 100', pendek:'Tambah & Tolak 100', ikon:'m-addsub100', warna:'amber', aras:2,
+  dsk:'Standard Kandungan 2.3 — Operasi asas dalam lingkungan 100',
+  tagline:'Susun puluh dengan puluh, sa dengan sa',
+  konsep:[
+    'Susun nombor <b>menegak</b>. Sa di bawah sa, puluh di bawah puluh.',
+    'Kira <b>lajur sa dahulu</b>, kemudian lajur puluh.',
+    'Jika sa melebihi 9, <b>kumpul semula</b>: ikat sepuluh dan bawa 1 ke lajur puluh.',
+    'Semak jawapan tolak dengan menambah balik.'
+  ],
+  contoh:{ tajuk:'Kira 27 + 15', langkah:[
+    'Susun menegak: <span class="math">27</span> di atas, <span class="math">15</span> di bawah.',
+    'Lajur sa: <span class="math">7 + 5 = 12</span>. Tulis <span class="math">2</span>, bawa <span class="math">1</span> ke lajur puluh.',
+    'Lajur puluh: <span class="math">2 + 1 + 1 = 4</span>.',
+    'Jawapan: <span class="math">42</span>.'
+  ]},
+  tip:'Kira sa dahulu, baru puluh. Jangan terbalik.',
+  guru:'Gunakan kertas berpetak atau lajur berwarna (hijau = sa, biru = puluh) untuk murid yang bermasalah menyusun secara visual-ruang. Warna yang konsisten mengurangkan beban memori kerja.',
+  lab:null,
+  soalan:[
+    {q:'23 + 14 = ?', v:'ten:37', o:['36','37','38','27'], a:1, h:'Sa: 3 + 4 = 7. Puluh: 2 + 1 = 3. Jawapan 37.'},
+    {q:'45 + 8 = ?', v:'ten:53', o:['52','53','54','43'], a:1, h:'Sa: 5 + 8 = 13. Tulis 3, bawa 1. Puluh: 4 + 1 = 5. Jawapan 53.'},
+    {q:'58 − 23 = ?', v:'ten:35', o:['34','35','36','25'], a:1, h:'Sa: 8 − 3 = 5. Puluh: 5 − 2 = 3. Jawapan 35.'},
+    {q:'Aina ada RM40. Dia belanja RM16. Berapa baki?', v:'ten:24', o:['22','24','26','34'], a:1, h:'40 tolak 16. Pinjam satu puluh: 10 − 6 = 4, kemudian 3 − 1 = 2. Baki RM24.'},
+    {q:'30 + 30 = ?', v:'ten:60', o:['50','60','70','33'], a:1, h:'3 puluh tambah 3 puluh sama dengan 6 puluh, iaitu 60.'},
+    {q:'Berapa perlu ditambah kepada 65 untuk cukup 70?', v:'ten:70', o:['4','5','6','15'], a:1, h:'Dari 65 bilang naik: 66, 67, 68, 69, 70. Itu 5 langkah.'}
+  ]
+},
+{
+  id:'bentuk', nama:'Bentuk 2D dan 3D', pendek:'Bentuk', ikon:'m-shape', warna:'pink', aras:2,
+  dsk:'Standard Kandungan 4.1 — Mengenal bentuk asas dan cirinya',
+  tagline:'Kenal bentuk di sekeliling kita',
+  konsep:[
+    '<b>Bulatan</b> tiada bucu dan tiada sisi lurus.',
+    '<b>Segi tiga</b> ada 3 sisi dan 3 bucu.',
+    '<b>Segi empat sama</b> ada 4 sisi yang <b>sama panjang</b>.',
+    'Bentuk 3D boleh dipegang: kubus, sfera, silinder dan kon.'
+  ],
+  contoh:{ tajuk:'Kenal pasti bentuk pintu kelas', langkah:[
+    'Kira bilangan sisi pintu: ada <span class="math">4</span> sisi.',
+    'Kira bilangan bucu: ada <span class="math">4</span> bucu.',
+    'Dua sisi panjang, dua sisi pendek — tidak semua sama.',
+    'Jadi pintu berbentuk <b>segi empat tepat</b>.'
+  ]},
+  tip:'Sentuh dan kira sisi dengan jari sambil menyebut nombornya.',
+  guru:'Buat "perburuan bentuk" di sekitar kelas dan tandas — murid PPKI belajar lebih baik apabila konsep dikaitkan dengan objek yang mereka gunakan setiap hari. Sediakan bentuk maujud untuk murid yang lemah penglihatan agar boleh diraba.',
+  lab:'bentuk',
+  soalan:[
+    {q:'Bentuk manakah bulatan?', v:'shape:bulatan,segitiga,segiempat', o:['Bentuk pertama','Bentuk kedua','Bentuk ketiga','Tiada'], a:0, h:'Bulatan tiada bucu dan garisnya melengkung sepenuhnya.'},
+    {q:'Berapa sisi ada pada segi tiga?', v:'shape:segitiga', o:['2','3','4','5'], a:1, h:'Segi tiga ada 3 sisi lurus dan 3 bucu.'},
+    {q:'Berapa bucu ada pada segi empat sama?', v:'shape:segiempat', o:['3','4','5','6'], a:1, h:'Segi empat sama ada 4 bucu dan 4 sisi yang sama panjang.'},
+    {q:'Bola sepak berbentuk apa?', v:'obj:⚽:1', o:['Kubus','Sfera','Silinder','Kon'], a:1, h:'Bola bulat sepenuhnya dan boleh menggolek. Bentuknya sfera.'},
+    {q:'Tin susu berbentuk apa?', v:'obj:🥫:1', o:['Kubus','Sfera','Silinder','Kon'], a:2, h:'Tin ada dua muka bulatan di atas dan bawah. Bentuknya silinder.'},
+    {q:'Bentuk manakah tiada bucu langsung?', v:'shape:bulatan,segiempat,segitiga', o:['Segi empat','Bulatan','Segi tiga','Semua ada bucu'], a:1, h:'Bulatan sahaja yang tiada bucu.'}
+  ]
+},
+{
+  id:'corak', nama:'Corak dan Urutan', pendek:'Corak', ikon:'m-pattern', warna:'blue', aras:2,
+  dsk:'Standard Kandungan 5.1 — Mengenal pasti dan melengkapkan pola',
+  tagline:'Cari yang berulang, teruskan corak',
+  konsep:[
+    'Corak ialah sesuatu yang <b>berulang mengikut aturan</b>.',
+    'Cari bahagian yang berulang dahulu, kemudian teruskan.',
+    'Corak boleh dibuat daripada warna, bentuk, saiz atau nombor.',
+    'Corak nombor boleh naik (2, 4, 6) atau turun (10, 8, 6).'
+  ],
+  contoh:{ tajuk:'Teruskan corak 🔴 🔵 🔴 🔵 ___', langkah:[
+    'Lihat dari kiri: merah, biru, merah, biru.',
+    'Bahagian yang berulang ialah <b>merah-biru</b>.',
+    'Selepas biru, corak bermula semula dengan merah.',
+    'Jadi tempat kosong diisi dengan <b>merah</b>.'
+  ]},
+  tip:'Sebut corak dengan kuat: "merah, biru, merah, biru…"',
+  guru:'Corak melatih kemahiran pra-algebra dan juga kemahiran <b>rutin harian</b>. Kaitkan dengan jadual visual kelas (mandi → makan → sekolah) supaya murid nampak corak dalam kehidupan sendiri.',
+  lab:'corak',
+  soalan:[
+    {q:'Apakah yang seterusnya?', v:'pola:🔴,🔵,🔴,🔵,?', o:['🔵','🔴','🟢','🟡'], a:1, h:'Corak merah-biru berulang. Selepas biru datang merah.'},
+    {q:'Apakah yang seterusnya?', v:'pola:⭐,⭐,🌙,⭐,⭐,?', o:['⭐','🌙','☀️','⚡'], a:1, h:'Corak ialah bintang-bintang-bulan. Selepas dua bintang datang bulan.'},
+    {q:'Lengkapkan: 2, 4, 6, ___', v:'line:0:10:8', o:['7','8','9','10'], a:1, h:'Corak naik dua-dua. 6 tambah 2 sama dengan 8.'},
+    {q:'Lengkapkan: 10, 8, 6, ___', v:'line:0:10:4', o:['5','4','3','2'], a:1, h:'Corak turun dua-dua. 6 tolak 2 sama dengan 4.'},
+    {q:'Apakah yang seterusnya?', v:'pola:🍎,🍌,🍇,🍎,🍌,?', o:['🍎','🍌','🍇','🍓'], a:2, h:'Tiga buah berulang: epal, pisang, anggur. Giliran anggur pula.'},
+    {q:'Lengkapkan: 5, 10, 15, ___', v:'ten:20', o:['16','18','20','25'], a:2, h:'Corak naik lima-lima. 15 tambah 5 sama dengan 20.'}
+  ]
+},
+{
+  id:'wang', nama:'Wang Malaysia', pendek:'Wang', ikon:'m-money', warna:'amber', aras:3,
+  dsk:'Standard Kandungan 3.1 — Mengenal dan menggunakan mata wang Malaysia',
+  tagline:'Kenal syiling, kira harga, terima baki',
+  konsep:[
+    'Syiling Malaysia: <b>10 sen, 20 sen, 50 sen</b>. Not: <b>RM1, RM5, RM10</b>.',
+    '<b>100 sen sama dengan RM1.</b>',
+    'Untuk membayar, kumpul wang sehingga <b>cukup atau lebih</b> daripada harga.',
+    'Jika bayar lebih, kita menerima <b>baki</b>: bayaran tolak harga.'
+  ],
+  contoh:{ tajuk:'Beli air RM1.20, bayar RM2. Berapa baki?', langkah:[
+    'Tukar kepada sen: <span class="math">RM2 = 200 sen</span>, <span class="math">RM1.20 = 120 sen</span>.',
+    'Baki ialah bayaran tolak harga: <span class="math">200 − 120</span>.',
+    'Kira: <span class="math">200 − 120 = 80</span> sen.',
+    'Jadi baki ialah <span class="math">80 sen</span>.'
+  ]},
+  tip:'Kira syiling besar dahulu, kemudian syiling kecil.',
+  guru:'Kemahiran wang ialah <b>kemahiran hidup berdikari</b> — utamakan latihan situasi sebenar di kantin sekolah. Guna wang tiruan bersaiz sebenar; murid PPKI sering keliru apabila saiz dan berat syiling tidak realistik.',
+  lab:'wang',
+  soalan:[
+    {q:'Berapa jumlah wang ini?', v:'coin:50,20,10', o:['70 sen','80 sen','90 sen','60 sen'], a:1, h:'50 + 20 + 10 = 80 sen.'},
+    {q:'Berapa sen dalam RM1?', v:'coin:50,50', o:['10 sen','50 sen','100 sen','1000 sen'], a:2, h:'RM1 sama dengan 100 sen. Dua keping 50 sen menjadi RM1.'},
+    {q:'Berapa jumlah wang ini?', v:'coin:100,50,20,20', o:['RM1.80','RM1.90','RM2.00','RM1.70'], a:1, h:'100 + 50 + 20 + 20 = 190 sen, iaitu RM1.90.'},
+    {q:'Pensel berharga 60 sen. Aina bayar RM1. Berapa baki?', v:'coin:100', o:['30 sen','40 sen','50 sen','60 sen'], a:1, h:'100 sen tolak 60 sen sama dengan 40 sen.'},
+    {q:'Aina ada RM5. Buku berharga RM3. Cukup atau tidak?', v:'coin:500', o:['Tidak cukup','Cukup dan ada baki','Cukup tepat','Tidak tahu'], a:1, h:'RM5 lebih daripada RM3. Cukup, dan baki RM2.'},
+    {q:'Nasi lemak RM2.50, air RM1.50. Berapa semua?', v:'coin:100,100,100,100', o:['RM3.00','RM4.00','RM4.50','RM3.50'], a:1, h:'RM2.50 tambah RM1.50 sama dengan RM4.00.'}
+  ]
+},
+{
+  id:'masa', nama:'Masa dan Waktu', pendek:'Masa', ikon:'m-time', warna:'indigo', aras:3,
+  dsk:'Standard Kandungan 3.2 — Membaca waktu dan menyusun rutin harian',
+  tagline:'Baca jam, atur rutin harian',
+  konsep:[
+    'Jarum <b>pendek</b> menunjukkan <b>jam</b>. Jarum <b>panjang</b> menunjukkan <b>minit</b>.',
+    'Jarum panjang di angka 12 bermaksud <b>tepat</b>. Di angka 6 bermaksud <b>setengah</b>.',
+    'Satu jam ada <b>60 minit</b>. Satu hari ada <b>24 jam</b>.',
+    'Waktu pagi, tengah hari, petang dan malam mengikut kedudukan matahari.'
+  ],
+  contoh:{ tajuk:'Baca waktu pada jam ini', langkah:[
+    'Lihat jarum <b>pendek</b>: ia melepasi angka <span class="math">7</span>.',
+    'Lihat jarum <b>panjang</b>: ia berada di angka <span class="math">6</span>.',
+    'Jarum panjang di 6 bermaksud <b>30 minit</b>.',
+    'Jadi waktunya ialah <span class="math">7:30</span> — pukul tujuh setengah.'
+  ]},
+  tip:'Jarum pendek untuk jam. Jarum panjang untuk minit.',
+  guru:'Pasangkan waktu dengan <b>jadual visual</b> murid (gambar aktiviti + jam). Bagi murid yang belum boleh membaca jam analog, mulakan dengan urutan peristiwa (dahulu → kemudian) sebelum nombor waktu.',
+  lab:'jam',
+  soalan:[
+    {q:'Pukul berapa?', v:'jam:3:0', o:['Pukul 2','Pukul 3','Pukul 4','Pukul 12'], a:1, h:'Jarum pendek di angka 3 dan jarum panjang di 12. Jadi pukul 3 tepat.'},
+    {q:'Pukul berapa?', v:'jam:7:30', o:['7:00','7:15','7:30','6:30'], a:2, h:'Jarum panjang di angka 6 bermaksud 30 minit. Jadi 7:30.'},
+    {q:'Berapa minit dalam satu jam?', v:'jam:12:0', o:['30 minit','50 minit','60 minit','100 minit'], a:2, h:'Satu jam penuh ada 60 minit.'},
+    {q:'Aina bangun pukul 6:30 pagi. Waktu apakah itu?', v:'jam:6:30', o:['Pagi','Tengah hari','Petang','Malam'], a:0, h:'Pukul 6:30 sebelum tengah hari, jadi ia waktu pagi.'},
+    {q:'Pukul berapa?', v:'jam:9:15', o:['9:00','9:15','9:30','3:45'], a:1, h:'Jarum panjang di angka 3 bermaksud 15 minit. Jadi 9:15.'},
+    {q:'Berapa jam dalam satu hari?', v:'jam:12:0', o:['12 jam','24 jam','30 jam','60 jam'], a:1, h:'Satu hari penuh ada 24 jam — siang dan malam.'}
+  ]
+},
+{
+  id:'ukur', nama:'Ukuran Panjang, Berat dan Isipadu', pendek:'Ukuran', ikon:'m-measure', warna:'teal', aras:3,
+  dsk:'Standard Kandungan 3.3 — Membanding dan mengukur menggunakan unit',
+  tagline:'Banding panjang, berat dan isipadu',
+  konsep:[
+    'Untuk membanding panjang, letakkan hujung objek <b>sama rata</b> dahulu.',
+    'Panjang diukur dalam <b>sentimeter (cm)</b> dan <b>meter (m)</b>.',
+    'Berat diukur dalam <b>gram (g)</b> dan <b>kilogram (kg)</b>. 1 kg = 1000 g.',
+    'Isipadu cecair diukur dalam <b>mililiter (ml)</b> dan <b>liter (l)</b>. 1 l = 1000 ml.'
+  ],
+  contoh:{ tajuk:'Ukur pensel dengan pembaris', langkah:[
+    'Letak hujung pensel di angka <span class="math">0</span> pada pembaris.',
+    'Lihat di mana hujung satu lagi berhenti.',
+    'Baca nombor pada pembaris di kedudukan itu.',
+    'Jika berhenti di 12, panjang pensel ialah <span class="math">12 cm</span>.'
+  ]},
+  tip:'Sentiasa mula ukur dari angka 0, bukan dari hujung pembaris.',
+  guru:'Mulakan dengan <b>unit tidak piawai</b> (tapak kaki, span tangan, klip kertas) sebelum memperkenalkan pembaris. Ini membina konsep "mengukur ialah mengulang unit" yang selalu terlepas oleh murid MBPK.',
+  lab:'ukur',
+  soalan:[
+    {q:'Objek manakah lebih panjang?', v:'obj:📏:1', o:['Pensel','Pembaris','Sama panjang','Tidak tahu'], a:1, h:'Pembaris biasanya 30 cm, lebih panjang daripada pensel.'},
+    {q:'1 kilogram sama dengan berapa gram?', v:'obj:⚖️:1', o:['10 g','100 g','1000 g','10 000 g'], a:2, h:'1 kg sama dengan 1000 g.'},
+    {q:'1 liter sama dengan berapa mililiter?', v:'obj:🧴:1', o:['100 ml','500 ml','1000 ml','10 ml'], a:2, h:'1 liter sama dengan 1000 ml.'},
+    {q:'Manakah lebih berat?', v:'grp:🍉:1:1:vs', o:['Sebiji tembikai','Sebiji anggur','Sama berat','Tidak tahu'], a:0, h:'Tembikai jauh lebih besar dan lebih berat daripada seulas anggur.'},
+    {q:'Pensel bermula di 0 dan berhenti di 12 cm. Berapa panjangnya?', v:'obj:✏️:1', o:['10 cm','11 cm','12 cm','13 cm'], a:2, h:'Mula di 0, berhenti di 12. Jadi panjangnya 12 cm.'},
+    {q:'Alat apakah digunakan untuk menimbang berat?', v:'obj:⚖️:1', o:['Pembaris','Penimbang','Jam','Bikar'], a:1, h:'Penimbang digunakan untuk mengukur berat.'}
+  ]
+},
+{
+  id:'data', nama:'Data Mudah dan Graf', pendek:'Data', ikon:'m-data', warna:'green', aras:3,
+  dsk:'Standard Kandungan 6.1 — Mengumpul dan membaca data bergambar',
+  tagline:'Kumpul, susun dan baca maklumat',
+  konsep:[
+    '<b>Data</b> ialah maklumat yang dikumpul, contohnya buah kegemaran kawan.',
+    'Susun data dalam <b>jadual</b> atau <b>graf palang</b> supaya mudah dibaca.',
+    'Palang yang <b>lebih tinggi</b> bermaksud jumlah yang lebih banyak.',
+    'Baca graf dengan melihat label di bawah dan nombor di tepi.'
+  ],
+  contoh:{ tajuk:'Baca graf buah kegemaran kelas', langkah:[
+    'Lihat label di bawah setiap palang: epal, pisang, anggur.',
+    'Lihat ketinggian setiap palang dan baca nombornya.',
+    'Palang <b>pisang</b> paling tinggi dengan <span class="math">5</span> orang.',
+    'Jadi pisang ialah buah paling ramai digemari.'
+  ]},
+  tip:'Palang paling tinggi bermaksud paling banyak.',
+  guru:'Kumpul data sebenar daripada murid dalam kelas (warna kegemaran, cara datang ke sekolah). Apabila data itu tentang <b>diri mereka sendiri</b>, penglibatan murid PPKI meningkat dengan ketara.',
+  lab:'graf',
+  soalan:[
+    {q:'Buah manakah paling ramai suka?', v:'graf:🍎=3,🍌=5,🍇=2', o:['🍎 Epal','🍌 Pisang','🍇 Anggur','Sama'], a:1, h:'Palang pisang paling tinggi dengan 5 orang.'},
+    {q:'Berapa orang suka epal?', v:'graf:🍎=3,🍌=5,🍇=2', o:['2','3','4','5'], a:1, h:'Palang epal berhenti di nombor 3.'},
+    {q:'Buah manakah paling sedikit?', v:'graf:🍎=3,🍌=5,🍇=2', o:['🍎 Epal','🍌 Pisang','🍇 Anggur','Sama'], a:2, h:'Palang anggur paling pendek dengan 2 orang.'},
+    {q:'Berapa orang semua dalam graf ini?', v:'graf:🍎=3,🍌=5,🍇=2', o:['9','10','11','8'], a:1, h:'3 tambah 5 tambah 2 sama dengan 10 orang.'},
+    {q:'Berapa lebih ramai suka pisang berbanding anggur?', v:'graf:🍌=5,🍇=2', o:['2','3','4','5'], a:1, h:'5 tolak 2 sama dengan 3 orang.'},
+    {q:'Haiwan manakah paling banyak?', v:'graf:🐱=4,🐶=6,🐦=1', o:['🐱 Kucing','🐶 Anjing','🐦 Burung','Sama'], a:1, h:'Palang anjing paling tinggi dengan 6 ekor.'}
+  ]
+}
+];
+
+/* ---------- lencana pencapaian ---------- */
+const LENCANA = [
+  {id:'mula',   nm:'Langkah Pertama', ds:'Habiskan 1 modul',            ikon:'i-play',   ok:m=>habisModul(m)>=1},
+  {id:'tiga',   nm:'Tiga Serangkai',  ds:'Habiskan 3 modul',            ikon:'i-map',    ok:m=>habisModul(m)>=3},
+  {id:'separuh',nm:'Separuh Jalan',   ds:'Habiskan 6 modul',            ikon:'i-target', ok:m=>habisModul(m)>=6},
+  {id:'semua',  nm:'Juara Modul',     ds:'Habiskan semua 12 modul',     ikon:'i-medal',  ok:m=>habisModul(m)>=12},
+  {id:'tepat',  nm:'Tepat Sasaran',   ds:'3 bintang dalam 1 modul',     ikon:'i-star',   ok:m=>maxBintang(m)>=3},
+  {id:'cemer',  nm:'Cemerlang',       ds:'3 bintang dalam 5 modul',     ikon:'i-flame',  ok:m=>kiraBintang(m,3)>=5},
+  {id:'rajin',  nm:'Rajin Berlatih',  ds:'20 markah dalam Latih Tubi',  ikon:'i-bolt',   ok:m=>(m.latihBest||0)>=20},
+  {id:'kumpul', nm:'Pengumpul Mata',  ds:'Kumpul 500 mata',             ikon:'i-coin',   ok:m=>(m.mata||0)>=500},
+  {id:'gigih',  nm:'Gigih Setiap Hari',ds:'Belajar 3 hari berlainan',   ikon:'i-refresh',ok:m=>hariUnik(m)>=3}
+];
+
+/* ---------- kedai stiker (peneguhan positif / token economy) ---------- */
+const STIKER = [
+  {id:'bintang', nm:'Bintang Emas',  ds:'Stiker klasik untuk buku kerja', harga:40,  emo:'⭐'},
+  {id:'jempol',  nm:'Ibu Jari',      ds:'Tanda syabas daripada cikgu',    harga:40,  emo:'👍'},
+  {id:'roket',   nm:'Roket',         ds:'Untuk murid yang laju maju',     harga:60,  emo:'🚀'},
+  {id:'kek',     nm:'Kek Manis',     ds:'Ganjaran hujung minggu',         harga:60,  emo:'🍰'},
+  {id:'kucing',  nm:'Kucing Comel',  ds:'Kawan belajar yang setia',       harga:80,  emo:'🐱'},
+  {id:'piala',   nm:'Piala Juara',   ds:'Untuk pencapaian besar',         harga:120, emo:'🏆'},
+  {id:'pelangi', nm:'Pelangi',       ds:'Hari yang ceria',                harga:100, emo:'🌈'},
+  {id:'mahkota', nm:'Mahkota',       ds:'Raja atau ratu matematik',       harga:150, emo:'👑'},
+  {id:'unikorn', nm:'Unikorn',       ds:'Stiker paling istimewa',         harga:200, emo:'🦄'},
+  {id:'bola',    nm:'Bola Sepak',    ds:'Untuk peminat sukan',            harga:80,  emo:'⚽'}
+];
+
+/* ---------- alat bantuan dalam kuiz ---------- */
+const BANTU = [
+  {id:'petunjuk', nm:'Petunjuk',  ds:'Cikgu Aina beri klu',            harga:30, ikon:'i-bulb'},
+  {id:'buang',    nm:'Buang Satu',ds:'Buang satu jawapan yang salah',  harga:40, ikon:'i-key'},
+  {id:'langkau',  nm:'Langkau',   ds:'Lompat soalan tanpa penalti',    harga:25, ikon:'i-right'}
+];
+
+const GELARAN = ['Pelajar Baharu','Pembilang Muda','Pengira Cekap','Ahli Matematik','Juara Matematik'];
+const AVATARS = ['🙂','😺','🐰','🦊','🐼','🐨','🦁','🐧','🐢','🦋','🌻','🚗','⚽','🎸','🍓'];
+const ARAS_NAMA = {1:'Aras 1 · Asas', 2:'Aras 2 · Pertengahan', 3:'Aras 3 · Kehidupan Harian'};
+const ARAS_PILIHAN = {1:2, 2:3, 3:4};
+
+/* ============================================================
+   LOGIK APLIKASI
+   ============================================================ */
+const $  = (s,r)=> (r||document).querySelector(s);
+const $$ = (s,r)=> Array.prototype.slice.call((r||document).querySelectorAll(s));
+const ic = (id,cls)=> '<svg class="ic '+(cls||'')+'" aria-hidden="true"><use href="#'+id+'"></use></svg>';
+const esc = s=> String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY = 'juara.aina.ppki.v1';
+
+const S = {
+  murid:[], aktif:null,
+  tetapan:{ bunyi:true, tts:true, tenang:false, besar:false, soalan:5, masa:false, laju:0.85 }
+};
+let cur = {};    // sesi kuiz semasa
+let latih = {};  // sesi latih tubi semasa
+let lab = {};    // keadaan makmal semasa
+let gEdit = null;// murid sedang disunting dalam panel guru
+let gLapor = null;
+
+/* ---------- storan ---------- */
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      S.murid = d.murid || [];
+      S.aktif = d.aktif || null;
+      Object.assign(S.tetapan, d.tetapan || {});
+    }
+  }catch(e){ /* storan tidak tersedia — main tanpa simpan */ }
+  if(!S.murid.length){
+    S.murid = [ muridBaharu('Aina', '🙂', 1) ];
+    S.aktif = S.murid[0].id;
+  }
+  if(!S.murid.some(m=>m.id===S.aktif)) S.aktif = S.murid[0].id;
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+}
+function muridBaharu(nama, fc, aras){
+  return {
+    id:'m'+Date.now().toString(36)+Math.floor(Math.random()*1000),
+    nama:nama, fc:fc, aras:aras,
+    mata:0, modul:{}, latihBest:0, lencana:[], stiker:[],
+    bantu:{petunjuk:0,buang:0,langkau:0}, log:[], hari:[]
+  };
+}
+
+/* ---------- pengiraan kemajuan ---------- */
+function M(){ return S.murid.find(m=>m.id===S.aktif) || S.murid[0]; }
+function mp(m,id){ if(!m.modul[id]) m.modul[id]={bintang:0,best:0,cuba:0,habis:false}; return m.modul[id]; }
+function habisModul(m){ return MODUL.filter(t=>mp(m,t.id).habis).length; }
+function maxBintang(m){ return MODUL.reduce((x,t)=>Math.max(x,mp(m,t.id).bintang),0); }
+function kiraBintang(m,n){ return MODUL.filter(t=>mp(m,t.id).bintang>=n).length; }
+function jumBintang(m){ return MODUL.reduce((x,t)=>x+mp(m,t.id).bintang,0); }
+function hariUnik(m){ return (m.hari||[]).length; }
+function tahap(m){ return Math.min(5, 1 + Math.floor((m.mata||0)/250)); }
+function gelaran(m){ return GELARAN[Math.min(GELARAN.length-1, tahap(m)-1)]; }
+function tambahMata(n){ const m=M(); m.mata=(m.mata||0)+n; save(); syncChrome(); }
+function catatHari(m){
+  const h = new Date().toISOString().slice(0,10);
+  m.hari = m.hari || [];
+  if(m.hari.indexOf(h)<0) m.hari.push(h);
+}
+function bilPilihan(m){ return ARAS_PILIHAN[m.aras] || 4; }
+
+/* ---------- bunyi ringkas (WebAudio) ---------- */
+const Bunyi = {
+  ctx:null,
+  on(){ if(!S.tetapan.bunyi) return null;
+    if(!this.ctx){ try{ this.ctx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+    if(this.ctx.state==='suspended') this.ctx.resume();
+    return this.ctx;
+  },
+  nada(f,dur,type,vol){
+    const c=this.on(); if(!c) return;
+    const o=c.createOscillator(), g=c.createGain();
+    o.type=type||'sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(vol||.12, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, c.currentTime+(dur||.18));
+    o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+(dur||.18));
+  },
+  tap(){ this.nada(460,.07,'triangle',.07); },
+  betul(){ this.nada(660,.12,'triangle',.11); setTimeout(()=>this.nada(880,.2,'triangle',.11),95); },
+  salah(){ this.nada(330,.18,'sine',.09); setTimeout(()=>this.nada(262,.22,'sine',.09),150); },
+  menang(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>this.nada(f,.22,'triangle',.11), i*110)); }
+};
+
+/* ---------- bacaan suara Bahasa Melayu (Text-to-Speech) ----------
+   Kritikal untuk MBPK yang belum lancar membaca. Semua soalan,
+   arahan dan maklum balas boleh didengar. Simbol matematik
+   ditukar kepada perkataan supaya sebutan betul.                  */
+const Cakap = {
+  suara:null, sedia:false,
+  init(){
+    if(!('speechSynthesis' in window)) return;
+    const pilih = ()=>{
+      const list = window.speechSynthesis.getVoices() || [];
+      this.suara = list.find(v=>/^ms/i.test(v.lang)) ||
+                   list.find(v=>/^id/i.test(v.lang)) ||
+                   list.find(v=>/^en-?(GB|AU|SG|MY)/i.test(v.lang)) || null;
+      this.sedia = true;
+    };
+    pilih();
+    window.speechSynthesis.onvoiceschanged = pilih;
+  },
+  bersih(t){
+    return String(t)
+      .replace(/<[^>]+>/g,' ')
+      .replace(/&minus;|−/g,' tolak ')
+      .replace(/&times;|×/g,' darab ')
+      .replace(/&divide;|÷/g,' bahagi ')
+      .replace(/&amp;/g,' dan ').replace(/&nbsp;/g,' ')
+      .replace(/\+/g,' tambah ').replace(/=/g,' sama dengan ')
+      .replace(/RM\s?([\d.]+)/g,'$1 ringgit')
+      .replace(/\s+/g,' ').trim();
+  },
+  sebut(teks, el){
+    if(!S.tetapan.tts || !('speechSynthesis' in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(this.bersih(teks));
+      u.lang = this.suara ? this.suara.lang : 'ms-MY';
+      if(this.suara) u.voice = this.suara;
+      u.rate = S.tetapan.laju; u.pitch = 1.05; u.volume = 1;
+      if(el){ el.classList.add('speaking'); u.onend = u.onerror = ()=>el.classList.remove('speaking'); }
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  },
+  henti(){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+};
+
+/* ---------- utiliti UI ---------- */
+function show(name){
+  $$('.screen').forEach(el=>el.classList.remove('active'));
+  const el = $('#s-'+name); if(el) el.classList.add('active');
+  const tab = ['home','modul','latih','lencana','guru'].indexOf(name);
+  $$('#nav button').forEach((b,i)=>b.classList.toggle('on', i===tab));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toast(msg,bad){
+  const t=$('#toast'); t.innerHTML=msg; t.classList.toggle('bad',!!bad); t.classList.add('show');
+  clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),2400);
+}
+function confetti(n){
+  if(S.tetapan.tenang) return;
+  const host=document.createElement('div'); host.className='conf'; document.body.appendChild(host);
+  const warna=['#FBBF24','#43A047','#1E88E5','#EC407A','#7E57C2','#FB8C00'];
+  for(let i=0;i<(n||40);i++){
+    const b=document.createElement('i');
+    b.style.left=Math.random()*100+'%'; b.style.top='-20px';
+    b.style.background=warna[i%warna.length];
+    b.style.animationDelay=(Math.random()*.5)+'s';
+    b.style.animationDuration=(1.1+Math.random()*.9)+'s';
+    host.appendChild(b);
+  }
+  setTimeout(()=>host.remove(),2600);
+}
+function bintangRow(n,cls){
+  let h='';
+  for(let i=0;i<3;i++) h+='<i class="'+(i<n?'on':'')+'">'+
+    '<svg viewBox="0 0 48 48" style="width:100%;height:100%"><use href="#i-star"></use></svg></i>';
+  return '<div class="'+(cls||'stars')+'">'+h+'</div>';
+}
+function bintangDari(betul,jumlah){
+  const p = betul/jumlah;
+  return p>=1 ? 3 : p>=.8 ? 2 : p>=.6 ? 1 : 0;
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function rm(sen){ return 'RM'+(sen/100).toFixed(2); }
+function tarikh(ts){
+  const d=new Date(ts);
+  const p=n=>String(n).padStart(2,'0');
+  return p(d.getDate())+'/'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+/* ---------- maskot Aina ---------- */
+function maskot(size){
+  const w = size||200;
+  return '<svg viewBox="0 0 200 200" width="'+w+'" style="max-width:100%" aria-hidden="true">'+
+  '<defs>'+
+    '<linearGradient id="ag1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#42A5F5"/><stop offset="1" stop-color="#1565C0"/></linearGradient>'+
+    '<linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDE68A"/><stop offset="1" stop-color="#F59E0B"/></linearGradient>'+
+    '<linearGradient id="ag3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EC407A"/><stop offset="1" stop-color="#AD1457"/></linearGradient>'+
+  '</defs>'+
+  '<ellipse cx="100" cy="180" rx="54" ry="9" fill="#221B45" opacity=".16"/>'+
+  /* blok nombor terapung */
+  '<rect x="16" y="116" width="32" height="32" rx="8" fill="url(#ag3)" transform="rotate(-12 32 132)"/>'+
+  '<text x="32" y="140" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="900" font-size="18" fill="#fff" transform="rotate(-12 32 132)">7</text>'+
+  '<rect x="152" y="108" width="30" height="30" rx="8" fill="url(#ag1)" transform="rotate(14 167 123)"/>'+
+  '<text x="167" y="131" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="900" font-size="17" fill="#fff" transform="rotate(14 167 123)">3</text>'+
+  /* badan */
+  '<path d="M62 176c2-26 17-38 38-38s36 12 38 38Z" fill="url(#ag1)" stroke="#90CAF9" stroke-width="5"/>'+
+  /* rambut belakang */
+  '<ellipse cx="100" cy="88" rx="60" ry="62" fill="#3B2A1E"/>'+
+  /* muka */
+  '<ellipse cx="100" cy="94" rx="46" ry="48" fill="#FFF1DC"/>'+
+  /* rambut depan */
+  '<path d="M54 84a46 46 0 0 1 92 0c-17-8-27-19-33-27-11 14-33 24-59 27Z" fill="#3B2A1E"/>'+
+  /* mata */
+  '<ellipse cx="83" cy="94" rx="7.5" ry="9.5" fill="#221B45"/><ellipse cx="117" cy="94" rx="7.5" ry="9.5" fill="#221B45"/>'+
+  '<circle cx="86" cy="90" r="2.8" fill="#fff"/><circle cx="120" cy="90" r="2.8" fill="#fff"/>'+
+  /* pipi */
+  '<circle cx="68" cy="108" r="9" fill="#F2A03C" opacity=".75"/><circle cx="132" cy="108" r="9" fill="#F2A03C" opacity=".75"/>'+
+  /* senyum */
+  '<path d="M88 112q12 12 24 0" fill="none" stroke="#221B45" stroke-width="5" stroke-linecap="round"/>'+
+  /* bintang di tangan */
+  '<path d="m152 158 4.6 9.6 10.4 1.4-7.6 7.3 1.9 10.6-9.3-5-9.3 5 1.9-10.6-7.6-7.3 10.4-1.4z" fill="url(#ag2)" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/>'+
+  '</svg>';
+}
+
+/* ============================================================
+   PENJANA VISUAL MAUJUD (bantuan konkrit MBPK)
+   ============================================================ */
+function viz(spec, paper){
+  if(!spec) return '';
+  const bit = String(spec).split(':');
+  const k = bit[0];
+  const box = h=>'<div class="viz'+(paper?' on-paper':'')+'">'+h+'</div>';
+
+  if(k==='obj'){
+    const emo=bit[1], n=Number(bit[2])||1;
+    return box('<div class="objs">'+Array(n).fill('<span>'+emo+'</span>').join('')+'</div>');
+  }
+  if(k==='grp'){
+    const emo=bit[1], a=Number(bit[2])||0, b=Number(bit[3])||0, tanda=bit[4]||'+';
+    const kotak=n=>'<div class="box">'+Array(n).fill('<span style="font-size:26px;line-height:1">'+emo+'</span>').join('')+'</div>';
+    const sgn = tanda==='+' ? '+' : tanda==='-' ? '&minus;' : '&harr;';
+    const cap = tanda==='vs'
+      ? '<div style="display:flex;justify-content:space-around;font-family:var(--f-d);font-weight:800;font-size:12px;margin-top:6px;opacity:.85"><span>Kiri</span><span>Kanan</span></div>' : '';
+    return box('<div class="grp">'+kotak(a)+'<span class="sgn">'+sgn+'</span>'+kotak(b)+'</div>'+cap);
+  }
+  if(k==='frame'){
+    const n=Number(bit[1])||0;
+    let h='';
+    for(let i=0;i<10;i++) h+='<i class="'+(i<n?'on':'')+'"></i>';
+    return box('<div class="frame10">'+h+'</div>'+
+      '<div style="text-align:center;font-family:var(--f-d);font-weight:800;font-size:12px;margin-top:8px;opacity:.85">'+
+      n+' penuh · '+(10-n)+' kosong</div>');
+  }
+  if(k==='line'){
+    const a=Number(bit[1])||0, b=Number(bit[2])||10, mark=Number(bit[3]);
+    const n=b-a;
+    let h='<span class="ln"></span>';
+    for(let i=0;i<=n;i++){
+      const v=a+i, x=(n?i/n*100:50);
+      const on = v===mark;
+      h+='<b class="'+(on?'on':'')+'" style="left:'+x+'%"><i></i>'+(on?'<em>'+v+'</em>':v)+'</b>';
+    }
+    return box('<div class="numline">'+h+'</div>');
+  }
+  if(k==='ten'){
+    const n=Number(bit[1])||0, p=Math.floor(n/10), s=n%10;
+    let h='';
+    for(let i=0;i<p;i++) h+='<div class="rod">'+Array(10).fill('<i></i>').join('')+'</div>';
+    if(s){
+      let u='';
+      for(let i=0;i<s;i++) u+='<span class="unit"></span>';
+      h+='<div class="units">'+u+'</div>';
+    }
+    return box('<div class="tens">'+(h||'<span style="opacity:.7">0</span>')+'</div>'+
+      '<div style="text-align:center;font-family:var(--f-d);font-weight:800;font-size:12px;margin-top:10px;opacity:.85">'+
+      p+' puluh · '+s+' sa</div>');
+  }
+  if(k==='coin'){
+    const list=(bit[1]||'').split(',').filter(Boolean).map(Number);
+    const lbl=n=> n>=100 ? 'RM'+(n/100).toFixed(n%100?2:0) : n+' sen';
+    const jum=list.reduce((x,y)=>x+y,0);
+    return box('<div class="coins">'+list.map(n=>
+        '<span class="coin" style="pointer-events:none">'+lbl(n)+'</span>').join('')+'</div>'+
+      '<div style="text-align:center;font-family:var(--f-d);font-weight:800;font-size:12px;margin-top:10px;opacity:.85">'+
+      list.length+' keping wang</div>'+(jum?'':''));
+  }
+  if(k==='jam'){
+    const j=Number(bit[1])||12, m=Number(bit[2])||0;
+    return box(mukaJam(j,m,paper));
+  }
+  if(k==='shape'){
+    const nama=(bit[1]||'').split(',').filter(Boolean);
+    const warna=paper?'#1E88E5':'#FFFFFF';
+    const lukis=n=>{
+      if(n==='bulatan') return '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="'+warna+'" stroke-width="6"/></svg>';
+      if(n==='segitiga') return '<svg viewBox="0 0 60 60"><path d="M30 8 54 50H6Z" fill="none" stroke="'+warna+'" stroke-width="6" stroke-linejoin="round"/></svg>';
+      if(n==='segiempat') return '<svg viewBox="0 0 60 60"><rect x="9" y="9" width="42" height="42" rx="3" fill="none" stroke="'+warna+'" stroke-width="6"/></svg>';
+      return '<svg viewBox="0 0 60 60"><rect x="6" y="16" width="48" height="28" rx="3" fill="none" stroke="'+warna+'" stroke-width="6"/></svg>';
+    };
+    return box('<div class="shapes">'+nama.map(lukis).join('')+'</div>');
+  }
+  if(k==='pola'){
+    const list=(bit[1]||'').split(',');
+    return box('<div class="objs" style="gap:12px">'+list.map(x=>
+      x==='?' ? '<span style="display:grid;place-items:center;width:44px;height:44px;border-radius:12px;'+
+                'border:3px dashed currentColor;font-size:24px;font-weight:900;opacity:.8">?</span>'
+              : '<span>'+x+'</span>').join('')+'</div>');
+  }
+  if(k==='graf'){
+    const list=(bit[1]||'').split(',').filter(Boolean).map(x=>{
+      const q=x.split('='); return {e:q[0], n:Number(q[1])||0};
+    });
+    const maks=Math.max(1,...list.map(x=>x.n));
+    return box('<div class="bars">'+list.map(x=>
+        '<div style="height:'+Math.max(18,x.n/maks*110)+'px">'+x.n+'</div>').join('')+'</div>'+
+      '<div class="bcap">'+list.map(x=>'<span>'+x.e+'</span>').join('')+'</div>');
+  }
+  return '';
+}
+function mukaJam(j,m,paper){
+  const jd=(j%12)*30 + m*0.5, md=m*6;
+  const stroke = paper ? '#1E88E5' : '#FFFFFF';
+  const isi = paper ? '#F3F8FF' : 'rgba(0,0,0,.25)';
+  let tick='', ang='';
+  for(let i=0;i<12;i++){
+    const a=(i*30-90)*Math.PI/180;
+    tick+='<circle cx="'+(85+Math.cos(a)*66).toFixed(1)+'" cy="'+(85+Math.sin(a)*66).toFixed(1)+'" r="'+(i%3?2.5:4)+'" fill="'+stroke+'"/>';
+    const num = i===0?12:i;
+    ang+='<text x="'+(85+Math.cos(a)*54).toFixed(1)+'" y="'+(85+Math.sin(a)*54+5).toFixed(1)+'" text-anchor="middle" '+
+      'font-family="Montserrat,sans-serif" font-weight="800" font-size="13" fill="'+stroke+'">'+num+'</text>';
+  }
+  return '<svg class="clock" viewBox="0 0 170 170" aria-hidden="true">'+
+    '<circle cx="85" cy="85" r="78" fill="'+isi+'" stroke="'+stroke+'" stroke-width="5"/>'+tick+ang+
+    '<line x1="85" y1="85" x2="'+(85+Math.cos((jd-90)*Math.PI/180)*36).toFixed(1)+'" y2="'+(85+Math.sin((jd-90)*Math.PI/180)*36).toFixed(1)+'" stroke="#FBBF24" stroke-width="8" stroke-linecap="round"/>'+
+    '<line x1="85" y1="85" x2="'+(85+Math.cos((md-90)*Math.PI/180)*58).toFixed(1)+'" y2="'+(85+Math.sin((md-90)*Math.PI/180)*58).toFixed(1)+'" stroke="'+stroke+'" stroke-width="5" stroke-linecap="round"/>'+
+    '<circle cx="85" cy="85" r="5.5" fill="'+stroke+'"/></svg>';
+}
+
+/* ---------- bar atas & rangka ---------- */
+function syncChrome(){
+  const m = M(); if(!m) return;
+  $('#points').textContent = m.mata||0;
+  $('#me-name').textContent = m.nama;
+  $('#me-rank').textContent = 'Aras '+m.aras+' · '+gelaran(m);
+  $('#avatar').textContent = m.fc;
+  $('#btn-sound').classList.toggle('on', S.tetapan.bunyi);
+  $('#btn-sound').classList.toggle('off', !S.tetapan.bunyi);
+  $('#sound-glyph').setAttribute('href', S.tetapan.bunyi ? '#i-sound' : '#i-mute');
+  $('#btn-sound').setAttribute('aria-pressed', String(S.tetapan.bunyi));
+  $('#btn-tts').classList.toggle('on', S.tetapan.tts);
+  $('#btn-tts').classList.toggle('off', !S.tetapan.tts);
+  $('#btn-tts').setAttribute('aria-pressed', String(S.tetapan.tts));
+  document.body.classList.toggle('calm', !!S.tetapan.tenang);
+  document.body.classList.toggle('big', !!S.tetapan.besar);
+  semakLencana(true);
+}
+function semakLencana(senyap){
+  const m = M(); if(!m) return;
+  m.lencana = m.lencana || [];
+  LENCANA.forEach(b=>{
+    if(m.lencana.indexOf(b.id)<0 && b.ok(m)){
+      m.lencana.push(b.id); save();
+      if(!senyap){ toast('Lencana baharu: '+b.nm); confetti(30); }
+      else setTimeout(()=>toast('Lencana baharu: '+b.nm),700);
+    }
+  });
+}
+
+/* ============================================================
+   SKRIN UTAMA MURID
+   ============================================================ */
+function paintHome(){
+  const m = M();
+  const habis = habisModul(m), jum = MODUL.length;
+  const lv = tahap(m), dlm = (m.mata||0) % 250;
+  const seterusnya = MODUL.find(t=>!mp(m,t.id).habis) || MODUL[0];
+
+  $('#s-home').innerHTML =
+  /* ---- kad misi hari ini ---- */
+  '<article class="card c-blue">'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<span class="badge">'+ic('i-target','ic-sm')+' Misi hari ini</span>'+
+      '<span class="badge aras">'+ARAS_NAMA[m.aras]+'</span>'+
+    '</div>'+
+    '<h2 class="h2 on-dark" style="margin:12px 0 6px">'+
+      (habis===0 ? 'Jom mula modul pertama' : habis<jum ? 'Baki '+(jum-habis)+' modul lagi' : 'Semua modul selesai!')+'</h2>'+
+    '<p class="lead on-dark-2">'+
+      (habis<jum ? 'Modul seterusnya: <b>'+seterusnya.nama+'</b>' : 'Ulang mana-mana modul untuk memperbaiki bintang.')+'</p>'+
+    '<div class="bar-wrap" style="margin-top:14px">'+
+      '<div class="bar"><i style="width:'+(habis/jum*100)+'%"></i></div>'+
+      '<span class="bar-lbl on-dark">'+habis+'/'+jum+'</span>'+
+    '</div>'+
+    '<button class="btn gold" style="margin-top:14px" data-belajar="'+seterusnya.id+'">'+
+      'Belajar '+esc(seterusnya.pendek)+ic('i-play','ic-sm')+'</button>'+
+  '</article>'+
+
+  /* ---- kad latih tubi ---- */
+  '<article class="card c-amber">'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<span class="badge">'+ic('i-bolt','ic-sm')+' Latihan</span>'+
+      '<span class="badge solid-gold">Terbaik: '+(m.latihBest||0)+'</span>'+
+    '</div>'+
+    '<h2 class="h2 on-dark" style="margin:12px 0 6px">Latih Tubi Aina</h2>'+
+    '<p class="lead on-dark-2">12 soalan pantas mengikut aras kamu. '+
+      (S.tetapan.masa ? 'Ada masa 90 saat.' : 'Tiada had masa — ambil masa kamu.')+'</p>'+
+    '<button class="btn" style="margin-top:14px" data-go="latih">Mula Latihan'+ic('i-play','ic-sm')+'</button>'+
+  '</article>'+
+
+  /* ---- kad kemajuan ---- */
+  '<article class="card c-purple">'+
+    '<span class="badge">'+ic('i-medal','ic-sm')+' Kemajuan</span>'+
+    '<h2 class="h2 on-dark" style="margin:12px 0 6px">Tahap '+lv+' · '+gelaran(m)+'</h2>'+
+    '<p class="lead on-dark-2">'+
+      (lv>=5 ? 'Kamu sudah mencapai gelaran tertinggi. Hebat!' :
+       'Kumpul '+(250-dlm)+' mata lagi untuk naik ke Tahap '+(lv+1)+'.')+'</p>'+
+    '<div class="bar-wrap" style="margin-top:14px">'+
+      '<div class="bar gold"><i style="width:'+(lv>=5?100:dlm/250*100)+'%"></i></div>'+
+      '<span class="bar-lbl on-dark">'+(lv>=5?'MAKS':dlm+'/250')+'</span>'+
+    '</div>'+
+    '<div class="btn-row" style="margin-top:14px">'+
+      '<button class="btn gold sm" data-go="lencana">Ganjaran</button>'+
+      '<button class="btn ghost sm" data-go="kelas">Kelas</button>'+
+    '</div>'+
+  '</article>'+
+
+  /* ---- kedai stiker ---- */
+  '<div class="sec-head"><h2 class="h2">Kedai Ganjaran</h2><span class="rule"></span></div>'+
+  '<div class="shop-head">'+
+    ic('i-shop','ic-lg')+
+    '<div style="flex:1">'+
+      '<b style="font-family:var(--f-d);font-size:14.5px">Tukar mata jadi bantuan</b>'+
+      '<div style="font-size:11.5px;color:#E6DBFF">Petunjuk, buang jawapan salah, atau langkau soalan</div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="shop-grid">'+ BANTU.map(it=>{
+      const bil = (m.bantu&&m.bantu[it.id])||0;
+      return '<div class="sitem"><div class="glyph">'+ic(it.ikon,'ic-lg')+'</div>'+
+        '<div class="nm">'+it.nm+(bil?' <span class="badge ghost" style="height:20px;padding:0 7px;font-size:10px">'+bil+'</span>':'')+'</div>'+
+        '<div class="ds">'+it.ds+'</div>'+
+        '<button class="price" data-beli="'+it.id+'">'+ic('i-coin','ic-sm')+it.harga+'</button></div>';
+    }).join('')+'</div>'+
+
+  /* ---- papan pilihan modul ---- */
+  '<div class="sec-head"><h2 class="h2">Modul Kamu</h2><span class="badge ghost">'+habis+'/'+jum+'</span></div>'+
+  '<div class="grid3">'+ MODUL.filter(t=>t.aras<=m.aras).slice(0,6).map((t)=>modulCell(t,MODUL.indexOf(t),m)).join('') +'</div>'+
+  '<button class="btn blue" style="margin-top:12px" data-go="modul">Lihat semua modul</button>';
+}
+function modulCell(t,i,m){
+  const d = mp(m,t.id);
+  return '<button class="tcard '+(d.habis?'done':'')+'" data-belajar="'+t.id+'" '+
+    'style="border-color:var(--'+t.warna+'-l);background:linear-gradient(160deg,var(--'+t.warna+'-d),var(--'+t.warna+'))">'+
+    '<span class="no">'+(i+1)+'</span>'+
+    '<span class="lv">A'+t.aras+'</span>'+
+    '<span class="glyph">'+ic(t.ikon,'ic-lg')+'</span>'+
+    '<span class="nm">'+t.pendek+'</span>'+
+    bintangRow(d.bintang)+
+  '</button>';
+}
+
+/* ---------- papan pilihan modul penuh ---------- */
+function renderModul(){
+  const m = M();
+  const kump = [1,2,3].map(a=>{
+    const senarai = MODUL.filter(t=>t.aras===a);
+    const kunci = a>m.aras;
+    return '<div class="sec-head"><h2 class="h2">'+ARAS_NAMA[a]+'</h2>'+
+      (kunci?'<span class="badge ghost">'+ic('i-lock','ic-sm')+' Aras lebih tinggi</span>':'<span class="rule"></span>')+'</div>'+
+      '<div class="grid3">'+senarai.map(t=>modulCell(t,MODUL.indexOf(t),m)).join('')+'</div>'+
+      (kunci?'<p class="mut" style="margin-top:8px">Guru boleh menaikkan aras murid dalam Panel Guru.</p>':'');
+  }).join('');
+
+  $('#s-modul').innerHTML =
+    '<h1 class="h1" style="margin:4px 0 6px">Papan Modul</h1>'+
+    '<p class="lead" style="margin-bottom:14px">Pilih satu modul. Setiap modul ada nota ringkas, contoh berperingkat, makmal maujud dan kuiz.</p>'+
+    '<div class="bar-wrap" style="margin-bottom:6px"><div class="bar gold dark"><i style="width:'+(habisModul(m)/MODUL.length*100)+'%"></i></div>'+
+    '<span class="bar-lbl">'+habisModul(m)+'/'+MODUL.length+'</span></div>'+
+    kump;
+}
+
+/* ---------- halaman pelajaran ---------- */
+function renderBelajar(id){
+  hentiLatih();
+  const t = MODUL.find(x=>x.id===id); if(!t) return;
+  const m = M(); const d = mp(m,id);
+  cur.modul = t;
+
+  $('#s-belajar').innerHTML =
+  '<button class="btn ghost xs" data-go="modul">'+ic('i-left','ic-sm')+' Papan Modul</button>'+
+  '<article class="card" style="margin-top:12px;border-color:var(--'+t.warna+'-l);background:linear-gradient(135deg,var(--'+t.warna+'-d),var(--'+t.warna+'))">'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<span class="badge">'+ic(t.ikon,'ic-sm')+' Modul '+(MODUL.indexOf(t)+1)+'</span>'+
+      '<span class="badge aras">Aras '+t.aras+'</span>'+
+      (d.habis?'<span class="badge solid-green">'+ic('i-check','ic-sm')+' Selesai</span>':'')+
+    '</div>'+
+    '<h1 class="h2 on-dark" style="margin:12px 0 6px;font-size:23px">'+t.nama+'</h1>'+
+    '<p class="lead on-dark-2">'+t.tagline+'</p>'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">'+
+      bintangRow(d.bintang)+'<span class="badge">Terbaik: '+d.best+' betul</span>'+
+      '<span class="badge">Cuba: '+d.cuba+'&times;</span>'+
+    '</div>'+
+    '<button class="btn ghost sm" style="margin-top:14px;width:auto;padding:8px 14px" data-sebut="'+esc(t.nama+'. '+t.tagline)+'">'+
+      ic('i-speak','ic-sm')+' Dengar tajuk</button>'+
+  '</article>'+
+
+  '<div class="tip dsk" style="margin-top:12px">'+ic('i-book','ic-sm')+
+    '<span><b>Standard Kandungan:</b> '+t.dsk+'</span></div>'+
+
+  '<div class="sec-head"><h2 class="h2">Nota Ringkas</h2><span class="rule"></span></div>'+
+  '<div class="panel"><ul class="klist">'+
+    t.konsep.map((k,i)=>'<li><span class="k">'+(i+1)+'</span><span>'+k+'</span></li>').join('')+
+  '</ul>'+
+  '<button class="btn ghost sm" style="margin-top:12px" data-sebut="'+esc(t.konsep.map(x=>x.replace(/<[^>]+>/g,'')).join('. '))+'">'+
+    ic('i-speak','ic-sm')+' Dengar nota</button></div>'+
+
+  '<div class="sec-head"><h2 class="h2">Contoh Berperingkat</h2><span class="rule"></span></div>'+
+  '<div class="panel">'+
+    '<h3 class="h3">'+ic('i-target')+' '+t.contoh.tajuk+'</h3>'+
+    '<div id="steps">'+t.contoh.langkah.map((l,i)=>
+      '<div class="step '+(i?'hide':'')+'" data-step="'+i+'"><span class="n">'+(i+1)+'</span><span>'+l+'</span></div>').join('')+
+    '</div>'+
+    '<button class="btn blue sm" id="btn-step" style="margin-top:12px">Tunjuk langkah seterusnya'+ic('i-right','ic-sm')+'</button>'+
+  '</div>'+
+
+  '<div class="tip" style="margin-top:12px">'+ic('i-bulb','ic-sm')+'<span><b>Tip murid:</b> '+t.tip+'</span></div>'+
+  '<div class="tip guru" style="margin-top:8px">'+ic('i-teacher','ic-sm')+'<span><b>Nota guru PPKI:</b> '+t.guru+'</span></div>'+
+
+  (t.lab ? '<div class="lab" id="lab-host"></div>' : '')+
+
+  '<button class="btn gold" style="margin-top:18px" data-kuiz="'+t.id+'">'+
+    'Jawab Kuiz ('+bilSoalan()+' soalan)'+ic('i-play','ic-sm')+'</button>';
+
+  if(t.lab) mulaLab(t.lab);
+  show('belajar');
+}
+function bilSoalan(){ return Math.min(S.tetapan.soalan, 6); }
+
+/* ============================================================
+   MAKMAL MAUJUD
+   ============================================================ */
+function mulaLab(key){
+  lab = {key:key};
+  if(key==='bilang'){ lab.n=0; lab.sasar=rnd(3,9); lab.emo=['🍎','⭐','🐟','🍬','⚽'][rnd(0,4)]; }
+  if(key==='garis'){ lab.pos=5; }
+  if(key==='frame'){ lab.a=3; lab.b=4; }
+  if(key==='frame2'){ lab.a=8; lab.b=3; }
+  if(key==='puluh'){ lab.p=3; lab.s=4; }
+  if(key==='bentuk'){ lab.pilih='bulatan'; }
+  if(key==='corak'){ lab.jenis=0; lab.isi=null; }
+  if(key==='wang'){ lab.sasar=(rnd(1,9))*100 + [0,50,20,10,80][rnd(0,4)]; lab.kumpul=0; }
+  if(key==='jam'){ lab.jam=7; lab.min=30; }
+  if(key==='ukur'){ lab.unit=6; }
+  if(key==='graf'){ lab.data={'🍎':3,'🍌':5,'🍇':2}; }
+  paintLab();
+}
+function paintLab(){
+  const host = $('#lab-host'); if(!host || !LAB[lab.key]) return;
+  host.innerHTML = LAB[lab.key]();
+}
+function labStep(field,delta,min,max){
+  lab[field] = Math.min(max, Math.max(min, lab[field]+delta));
+  Bunyi.tap(); paintLab();
+}
+const LAB = {
+  /* --- membilang objek --- */
+  bilang(){
+    let h='';
+    for(let i=0;i<10;i++) h+='<button class="unitobj" data-a="bil:'+i+'" style="font-size:30px;line-height:1;'+
+      'width:44px;height:44px;border-radius:12px;border:3px solid '+(i<lab.n?'#FBBF24':'rgba(255,255,255,.45)')+';'+
+      'background:'+(i<lab.n?'rgba(251,191,36,.28)':'rgba(255,255,255,.12)')+'">'+
+      (i<lab.sasar?lab.emo:'')+'</button>';
+    return '<h3 class="h3">'+ic('i-hand')+' Makmal Membilang</h3>'+
+    '<p class="hint">Sentuh objek satu demi satu dari kiri. Setiap sentuhan menambah satu.</p>'+
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;justify-items:center">'+h+'</div>'+
+    '<div class="lab-out"><div class="big">'+lab.n+'</div>'+
+      '<div class="sub">Kamu sudah membilang <b>'+lab.n+'</b> daripada <b>'+lab.sasar+'</b> objek.'+
+      (lab.n===lab.sasar?'<br>Tepat! Nombor terakhir ialah jumlahnya.':'')+'</div></div>'+
+    '<div class="btn-row" style="margin-top:12px">'+
+      '<button class="btn ghost sm" data-a="reset">Mula semula</button>'+
+      '<button class="btn ghost sm" data-a="baru">Set baharu</button></div>';
+  },
+  /* --- garis nombor --- */
+  garis(){
+    return '<h3 class="h3">'+ic('m-num20')+' Makmal Garis Nombor</h3>'+
+    '<p class="hint">Gerak ke kiri untuk kurang satu, ke kanan untuk tambah satu.</p>'+
+    viz('line:0:20:'+lab.pos)+
+    '<div class="stepper"><span class="lbl">Kedudukan</span><span class="ctrl">'+
+      '<button class="rnd" data-a="g-">&minus;</button><span class="val">'+lab.pos+'</span>'+
+      '<button class="rnd" data-a="g+">+</button></span></div>'+
+    '<div class="lab-out"><div class="big">'+lab.pos+'</div>'+
+      '<div class="sub">Sebelum: <b>'+Math.max(0,lab.pos-1)+'</b> · Selepas: <b>'+Math.min(20,lab.pos+1)+'</b><br>'+
+      (lab.pos%2===0?'Nombor genap':'Nombor ganjil')+' · '+(lab.pos>=10?'Lebih besar daripada 10':'Kurang daripada 10')+'</div></div>';
+  },
+  /* --- bingkai sepuluh untuk tambah --- */
+  frame(){
+    const jum=Math.min(10,lab.a+lab.b);
+    let h='';
+    for(let i=0;i<10;i++){
+      const w = i<lab.a ? 'a' : i<lab.a+lab.b ? 'b' : '';
+      h+='<i class="'+(w?'on':'')+'" style="'+(w==='b'?'background:#66BB6A;border-color:#A5D6A7':'')+'"></i>';
+    }
+    return '<h3 class="h3">'+ic('m-add')+' Makmal Tambah</h3>'+
+    '<p class="hint">Kumpulan kuning tambah kumpulan hijau. Bilang semua yang penuh.</p>'+
+    '<div class="frame10">'+h+'</div>'+
+    '<div class="stepper"><span class="lbl">Kumpulan 1</span><span class="ctrl">'+
+      '<button class="rnd" data-a="a-">&minus;</button><span class="val">'+lab.a+'</span><button class="rnd" data-a="a+">+</button></span></div>'+
+    '<div class="stepper"><span class="lbl">Kumpulan 2</span><span class="ctrl">'+
+      '<button class="rnd" data-a="b-">&minus;</button><span class="val">'+lab.b+'</span><button class="rnd" data-a="b+">+</button></span></div>'+
+    '<div class="lab-out"><div class="big">'+lab.a+' + '+lab.b+' = '+jum+'</div>'+
+      '<div class="sub">'+(jum===10?'Cukup sepuluh! Bingkai penuh.':'Baki kotak kosong: <b>'+(10-jum)+'</b>')+'</div></div>';
+  },
+  /* --- bingkai sepuluh untuk tolak --- */
+  frame2(){
+    const baki=Math.max(0,lab.a-lab.b);
+    let h='';
+    for(let i=0;i<10;i++){
+      const ada = i<lab.a, buang = ada && i>=baki;
+      h+='<i class="'+(ada?'on':'')+'" style="'+(buang?'background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);opacity:.5':'')+'"></i>';
+    }
+    return '<h3 class="h3">'+ic('m-sub')+' Makmal Tolak</h3>'+
+    '<p class="hint">Kotak yang pudar ialah objek yang diambil keluar.</p>'+
+    '<div class="frame10">'+h+'</div>'+
+    '<div class="stepper"><span class="lbl">Mula dengan</span><span class="ctrl">'+
+      '<button class="rnd" data-a="a-">&minus;</button><span class="val">'+lab.a+'</span><button class="rnd" data-a="a+">+</button></span></div>'+
+    '<div class="stepper"><span class="lbl">Ambil keluar</span><span class="ctrl">'+
+      '<button class="rnd" data-a="b-">&minus;</button><span class="val">'+lab.b+'</span><button class="rnd" data-a="b+">+</button></span></div>'+
+    '<div class="lab-out"><div class="big">'+lab.a+' &minus; '+lab.b+' = '+baki+'</div>'+
+      '<div class="sub">'+(baki===0?'Semua diambil. Baki sifar.':'Tinggal <b>'+baki+'</b> objek.')+'</div></div>';
+  },
+  /* --- blok puluh & sa --- */
+  puluh(){
+    const n=lab.p*10+lab.s;
+    return '<h3 class="h3">'+ic('m-place')+' Makmal Puluh &amp; Sa</h3>'+
+    '<p class="hint">Tambah blok panjang (puluh) dan kiub kecil (sa). Lihat nombor terbentuk.</p>'+
+    viz('ten:'+n)+
+    '<div class="stepper"><span class="lbl">Puluh</span><span class="ctrl">'+
+      '<button class="rnd" data-a="p-">&minus;</button><span class="val">'+lab.p+'</span><button class="rnd" data-a="p+">+</button></span></div>'+
+    '<div class="stepper"><span class="lbl">Sa</span><span class="ctrl">'+
+      '<button class="rnd" data-a="s-">&minus;</button><span class="val">'+lab.s+'</span><button class="rnd" data-a="s+">+</button></span></div>'+
+    '<div class="lab-out"><div class="big">'+n+'</div>'+
+      '<div class="sub">'+lab.p+' puluh bernilai <b>'+(lab.p*10)+'</b> · '+lab.s+' sa bernilai <b>'+lab.s+'</b><br>'+
+      (lab.p*10)+' + '+lab.s+' = <b>'+n+'</b></div></div>';
+  },
+  /* --- bentuk --- */
+  bentuk(){
+    const info={
+      bulatan:{n:'Bulatan', sisi:0, bucu:0, ct:'Jam dinding, duit syiling, roti canai'},
+      segitiga:{n:'Segi tiga', sisi:3, bucu:3, ct:'Papan tanda jalan, sandwic dipotong'},
+      segiempat:{n:'Segi empat sama', sisi:4, bucu:4, ct:'Ubin lantai, kertas nota'}
+    }[lab.pilih];
+    const btn=(k,l)=>'<button class="coin" data-a="bt:'+k+'" style="'+(lab.pilih===k?'background:#FBBF24;color:#4A2D00;border-color:#FFF0BF':'')+'">'+l+'</button>';
+    return '<h3 class="h3">'+ic('m-shape')+' Makmal Bentuk</h3>'+
+    '<p class="hint">Pilih bentuk, kemudian kira sisi dan bucunya.</p>'+
+    viz('shape:'+lab.pilih)+
+    '<div class="coins">'+btn('bulatan','Bulatan')+btn('segitiga','Segi tiga')+btn('segiempat','Segi empat')+'</div>'+
+    '<div class="lab-out"><div class="big">'+info.sisi+' sisi · '+info.bucu+' bucu</div>'+
+      '<div class="sub"><b>'+info.n+'</b><br>Contoh di sekeliling: '+info.ct+'</div></div>';
+  },
+  /* --- corak --- */
+  corak(){
+    const set=[
+      {p:['🔴','🔵'], nm:'Dua warna berulang'},
+      {p:['⭐','⭐','🌙'], nm:'Dua bintang satu bulan'},
+      {p:['🟩','🟨','🟦'], nm:'Tiga warna berulang'}
+    ][lab.jenis];
+    const urut=[]; for(let i=0;i<7;i++) urut.push(set.p[i%set.p.length]);
+    const papar=urut.slice(0,6).concat(['?']);
+    const jawapan=urut[6];
+    const pilih=set.p.map(x=>'<button class="coin" data-a="cp:'+x+'" style="font-size:20px'+
+      (lab.isi===x?';background:#FBBF24;border-color:#FFF0BF':'')+'">'+x+'</button>').join('');
+    return '<h3 class="h3">'+ic('m-pattern')+' Makmal Corak</h3>'+
+    '<p class="hint">Sebut corak dengan kuat, kemudian pilih yang seterusnya.</p>'+
+    viz('pola:'+papar.join(','))+
+    '<div class="coins">'+pilih+'</div>'+
+    '<div class="lab-out"><div class="big">'+(lab.isi? (lab.isi===jawapan?'Betul! '+jawapan:'Cuba lagi') : set.p.join(' '))+'</div>'+
+      '<div class="sub">'+set.nm+' · bahagian berulang ada <b>'+set.p.length+'</b> item</div></div>'+
+    '<button class="btn ghost sm" style="margin-top:12px" data-a="cbaru">Corak lain</button>';
+  },
+  /* --- wang --- */
+  wang(){
+    const nilai=[1000,500,100,50,20,10];
+    const label=n=> n>=100 ? 'RM'+(n/100) : n+' sen';
+    const baki = lab.sasar - lab.kumpul;
+    return '<h3 class="h3">'+ic('m-money')+' Makmal Wang</h3>'+
+    '<p class="hint">Sentuh not dan syiling sehingga cukup dengan harga.</p>'+
+    '<div class="lab-out"><div class="big">'+rm(lab.sasar)+'</div><div class="sub">Harga yang perlu dibayar</div></div>'+
+    '<div class="coins">'+nilai.map(n=>'<button class="coin" data-a="duit:'+n+'">'+label(n)+'</button>').join('')+'</div>'+
+    '<div class="lab-out" style="margin-top:10px"><div class="big">'+rm(lab.kumpul)+'</div>'+
+      '<div class="sub">'+(baki>0 ? 'Kurang <b>'+rm(baki)+'</b> lagi.' :
+        baki===0 ? 'Tepat! Jumlah sama dengan harga.' : 'Lebih '+rm(-baki)+' — kamu akan terima baki itu.')+'</div></div>'+
+    '<div class="btn-row" style="margin-top:12px">'+
+      '<button class="btn ghost sm" data-a="kosong">Kosongkan</button>'+
+      '<button class="btn ghost sm" data-a="harga">Harga baharu</button></div>';
+  },
+  /* --- jam --- */
+  jam(){
+    const j=lab.jam, m=lab.min;
+    const j12 = j%12===0?12:j%12;
+    const sesi = j<12?'pagi':j<15?'tengah hari':j<19?'petang':'malam';
+    const rutin = j<7?'Bangun tidur':j<9?'Ke sekolah':j<11?'Belajar di kelas':j<14?'Rehat dan makan':
+                  j<17?'Balik ke rumah':j<20?'Makan malam':'Masa tidur';
+    const baca = m===0?'tepat':m===30?'setengah':m+' minit';
+    return '<h3 class="h3">'+ic('m-time')+' Makmal Jam</h3>'+
+    '<p class="hint">Laraskan jarum, kemudian padankan dengan rutin harian kamu.</p>'+
+    mukaJam(j,m,false)+
+    '<div class="stepper"><span class="lbl">Jam</span><span class="ctrl">'+
+      '<button class="rnd" data-a="j-">&minus;</button><span class="val">'+String(j).padStart(2,'0')+'</span><button class="rnd" data-a="j+">+</button></span></div>'+
+    '<div class="stepper"><span class="lbl">Minit</span><span class="ctrl">'+
+      '<button class="rnd" data-a="m-">&minus;</button><span class="val">'+String(m).padStart(2,'0')+'</span><button class="rnd" data-a="m+">+</button></span></div>'+
+    '<div class="lab-out"><div class="big">'+j12+':'+String(m).padStart(2,'0')+' '+sesi+'</div>'+
+      '<div class="sub">Pukul '+j12+' '+baca+'<br>Rutin biasa waktu ini: <b>'+rutin+'</b></div></div>';
+  },
+  /* --- ukuran unit tidak piawai --- */
+  ukur(){
+    const u=lab.unit;
+    let blok=''; for(let i=0;i<u;i++) blok+='<span class="unit" style="width:22px;height:22px"></span>';
+    return '<h3 class="h3">'+ic('m-measure')+' Makmal Ukuran</h3>'+
+    '<p class="hint">Ukur pensel menggunakan klip kertas. Setiap klip ialah 2 cm.</p>'+
+    '<div style="font-size:44px;text-align:center;margin:6px 0">✏️</div>'+
+    '<div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">'+blok+'</div>'+
+    '<div class="stepper"><span class="lbl">Bilangan klip</span><span class="ctrl">'+
+      '<button class="rnd" data-a="u-">&minus;</button><span class="val">'+u+'</span><button class="rnd" data-a="u+">+</button></span></div>'+
+    '<div class="lab-out"><div class="big">'+(u*2)+' cm</div>'+
+      '<div class="sub">'+u+' klip &times; 2 cm = <b>'+(u*2)+' cm</b><br>'+
+      (u*2>=100 ? 'Sama dengan '+((u*2)/100).toFixed(2)+' meter' : 'Masih kurang daripada 1 meter')+'</div></div>';
+  },
+  /* --- graf palang --- */
+  graf(){
+    const d=lab.data, kunci=Object.keys(d);
+    const jum=kunci.reduce((x,k)=>x+d[k],0);
+    const tinggi=kunci.reduce((a,b)=>d[a]>=d[b]?a:b);
+    return '<h3 class="h3">'+ic('m-data')+' Makmal Graf</h3>'+
+    '<p class="hint">Tambah undi untuk setiap buah, kemudian baca graf.</p>'+
+    viz('graf:'+kunci.map(k=>k+'='+d[k]).join(','))+
+    kunci.map(k=>'<div class="stepper"><span class="lbl" style="font-size:22px">'+k+'</span><span class="ctrl">'+
+      '<button class="rnd" data-a="gr-:'+k+'">&minus;</button><span class="val">'+d[k]+'</span>'+
+      '<button class="rnd" data-a="gr+:'+k+'">+</button></span></div>').join('')+
+    '<div class="lab-out"><div class="big">'+tinggi+' paling banyak</div>'+
+      '<div class="sub">Jumlah semua undi: <b>'+jum+'</b><br>Palang paling tinggi bermaksud paling ramai suka.</div></div>';
+  }
+};
+function labAksi(a){
+  const k = lab.key;
+  if(k==='bilang'){
+    if(a.indexOf('bil:')===0){
+      const i=Number(a.split(':')[1]);
+      if(i<lab.sasar){ lab.n=i+1; Bunyi.tap(); Cakap.sebut(String(lab.n));
+        if(lab.n===lab.sasar){ Bunyi.betul(); } }
+      paintLab();
+    }
+    if(a==='reset'){ lab.n=0; paintLab(); }
+    if(a==='baru'){ lab.n=0; lab.sasar=rnd(3,10); lab.emo=['🍎','⭐','🐟','🍬','⚽'][rnd(0,4)]; paintLab(); }
+  }
+  if(k==='garis'){
+    if(a==='g+') labStep('pos',1,0,20);
+    if(a==='g-') labStep('pos',-1,0,20);
+  }
+  if(k==='frame'){
+    if(a==='a+') labStep('a',1,0,10-lab.b);
+    if(a==='a-') labStep('a',-1,0,10);
+    if(a==='b+') labStep('b',1,0,10-lab.a);
+    if(a==='b-') labStep('b',-1,0,10);
+  }
+  if(k==='frame2'){
+    if(a==='a+') labStep('a',1,0,10);
+    if(a==='a-'){ labStep('a',-1,0,10); if(lab.b>lab.a){ lab.b=lab.a; paintLab(); } }
+    if(a==='b+') labStep('b',1,0,lab.a);
+    if(a==='b-') labStep('b',-1,0,lab.a);
+  }
+  if(k==='puluh'){
+    if(a==='p+') labStep('p',1,0,9);
+    if(a==='p-') labStep('p',-1,0,9);
+    if(a==='s+') labStep('s',1,0,9);
+    if(a==='s-') labStep('s',-1,0,9);
+  }
+  if(k==='bentuk' && a.indexOf('bt:')===0){ lab.pilih=a.split(':')[1]; Bunyi.tap(); paintLab(); }
+  if(k==='corak'){
+    if(a.indexOf('cp:')===0){
+      lab.isi=a.split(':')[1];
+      const set=[['🔴','🔵'],['⭐','⭐','🌙'],['🟩','🟨','🟦']][lab.jenis];
+      const betul=set[6%set.length];
+      if(lab.isi===betul){ Bunyi.betul(); toast('Betul! Corak diteruskan.'); } else Bunyi.salah();
+      paintLab();
+    }
+    if(a==='cbaru'){ lab.jenis=(lab.jenis+1)%3; lab.isi=null; Bunyi.tap(); paintLab(); }
+  }
+  if(k==='wang'){
+    if(a.indexOf('duit:')===0){ lab.kumpul += Number(a.split(':')[1]); Bunyi.tap();
+      if(lab.kumpul===lab.sasar){ Bunyi.betul(); toast('Tepat! Jumlah sama dengan harga.'); }
+      paintLab(); }
+    if(a==='kosong'){ lab.kumpul=0; Bunyi.tap(); paintLab(); }
+    if(a==='harga'){ lab.sasar=(rnd(1,9))*100 + [0,50,20,10,80][rnd(0,4)]; lab.kumpul=0; Bunyi.tap(); paintLab(); }
+  }
+  if(k==='jam'){
+    if(a==='j+') labStep('jam',1,0,23);
+    if(a==='j-') labStep('jam',-1,0,23);
+    if(a==='m+') labStep('min',5,0,55);
+    if(a==='m-') labStep('min',-5,0,55);
+  }
+  if(k==='ukur'){
+    if(a==='u+') labStep('unit',1,1,15);
+    if(a==='u-') labStep('unit',-1,1,15);
+  }
+  if(k==='graf'){
+    if(a.indexOf('gr+:')===0){ const e=a.split(':')[1]; lab.data[e]=Math.min(9,lab.data[e]+1); Bunyi.tap(); paintLab(); }
+    if(a.indexOf('gr-:')===0){ const e=a.split(':')[1]; lab.data[e]=Math.max(0,lab.data[e]-1); Bunyi.tap(); paintLab(); }
+  }
+}
+
+/* ============================================================
+   KUIZ MODUL
+   ============================================================ */
+function siapkanSoalan(q, m){
+  const n = bilPilihan(m);
+  if(n >= q.o.length) return {q:q.q, v:q.v, o:q.o.slice(), a:q.a, h:q.h};
+  const salah = q.o.map((_,i)=>i).filter(i=>i!==q.a);
+  shuffle(salah);
+  const simpan = salah.slice(0, n-1).concat([q.a]).sort((x,y)=>x-y);
+  return {q:q.q, v:q.v, o:simpan.map(i=>q.o[i]), a:simpan.indexOf(q.a), h:q.h};
+}
+function mulaKuiz(id){
+  hentiLatih();
+  const m = M();
+  const t = MODUL.find(x=>x.id===id);
+  const senarai = t.soalan.slice(0, bilSoalan()).map(q=>siapkanSoalan(q,m));
+  cur = {modul:t, list:senarai, i:0, betul:0, jawab:false, rekod:[]};
+  renderKuiz(); show('kuiz');
+}
+function renderKuiz(){
+  const t=cur.modul, s=cur.list[cur.i], m=M();
+  const duaLajur = s.o.length===2;
+  let pips='';
+  cur.list.forEach((_,i)=>{
+    const r = cur.rekod[i];
+    pips += '<i class="'+(r===true?'ok':r===false?'no':i===cur.i?'now':'')+'"></i>';
+  });
+
+  $('#s-kuiz').innerHTML =
+  '<div class="q-top">'+
+    '<button class="btn ghost xs" data-belajar="'+t.id+'">'+ic('i-left','ic-sm')+'</button>'+
+    '<span class="badge ghost">'+ic(t.ikon,'ic-sm')+' '+t.pendek+'</span>'+
+    '<span style="flex:1"></span>'+
+    '<span class="badge ghost">Soalan '+(cur.i+1)+'/'+cur.list.length+'</span>'+
+  '</div>'+
+  '<div class="pips">'+pips+'</div>'+
+  '<div class="q-card">'+
+    '<button class="q-say" id="btn-say">'+ic('i-speak','ic-sm')+' Dengar</button>'+
+    '<p class="q-text">'+s.q+'</p>'+
+    viz(s.v)+
+    '<p class="q-sub">Pilih satu jawapan</p>'+
+  '</div>'+
+  '<div class="opts'+(duaLajur?' two':'')+'" id="opts">'+ s.o.map((o,i)=>
+    '<button class="opt" data-opt="'+i+'">'+
+      (duaLajur?'':'<span class="key">'+'ABCD'[i]+'</span>')+
+      '<span class="tx">'+o+'</span></button>').join('')+'</div>'+
+  '<div id="fb"></div>'+
+  '<div class="btn-row wrap" style="margin-top:14px">'+ butangBantu() +'</div>';
+
+  if(S.tetapan.tts) setTimeout(()=>Cakap.sebut(s.q, $('#btn-say')), 350);
+}
+function butangBantu(){
+  const m=M();
+  return BANTU.map(b=>'<button class="btn ghost sm" data-guna="'+b.id+'" style="flex:1 1 30%">'+
+    ic(b.ikon,'ic-sm')+' '+b.nm+' ('+((m.bantu&&m.bantu[b.id])||0)+')</button>').join('');
+}
+function jawab(i){
+  if(cur.jawab) return;
+  const s = cur.list[cur.i];
+  cur.jawab = true;
+  const betul = i===s.a;
+  cur.rekod[cur.i] = betul;
+  if(betul){ cur.betul++; Bunyi.betul(); } else { Bunyi.salah(); }
+
+  $$('#opts .opt').forEach((b,k)=>{
+    if(k===s.a) b.classList.add('correct');
+    else if(k===i) b.classList.add('incorrect');
+    else b.classList.add('dim');
+    if(k===s.a) b.insertAdjacentHTML('beforeend','<span class="mark">&#10003;</span>');
+    else if(k===i) b.insertAdjacentHTML('beforeend','<span class="mark">&#10007;</span>');
+  });
+  if(!betul && !S.tetapan.tenang) $('#opts').classList.add('shake');
+
+  const kepala = betul ? 'Syabas! Betul' : 'Belum tepat — jom cuba lagi';
+  $('#fb').innerHTML =
+    '<div class="fb '+(betul?'ok':'no')+'">'+
+      '<div class="hd">'+ic(betul?'i-check':'i-bulb','ic-sm')+kepala+'</div>'+
+      '<p>'+s.h+'</p>'+
+      '<button class="btn ghost sm" style="margin-top:10px" data-sebut="'+esc(kepala+'. '+s.h)+'">'+
+        ic('i-speak','ic-sm')+' Dengar huraian</button>'+
+    '</div>'+
+    '<button class="btn '+(betul?'':'blue')+'" style="margin-top:12px" id="btn-next">'+
+      (cur.i+1<cur.list.length ? 'Soalan seterusnya' : 'Lihat keputusan')+ic('i-right','ic-sm')+'</button>';
+
+  if(S.tetapan.tts) Cakap.sebut(kepala+'. '+s.h);
+  const n=$('#btn-next'); if(n) n.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function seterusnyaKuiz(){
+  cur.i++;
+  if(cur.i >= cur.list.length){ habisKuiz(); return; }
+  cur.jawab=false; renderKuiz();
+}
+function habisKuiz(){
+  Cakap.henti();
+  const m=M(), t=cur.modul, jum=cur.list.length, betul=cur.betul;
+  const bintang = bintangDari(betul,jum);
+  const mata = betul*15 + (betul===jum?25:0);
+  const d = mp(m,t.id);
+  d.habis = true;
+  d.cuba = (d.cuba||0)+1;
+  if(betul >= (d.best||0)){ d.best = betul; d.bestJum = jum; }
+  d.bintang = Math.max(d.bintang||0, bintang);
+  m.mata = (m.mata||0) + mata;
+  m.log = m.log || [];
+  m.log.unshift({t:Date.now(), jenis:'kuiz', modul:t.id, nama:t.pendek, betul:betul, jum:jum, bintang:bintang, mata:mata});
+  m.log = m.log.slice(0,80);
+  catatHari(m);
+  save(); syncChrome();
+  if(bintang>=2){ Bunyi.menang(); confetti(50); }
+
+  const tajuk = bintang===3?'Sempurna!' : bintang===2?'Bagus sekali!' : bintang===1?'Boleh lagi!' : 'Jom cuba semula';
+  if(S.tetapan.tts) setTimeout(()=>Cakap.sebut(tajuk+'. Kamu dapat '+betul+' daripada '+jum+' betul.'),400);
+
+  renderKeputusan({
+    tajuk: tajuk, sub: t.nama, bintang: bintang,
+    kpi:[[betul+'/'+jum,'Betul'],[mata,'Mata'],[bintang,'Bintang']],
+    utama:{lbl:'Ulang kuiz ini', act:'kuiz:'+t.id},
+    kedua:{lbl:'Kembali ke modul', act:'belajar:'+t.id}
+  });
+}
+
+/* ============================================================
+   LATIH TUBI (mengikut aras murid)
+   ============================================================ */
+function janaLatih(aras){
+  let q,a,v='';
+  if(aras===1){
+    const jenis=rnd(0,3);
+    if(jenis===0){ const n=rnd(2,10), e=['🍎','⭐','🐟','🍬'][rnd(0,3)];
+      q='Berapa banyak?'; v='obj:'+e+':'+n; a=n; }
+    else if(jenis===1){ const x=rnd(1,6), y=rnd(1,10-x);
+      q=x+' + '+y+' = ?'; v='grp:⭐:'+x+':'+y+':+'; a=x+y; }
+    else if(jenis===2){ const x=rnd(3,10), y=rnd(1,x);
+      q=x+' &minus; '+y+' = ?'; v='frame:'+x; a=x-y; }
+    else { const n=rnd(1,9); q='Nombor apakah selepas '+n+'?'; v='line:0:10:'+(n+1); a=n+1; }
+  } else if(aras===2){
+    const jenis=rnd(0,3);
+    if(jenis===0){ const x=rnd(11,49), y=rnd(10,40);
+      q=x+' + '+y+' = ?'; a=x+y; v='ten:'+(x+y); }
+    else if(jenis===1){ const x=rnd(30,99), y=rnd(10,29);
+      q=x+' &minus; '+y+' = ?'; a=x-y; v='ten:'+(x-y); }
+    else if(jenis===2){ const p=rnd(1,9), s=rnd(0,9);
+      q=p+' puluh dan '+s+' sa ialah nombor apa?'; a=p*10+s; v='ten:'+(p*10+s); }
+    else { const n=rnd(2,9)*10; q='Berapa nilai digit puluh dalam '+(n+rnd(1,9))+'?'; a=n; v='ten:'+n; }
+  } else {
+    const jenis=rnd(0,3);
+    if(jenis===0){ const c=[[50,20,10],[100,50],[20,20,10],[100,100,50],[50,50,20]][rnd(0,4)];
+      q='Berapa jumlah wang ini (sen)?'; v='coin:'+c.join(','); a=c.reduce((x,y)=>x+y,0); }
+    else if(jenis===1){ const bayar=[100,200,500][rnd(0,2)], harga=rnd(1,bayar/10-1)*10;
+      q='Bayar '+rm(bayar)+', harga '+rm(harga)+'. Berapa baki (sen)?'; v='coin:'+bayar; a=bayar-harga; }
+    else if(jenis===2){ const j=rnd(1,12), mn=[0,15,30,45][rnd(0,3)];
+      q='Berapa minit ditunjukkan?'; v='jam:'+j+':'+mn; a=mn; }
+    else { const x=rnd(2,9); q=x+' kg sama dengan berapa gram?'; v='obj:⚖️:1'; a=x*1000; }
+  }
+  const pilih=[a];
+  while(pilih.length<4){
+    const jarak = a>200 ? (a>=1000?1000:10) : a>20 ? 5 : 1;
+    const d = a + rnd(1,4)*jarak*(Math.random()<.5?-1:1);
+    if(d>=0 && pilih.indexOf(d)<0) pilih.push(d);
+  }
+  shuffle(pilih);
+  return {q:q, v:v, o:pilih.map(String), a:pilih.indexOf(a)};
+}
+function mulaLatih(){
+  const m=M();
+  hentiLatih();
+  latih = {skor:0, streak:0, i:0, jum:12, masa:90, kunci:false, soal:null, rekod:[]};
+  const s0 = janaLatih(m.aras);
+  latih.soal = siapkanSoalan(s0, m);
+  renderLatih();
+  if(S.tetapan.masa){
+    latih.t = setInterval(()=>{
+      latih.masa--;
+      const el=$('#latih-timer');
+      if(el){ el.textContent = latih.masa+'s'; el.classList.toggle('low', latih.masa<=15); }
+      if(latih.masa<=0) habisLatih();
+    },1000);
+  }
+  show('latih');
+}
+function hentiLatih(){ if(latih.t){ clearInterval(latih.t); latih.t=null; } }
+function renderLatih(){
+  const s=latih.soal, m=M();
+  const duaLajur = s.o.length===2;
+  let pips='';
+  for(let i=0;i<latih.jum;i++){
+    const r=latih.rekod[i];
+    pips += '<i class="'+(r===true?'ok':r===false?'no':i===latih.i?'now':'')+'"></i>';
+  }
+  $('#s-latih').innerHTML =
+  '<div class="q-top">'+
+    '<span class="badge ghost">'+ic('i-bolt','ic-sm')+' Latih Tubi</span>'+
+    '<span style="flex:1"></span>'+
+    '<span class="badge ghost">Betul: <b>'+latih.skor+'</b></span>'+
+    (S.tetapan.masa?'<span class="timer" id="latih-timer">'+latih.masa+'s</span>':
+      '<span class="badge ghost">'+(latih.i+1)+'/'+latih.jum+'</span>')+
+  '</div>'+
+  '<div class="pips">'+pips+'</div>'+
+  (latih.streak>2?'<div class="badge solid-gold" style="margin-bottom:10px">'+ic('i-flame','ic-sm')+
+    ' Hebat! '+latih.streak+' betul berturut-turut</div>':'')+
+  '<div class="q-card" style="border-color:var(--amber-l);background:linear-gradient(135deg,var(--amber-d),var(--amber))">'+
+    '<button class="q-say" id="btn-say">'+ic('i-speak','ic-sm')+' Dengar</button>'+
+    '<p class="q-text">'+s.q+'</p>'+
+    viz(s.v)+
+    '<p class="q-sub">Pilih satu jawapan</p>'+
+  '</div>'+
+  '<div class="opts'+(duaLajur?' two':'')+'" id="latih-opts">'+ s.o.map((o,i)=>
+    '<button class="opt" data-lopt="'+i+'">'+
+      (duaLajur?'':'<span class="key">'+'ABCD'[i]+'</span>')+
+      '<span class="tx">'+o+'</span></button>').join('')+'</div>'+
+  '<button class="btn ghost sm" style="margin-top:14px" id="btn-latih-stop">Tamatkan latihan</button>';
+
+  if(S.tetapan.tts) setTimeout(()=>Cakap.sebut(s.q, $('#btn-say')), 300);
+}
+function jawabLatih(i){
+  if(latih.kunci) return;
+  latih.kunci=true;
+  const s=latih.soal, betul = i===s.a;
+  const b = $$('#latih-opts .opt');
+  b[s.a].classList.add('correct');
+  if(!betul){ b[i].classList.add('incorrect'); Bunyi.salah(); latih.streak=0; }
+  else { Bunyi.betul(); latih.skor++; latih.streak++; }
+  latih.rekod[latih.i]=betul;
+  setTimeout(()=>{
+    latih.i++;
+    if(latih.i>=latih.jum){ habisLatih(); return; }
+    const m=M();
+    latih.soal = siapkanSoalan(janaLatih(m.aras), m);
+    latih.kunci=false; renderLatih();
+  }, betul?600:1100);
+}
+function habisLatih(){
+  hentiLatih(); Cakap.henti();
+  const m=M();
+  const mata = latih.skor*8;
+  m.latihBest = Math.max(m.latihBest||0, latih.skor);
+  m.mata = (m.mata||0)+mata;
+  m.log = m.log || [];
+  m.log.unshift({t:Date.now(), jenis:'latih', nama:'Latih Tubi', betul:latih.skor, jum:latih.i||latih.jum,
+    bintang: latih.skor>=11?3:latih.skor>=9?2:latih.skor>=6?1:0, mata:mata});
+  m.log = m.log.slice(0,80);
+  catatHari(m);
+  save(); syncChrome();
+  const bintang = latih.skor>=11?3:latih.skor>=9?2:latih.skor>=6?1:0;
+  if(bintang>=2){ Bunyi.menang(); confetti(50); }
+  renderKeputusan({
+    tajuk: bintang===3?'Luar Biasa!' : bintang===2?'Bagus sekali!' : bintang===1?'Bagus, teruskan!' : 'Latihan tamat',
+    sub:'Latih Tubi · Aras '+m.aras, bintang:bintang,
+    kpi:[[latih.skor+'/'+(latih.i||latih.jum),'Betul'],[mata,'Mata'],[m.latihBest,'Rekod']],
+    utama:{lbl:'Latih sekali lagi', act:'latih'},
+    kedua:{lbl:'Kembali ke utama', act:'go:home'}
+  });
+}
+
+/* ============================================================
+   KEPUTUSAN · GANJARAN · KELAS
+   ============================================================ */
+function renderKeputusan(o){
+  const m=M();
+  $('#s-habis').innerHTML =
+  '<div class="card c-purple result" style="margin-top:16px">'+
+    '<div class="medal" style="margin:0 auto 6px">'+maskot(130)+'</div>'+
+    '<span class="badge">'+o.sub+'</span>'+
+    '<h1 class="h1 on-dark" style="margin:10px 0 0">'+o.tajuk+'</h1>'+
+    bintangRow(o.bintang,'stars-big')+
+    '<div class="kpi">'+o.kpi.map(k=>'<div><b>'+k[0]+'</b><span>'+k[1]+'</span></div>').join('')+'</div>'+
+    (o.bintang>=2 ? '<div class="sticker-pop">'+(o.bintang===3?'🏆':'🎉')+'</div>' : '')+
+  '</div>'+
+  '<div class="btn-row" style="margin-top:16px">'+
+    '<button class="btn gold" data-act="'+o.utama.act+'">'+o.utama.lbl+'</button></div>'+
+  '<button class="btn ghost" style="margin-top:10px" data-act="'+o.kedua.act+'">'+o.kedua.lbl+'</button>'+
+  '<button class="btn blue" style="margin-top:10px" data-go="modul">Pilih modul lain</button>';
+  show('habis'); paintHome();
+}
+function renderLencana(){
+  const m=M();
+  const buka = (m.lencana||[]).length;
+  const milik = m.stiker||[];
+  $('#s-lencana').innerHTML =
+  '<h1 class="h1" style="margin:4px 0 6px">Ganjaran '+esc(m.nama)+'</h1>'+
+  '<p class="lead" style="margin-bottom:14px">'+buka+' daripada '+LENCANA.length+' lencana dibuka. '+
+    'Lencana terbuka sendiri apabila syaratnya dicapai.</p>'+
+  '<div class="bar-wrap" style="margin-bottom:18px"><div class="bar gold dark"><i style="width:'+(buka/LENCANA.length*100)+'%"></i></div>'+
+  '<span class="bar-lbl">'+buka+'/'+LENCANA.length+'</span></div>'+
+  '<div class="bgrid">'+ LENCANA.map(b=>{
+    const ada = (m.lencana||[]).indexOf(b.id)>=0;
+    return '<div class="bcell '+(ada?'win':'lock')+'"><span class="glyph">'+ic(ada?b.ikon:'i-lock','ic-lg')+'</span>'+
+      '<span class="nm">'+b.nm+'</span><span class="ds">'+b.ds+'</span></div>';
+  }).join('')+'</div>'+
+
+  '<div class="sec-head"><h2 class="h2">Album Stiker</h2><span class="badge ghost">'+milik.length+'/'+STIKER.length+'</span></div>'+
+  '<div class="panel">'+
+    '<div class="stikers">'+ STIKER.map(s=>{
+      const ada = milik.indexOf(s.id)>=0;
+      return '<div class="'+(ada?'':'empty')+'">'+(ada?s.emo:'🔒')+'</div>';
+    }).join('')+'</div>'+
+    '<p class="mut" style="margin-top:10px">Stiker boleh dicetak atau ditunjukkan kepada ibu bapa sebagai peneguhan positif.</p>'+
+  '</div>'+
+
+  '<div class="sec-head"><h2 class="h2">Beli Stiker</h2><span class="rule"></span></div>'+
+  '<div class="shop-grid">'+ STIKER.map(s=>{
+      const ada = milik.indexOf(s.id)>=0;
+      return '<div class="sitem'+(ada?' owned':'')+'">'+
+        '<div class="glyph" style="background:linear-gradient(135deg,var(--gold-d),var(--gold));border-color:#FFF0BF">'+s.emo+'</div>'+
+        '<div class="nm">'+s.nm+'</div><div class="ds">'+s.ds+'</div>'+
+        (ada ? '<span class="price" style="background:#E8F5E9;color:#2E7D32;border-color:#A5D6A7;box-shadow:none">Sudah ada</span>'
+             : '<button class="price" data-stiker="'+s.id+'">'+ic('i-coin','ic-sm')+s.harga+'</button>')+
+      '</div>';
+    }).join('')+'</div>'+
+
+  '<div class="panel" style="margin-top:16px"><h3 class="h3">'+ic('i-chart')+' Ringkasan kamu</h3>'+
+    '<ul class="klist">'+
+      '<li><span class="k">'+ic('i-coin','ic-sm')+'</span><span>Jumlah mata: <b>'+(m.mata||0)+'</b></span></li>'+
+      '<li><span class="k">'+ic('i-star','ic-sm')+'</span><span>Modul selesai: <b>'+habisModul(m)+'/'+MODUL.length+'</b> · Bintang dikumpul: <b>'+jumBintang(m)+'</b></span></li>'+
+      '<li><span class="k">'+ic('i-bolt','ic-sm')+'</span><span>Rekod Latih Tubi: <b>'+(m.latihBest||0)+'</b> betul</span></li>'+
+      '<li><span class="k">'+ic('i-refresh','ic-sm')+'</span><span>Hari belajar: <b>'+hariUnik(m)+'</b> hari</span></li>'+
+    '</ul></div>';
+}
+function renderKelas(){
+  const senarai = S.murid.slice().sort((a,b)=>(b.mata||0)-(a.mata||0));
+  $('#s-kelas').innerHTML =
+  '<h1 class="h1" style="margin:4px 0 6px">Papan Bintang Kelas</h1>'+
+  '<p class="lead" style="margin-bottom:16px">Semua murid dalam peranti ini. Raikan kemajuan setiap orang — '+
+    'bandingkan murid dengan dirinya semalam, bukan dengan rakan.</p>'+
+  senarai.map((p,i)=>
+    '<div class="row-rank '+(p.id===S.aktif?'me':'')+'">'+
+      '<span class="pos '+(i<3?'p'+(i+1):'')+'">'+(i+1)+'</span>'+
+      '<span class="fc">'+p.fc+'</span>'+
+      '<span class="nm">'+esc(p.nama)+'<small>Aras '+p.aras+' · '+habisModul(p)+' modul · '+jumBintang(p)+' bintang</small></span>'+
+      '<span class="pt">'+(p.mata||0)+'</span></div>').join('')+
+  '<div class="tip guru" style="margin-top:16px">'+ic('i-teacher','ic-sm')+
+    '<span><b>Nota guru:</b> Papan ini boleh disembunyikan daripada murid jika perbandingan menimbulkan kebimbangan. '+
+    'Gunakan sebagai rekod kelas untuk guru sahaja.</span></div>'+
+  '<button class="btn ghost" style="margin-top:14px" data-go="home">Kembali ke utama</button>';
+}
+
+/* ============================================================
+   PANEL GURU PPKI
+   ============================================================ */
+function renderGuru(){
+  const m = M();
+  const sw=(on)=>'<span class="sw'+(on?' on':'')+'"></span>';
+
+  $('#s-guru').innerHTML =
+  '<h1 class="h1" style="margin:4px 0 6px">Panel Guru</h1>'+
+  '<p class="lead" style="margin-bottom:16px">Urus murid, laraskan tetapan sesi mengikut keperluan individu, '+
+    'dan jana laporan untuk Rancangan Pendidikan Individu (RPI).</p>'+
+
+  /* ---- senarai murid ---- */
+  '<div class="gcard">'+
+    '<h3 class="h3">'+ic('i-users')+' Senarai Murid ('+S.murid.length+')</h3>'+
+    '<p class="mut" style="margin:6px 0 12px">Sentuh nama untuk menjadikannya murid aktif.</p>'+
+    S.murid.map(p=>
+      '<div class="mrow'+(p.id===S.aktif?' on':'')+'">'+
+        '<button class="fc" data-pilih="'+p.id+'" aria-label="Pilih '+esc(p.nama)+'">'+p.fc+'</button>'+
+        '<button class="nm" data-pilih="'+p.id+'" style="text-align:left">'+
+          '<b>'+esc(p.nama)+'</b>'+
+          '<span>Aras '+p.aras+' · '+(p.mata||0)+' mata · '+habisModul(p)+'/'+MODUL.length+' modul</span></button>'+
+        '<button class="btn ghost xs" data-lapor="'+p.id+'">'+ic('i-chart','ic-sm')+'</button>'+
+        '<button class="btn ghost xs" data-sunting="'+p.id+'">'+ic('i-gear','ic-sm')+'</button>'+
+      '</div>').join('')+
+    '<button class="btn purple" style="margin-top:12px" data-sunting="baharu">'+ic('i-plus','ic-sm')+' Tambah murid</button>'+
+  '</div>'+
+
+  /* ---- borang murid ---- */
+  (gEdit ? borangMurid() : '')+
+
+  /* ---- tetapan sesi ---- */
+  '<div class="gcard">'+
+    '<h3 class="h3">'+ic('i-gear')+' Tetapan Sesi</h3>'+
+    '<p class="mut" style="margin:6px 0 4px">Tetapan ini dikenakan kepada semua murid pada peranti ini.</p>'+
+    '<div class="swrow"><div class="tx"><b>Bacaan suara (TTS)</b>'+
+      '<span>Soalan dan huraian dibaca kuat dalam Bahasa Melayu. Penting untuk murid yang belum lancar membaca.</span></div>'+
+      '<button data-set="tts" aria-pressed="'+S.tetapan.tts+'">'+sw(S.tetapan.tts)+'</button></div>'+
+    '<div class="swrow"><div class="tx"><b>Kesan bunyi</b>'+
+      '<span>Bunyi ganjaran ringkas semasa menjawab.</span></div>'+
+      '<button data-set="bunyi" aria-pressed="'+S.tetapan.bunyi+'">'+sw(S.tetapan.bunyi)+'</button></div>'+
+    '<div class="swrow"><div class="tx"><b>Mod Tenang</b>'+
+      '<span>Buang animasi, konfeti dan warna kuat. Sesuai untuk murid hipersensitif deria atau mudah terganggu.</span></div>'+
+      '<button data-set="tenang" aria-pressed="'+S.tetapan.tenang+'">'+sw(S.tetapan.tenang)+'</button></div>'+
+    '<div class="swrow"><div class="tx"><b>Teks Besar</b>'+
+      '<span>Membesarkan soalan dan pilihan jawapan untuk murid bermasalah penglihatan.</span></div>'+
+      '<button data-set="besar" aria-pressed="'+S.tetapan.besar+'">'+sw(S.tetapan.besar)+'</button></div>'+
+    '<div class="swrow"><div class="tx"><b>Had masa dalam Latih Tubi</b>'+
+      '<span>Dimatikan secara lalai. Hidupkan hanya untuk murid yang bersedia dengan tekanan masa.</span></div>'+
+      '<button data-set="masa" aria-pressed="'+S.tetapan.masa+'">'+sw(S.tetapan.masa)+'</button></div>'+
+
+    '<div class="field"><label>Bilangan soalan setiap kuiz</label>'+
+      '<div class="seg">'+[3,4,5,6].map(n=>
+        '<button data-soalan="'+n+'" class="'+(S.tetapan.soalan===n?'on':'')+'">'+n+' soalan</button>').join('')+'</div></div>'+
+
+    '<div class="field"><label>Kelajuan bacaan suara</label>'+
+      '<div class="seg">'+[[0.7,'Perlahan'],[0.85,'Sederhana'],[1,'Biasa']].map(x=>
+        '<button data-laju="'+x[0]+'" class="'+(S.tetapan.laju===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div>'+
+      '<button class="btn ghost sm" style="margin-top:10px" data-sebut="Ini contoh bacaan suara untuk murid. Dua tambah tiga sama dengan lima.">'+
+        ic('i-speak','ic-sm')+' Uji suara</button></div>'+
+  '</div>'+
+
+  /* ---- panduan aras ---- */
+  '<div class="gcard">'+
+    '<h3 class="h3">'+ic('i-eye')+' Panduan Aras</h3>'+
+    '<table class="tbl">'+
+      '<tr><th>Aras</th><th>Modul dibuka</th><th>Pilihan jawapan</th></tr>'+
+      '<tr><td><b>1</b> Asas</td><td>Modul 1–4 (bilang, tambah &amp; tolak asas)</td><td class="cen">2 pilihan</td></tr>'+
+      '<tr><td><b>2</b> Pertengahan</td><td>Modul 1–8 (nilai tempat, bentuk, corak)</td><td class="cen">3 pilihan</td></tr>'+
+      '<tr><td><b>3</b> Kehidupan Harian</td><td>Semua 12 modul (wang, masa, ukuran, data)</td><td class="cen">4 pilihan</td></tr>'+
+    '</table>'+
+    '<div class="tip guru" style="margin-top:12px">'+ic('i-bulb','ic-sm')+
+      '<span>Turunkan aras jika murid gagal 3 kali berturut-turut dalam satu modul. Kejayaan berterusan '+
+      'lebih penting daripada kelajuan menghabiskan sukatan.</span></div>'+
+  '</div>'+
+
+  /* ---- data & privasi ---- */
+  '<div class="gcard">'+
+    '<h3 class="h3">'+ic('i-lock')+' Data &amp; Privasi</h3>'+
+    '<ul class="klist">'+
+      '<li><span class="k">'+ic('i-check','ic-sm')+'</span><span>Semua rekod murid disimpan <b>dalam pelayar peranti ini sahaja</b> (localStorage).</span></li>'+
+      '<li><span class="k">'+ic('i-check','ic-sm')+'</span><span>Tiada nama atau markah dihantar ke internet.</span></li>'+
+      '<li><span class="k">'+ic('i-bulb','ic-sm')+'</span><span>Muat turun CSV dari halaman laporan sebagai salinan simpanan.</span></li>'+
+    '</ul>'+
+    '<button class="btn red" style="margin-top:12px" id="btn-reset-semua">'+ic('i-trash','ic-sm')+' Padam semua data</button>'+
+  '</div>';
+}
+function borangMurid(){
+  const b = gEdit;
+  const baharu = b.id==='baharu';
+  return '<div class="gcard" style="border-color:var(--purple-l)">'+
+    '<h3 class="h3">'+ic(baharu?'i-plus':'i-gear')+' '+(baharu?'Murid Baharu':'Sunting Murid')+'</h3>'+
+    '<div class="field"><label>Nama murid</label>'+
+      '<input type="text" id="f-nama" value="'+esc(b.nama||'')+'" placeholder="Contoh: Aina binti Rahim" maxlength="40"></div>'+
+    '<div class="field"><label>Avatar</label><div class="avapick">'+
+      AVATARS.map(a=>'<button data-ava="'+a+'" class="'+(b.fc===a?'on':'')+'">'+a+'</button>').join('')+
+    '</div></div>'+
+    '<div class="field"><label>Aras murid</label><div class="seg">'+
+      [1,2,3].map(n=>'<button data-aras="'+n+'" class="'+(b.aras===n?'on':'')+'">Aras '+n+'</button>').join('')+
+    '</div></div>'+
+    '<div class="btn-row" style="margin-top:16px">'+
+      '<button class="btn" id="btn-simpan-murid">'+ic('i-check','ic-sm')+' Simpan</button>'+
+      '<button class="btn ghost" id="btn-batal-murid">Batal</button>'+
+    '</div>'+
+    (baharu ? '' :
+      '<button class="btn red sm" style="margin-top:10px" data-buang="'+b.id+'">'+
+      ic('i-trash','ic-sm')+' Padam murid ini</button>')+
+  '</div>';
+}
+
+/* ============================================================
+   LAPORAN MURID (untuk RPI)
+   ============================================================ */
+function statusModul(d){
+  if(!d.habis) return ['b','Belum mula'];
+  const jum = d.bestJum || 5;
+  const p = (d.best||0) / jum;
+  if(p>=0.8) return ['k','Menguasai'];
+  if(p>=0.5) return ['s','Sedang maju'];
+  return ['b','Perlu bimbingan'];
+}
+function renderLapor(id){
+  const m = S.murid.find(x=>x.id===id) || M();
+  gLapor = m.id;
+  const kuasai = MODUL.filter(t=>statusModul(mp(m,t.id))[0]==='k').length;
+  const sedang = MODUL.filter(t=>statusModul(mp(m,t.id))[0]==='s').length;
+  const jumCuba = MODUL.reduce((x,t)=>x+(mp(m,t.id).cuba||0),0);
+  const hariIni = new Date().toLocaleDateString('ms-MY',{day:'2-digit',month:'long',year:'numeric'});
+
+  $('#s-lapor').innerHTML =
+  '<button class="btn ghost xs noprint" data-go="guru">'+ic('i-left','ic-sm')+' Panel Guru</button>'+
+
+  '<div class="gcard" style="margin-top:12px">'+
+    '<div style="display:flex;align-items:center;gap:12px">'+
+      '<span style="font-size:40px">'+m.fc+'</span>'+
+      '<div style="flex:1">'+
+        '<div class="eyebrow">Laporan Kemajuan Matematik · PPKI</div>'+
+        '<h1 class="h2" style="margin-top:2px">'+esc(m.nama)+'</h1>'+
+        '<p class="mut">'+ARAS_NAMA[m.aras]+' · Dijana '+hariIni+'</p>'+
+      '</div>'+
+    '</div>'+
+    '<div class="kpi" style="margin-top:14px">'+
+      '<div style="border-color:var(--line);background:#F7F4FF;color:var(--ink)"><b>'+kuasai+'</b><span>Modul dikuasai</span></div>'+
+      '<div style="border-color:var(--line);background:#F7F4FF;color:var(--ink)"><b>'+jumBintang(m)+'</b><span>Jumlah bintang</span></div>'+
+      '<div style="border-color:var(--line);background:#F7F4FF;color:var(--ink)"><b>'+hariUnik(m)+'</b><span>Hari belajar</span></div>'+
+    '</div>'+
+    '<div class="bar-wrap" style="margin-top:14px">'+
+      '<div class="bar dark"><i style="width:'+(kuasai/MODUL.length*100)+'%"></i></div>'+
+      '<span class="bar-lbl">'+kuasai+'/'+MODUL.length+' dikuasai</span></div>'+
+  '</div>'+
+
+  '<div class="gcard">'+
+    '<h3 class="h3">'+ic('i-chart')+' Pencapaian Mengikut Modul</h3>'+
+    '<table class="tbl">'+
+      '<tr><th>Modul</th><th class="cen">Aras</th><th class="cen">Terbaik</th><th class="cen">★</th><th class="cen">Cuba</th><th>Status</th></tr>'+
+      MODUL.map(t=>{
+        const d = mp(m,t.id), st = statusModul(d);
+        return '<tr><td><b>'+t.pendek+'</b></td>'+
+          '<td class="cen">'+t.aras+'</td>'+
+          '<td class="cen">'+(d.habis?d.best+'/'+(d.bestJum||5):'—')+'</td>'+
+          '<td class="cen">'+(d.bintang||0)+'</td>'+
+          '<td class="cen">'+(d.cuba||0)+'</td>'+
+          '<td><span class="pill '+st[0]+'">'+st[1]+'</span></td></tr>';
+      }).join('')+
+    '</table>'+
+    '<p class="mut" style="margin-top:10px">Menguasai = 80% atau lebih betul. Sedang maju = 50–79%. '+
+      'Perlu bimbingan = kurang 50% atau belum dicuba.</p>'+
+  '</div>'+
+
+  '<div class="gcard">'+
+    '<h3 class="h3">'+ic('i-bulb')+' Cadangan Tindakan</h3>'+
+    '<ul class="klist">'+ cadanganRPI(m).map((c,i)=>
+      '<li><span class="k">'+(i+1)+'</span><span>'+c+'</span></li>').join('')+'</ul>'+
+  '</div>'+
+
+  '<div class="gcard">'+
+    '<h3 class="h3">'+ic('i-clock')+' Rekod Sesi Terkini</h3>'+
+    ((m.log||[]).length ? (m.log||[]).slice(0,15).map(l=>
+      '<div class="logline"><time>'+tarikh(l.t)+'</time>'+
+      '<span><b>'+esc(l.nama)+'</b> — '+l.betul+'/'+l.jum+' betul · '+l.bintang+' bintang · +'+l.mata+' mata</span></div>'
+    ).join('') : '<p class="mut">Belum ada rekod sesi.</p>')+
+    '<p class="mut" style="margin-top:10px">Jumlah percubaan kuiz: <b>'+jumCuba+'</b> · '+
+      'Rekod Latih Tubi: <b>'+(m.latihBest||0)+'</b> betul</p>'+
+  '</div>'+
+
+  '<div class="gcard noprint">'+
+    '<h3 class="h3">'+ic('i-print')+' Simpan Laporan</h3>'+
+    '<div class="btn-row" style="margin-top:10px">'+
+      '<button class="btn blue" id="btn-cetak">'+ic('i-print','ic-sm')+' Cetak / PDF</button>'+
+      '<button class="btn teal" id="btn-csv">'+ic('i-chart','ic-sm')+' Muat turun CSV</button>'+
+    '</div>'+
+    '<p class="mut" style="margin-top:10px">Cetakan menggunakan susun atur khas — hanya laporan ini dicetak, '+
+      'tanpa menu dan butang.</p>'+
+  '</div>';
+
+  show('lapor');
+}
+function cadanganRPI(m){
+  const out = [];
+  const lemah = MODUL.filter(t=>t.aras<=m.aras && statusModul(mp(m,t.id))[0]!=='k');
+  const kuasaiSemua = lemah.length===0;
+
+  if(kuasaiSemua && m.aras<3){
+    out.push('Murid telah menguasai semua modul Aras '+m.aras+'. <b>Naikkan ke Aras '+(m.aras+1)+'</b> dalam Panel Guru.');
+  } else if(kuasaiSemua){
+    out.push('Murid telah menguasai kesemua modul. Kekalkan dengan latihan pengekalan mingguan dan aplikasi situasi sebenar.');
+  } else {
+    const fokus = lemah.slice(0,2).map(t=>'<b>'+t.pendek+'</b>').join(' dan ');
+    out.push('Fokus pengajaran seterusnya: '+fokus+'. Ulang makmal maujud sebelum kuiz.');
+  }
+  const cuba = MODUL.filter(t=>(mp(m,t.id).cuba||0)>=3 && mp(m,t.id).bintang<2);
+  if(cuba.length){
+    out.push('Modul <b>'+cuba[0].pendek+'</b> telah dicuba '+mp(m,cuba[0].id).cuba+' kali tanpa 2 bintang. '+
+      'Pertimbangkan menurunkan bilangan pilihan jawapan atau menambah sesi bimbingan individu.');
+  }
+  if(hariUnik(m)<3){
+    out.push('Baharu '+hariUnik(m)+' hari sesi direkodkan. Sasarkan <b>3 sesi pendek seminggu</b> (10–15 minit) untuk membina rutin.');
+  } else {
+    out.push('Rutin belajar sudah terbentuk ('+hariUnik(m)+' hari). Kekalkan sesi pendek dan konsisten.');
+  }
+  if(m.aras>=3){
+    out.push('Kaitkan modul <b>Wang</b> dan <b>Masa</b> dengan aktiviti sebenar di kantin dan jadual kelas '+
+      'untuk memindahkan kemahiran ke kehidupan harian.');
+  } else {
+    out.push('Gunakan bahan maujud sebenar (guli, penutup botol, straw) seiring dengan aplikasi ini '+
+      'supaya konsep tidak terhad kepada skrin sahaja.');
+  }
+  return out;
+}
+function muatTurunCSV(){
+  const m = S.murid.find(x=>x.id===gLapor) || M();
+  const baris = [['Modul','Aras','Terbaik','Jumlah Soalan','Bintang','Percubaan','Status']];
+  MODUL.forEach(t=>{
+    const d=mp(m,t.id), st=statusModul(d);
+    baris.push([t.nama.replace(/&amp;/g,'dan'), t.aras, d.habis?d.best:'', d.habis?(d.bestJum||5):'', d.bintang||0, d.cuba||0, st[1]]);
+  });
+  baris.push([]);
+  baris.push(['Rekod Sesi','Tarikh','Aktiviti','Betul','Jumlah','Bintang','Mata']);
+  (m.log||[]).forEach(l=>{
+    baris.push(['', new Date(l.t).toLocaleString('ms-MY'), l.nama, l.betul, l.jum, l.bintang, l.mata]);
+  });
+  const csv = '﻿' + baris.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  try{
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'Laporan-'+m.nama.replace(/[^\w]+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast('Fail CSV dimuat turun.');
+  }catch(e){ toast('Pelayar ini tidak menyokong muat turun.', true); }
+}
+
+/* ============================================================
+   KEDAI & ALAT BANTUAN
+   ============================================================ */
+function beliBantu(id){
+  const m=M(), it = BANTU.find(x=>x.id===id);
+  if((m.mata||0) < it.harga){ Bunyi.salah(); toast('Mata belum cukup. Perlu '+it.harga+' mata.',true); return; }
+  m.mata -= it.harga;
+  m.bantu = m.bantu || {};
+  m.bantu[id] = (m.bantu[id]||0)+1;
+  save(); syncChrome(); paintHome(); Bunyi.betul();
+  toast(it.nm+' dibeli. Simpanan: '+m.bantu[id]);
+}
+function beliStiker(id){
+  const m=M(), it = STIKER.find(x=>x.id===id);
+  m.stiker = m.stiker || [];
+  if(m.stiker.indexOf(id)>=0) return;
+  if((m.mata||0) < it.harga){ Bunyi.salah(); toast('Mata belum cukup. Perlu '+it.harga+' mata.',true); return; }
+  m.mata -= it.harga; m.stiker.push(id);
+  save(); syncChrome(); Bunyi.menang(); confetti(30);
+  toast('Stiker '+it.emo+' '+it.nm+' diperoleh!');
+  renderLencana();
+}
+function gunaBantu(id){
+  const m=M();
+  m.bantu = m.bantu || {};
+  if((m.bantu[id]||0)<=0){
+    toast('Belum ada '+BANTU.find(x=>x.id===id).nm+'. Beli di Kedai Ganjaran.', true); return;
+  }
+  if(cur.jawab) return;
+  if(id==='petunjuk'){
+    m.bantu.petunjuk--; save();
+    const t = cur.modul.tip.replace(/<[^>]+>/g,'');
+    toast('Petunjuk: '+t);
+    Cakap.sebut('Petunjuk. '+t);
+  }
+  if(id==='buang'){
+    m.bantu.buang--; save();
+    const s = cur.list[cur.i];
+    const salah = s.o.map((_,i)=>i).filter(i=>i!==s.a);
+    const ada = salah.filter(i=>{ const b=$('#opts .opt[data-opt="'+i+'"]'); return b && !b.disabled; });
+    if(ada.length>1){
+      const buang = ada[rnd(0,ada.length-1)];
+      const b=$('#opts .opt[data-opt="'+buang+'"]');
+      if(b){ b.classList.add('dim'); b.disabled=true; }
+      Bunyi.tap();
+    }
+  }
+  if(id==='langkau'){
+    m.bantu.langkau--; save();
+    cur.rekod[cur.i] = null;
+    cur.jawab=false; cur.i++;
+    if(cur.i>=cur.list.length) habisKuiz(); else renderKuiz();
+    return;
+  }
+  const row = $('#s-kuiz .btn-row'); if(row) row.innerHTML = butangBantu();
+}
+
+/* ============================================================
+   PENGENDALI KLIK & PERMULAAN
+   ============================================================ */
+function pergi(tab){
+  Cakap.henti();
+  if(tab!=='latih') hentiLatih();
+  if(tab==='home')    paintHome();
+  if(tab==='modul')   renderModul();
+  if(tab==='lencana') renderLencana();
+  if(tab==='kelas')   renderKelas();
+  if(tab==='guru'){ gEdit=null; renderGuru(); }
+  if(tab==='latih'){ mulaLatih(); return; }
+  show(tab);
+}
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-go],[data-belajar],[data-kuiz],[data-opt],[data-lopt],[data-beli],'+
+    '[data-stiker],[data-guna],[data-act],[data-a],[data-tab],[data-sebut],[data-pilih],[data-sunting],'+
+    '[data-lapor],[data-buang],[data-set],[data-soalan],[data-laju],[data-ava],[data-aras]');
+  if(!t) return;
+
+  if(t.dataset.tab){ Bunyi.tap(); pergi(t.dataset.tab); return; }
+  if(t.dataset.go){ Bunyi.tap(); pergi(t.dataset.go); return; }
+  if(t.dataset.sebut!==undefined){ Cakap.sebut(t.dataset.sebut, t); return; }
+  if(t.dataset.belajar){ Bunyi.tap(); renderBelajar(t.dataset.belajar); return; }
+  if(t.dataset.kuiz){ Bunyi.tap(); mulaKuiz(t.dataset.kuiz); return; }
+  if(t.dataset.opt!==undefined && !t.disabled){ jawab(Number(t.dataset.opt)); return; }
+  if(t.dataset.lopt!==undefined){ jawabLatih(Number(t.dataset.lopt)); return; }
+  if(t.dataset.beli){ beliBantu(t.dataset.beli); return; }
+  if(t.dataset.stiker){ beliStiker(t.dataset.stiker); return; }
+  if(t.dataset.guna){ gunaBantu(t.dataset.guna); return; }
+  if(t.dataset.a){ labAksi(t.dataset.a); return; }
+
+  /* ---- panel guru ---- */
+  if(t.dataset.pilih){
+    S.aktif = t.dataset.pilih; gEdit=null; save(); syncChrome(); Bunyi.betul();
+    toast('Murid aktif: '+M().nama); renderGuru(); return;
+  }
+  if(t.dataset.sunting){
+    const id=t.dataset.sunting;
+    gEdit = id==='baharu' ? {id:'baharu', nama:'', fc:AVATARS[0], aras:1}
+                          : Object.assign({}, S.murid.find(x=>x.id===id));
+    Bunyi.tap(); renderGuru();
+    setTimeout(()=>{ const f=$('#f-nama'); if(f) f.focus(); },60);
+    return;
+  }
+  if(t.dataset.lapor){ Bunyi.tap(); renderLapor(t.dataset.lapor); return; }
+  if(t.dataset.buang){
+    const id=t.dataset.buang;
+    if(S.murid.length<=1){ toast('Sekurang-kurangnya seorang murid diperlukan.',true); return; }
+    const p=S.murid.find(x=>x.id===id);
+    if(!confirm('Padam murid "'+p.nama+'" dan semua rekodnya?')) return;
+    S.murid = S.murid.filter(x=>x.id!==id);
+    if(S.aktif===id) S.aktif = S.murid[0].id;
+    gEdit=null; save(); syncChrome(); renderGuru(); toast('Rekod murid dipadam.');
+    return;
+  }
+  if(t.dataset.ava){ if(gEdit){ gEdit.fc=t.dataset.ava; Bunyi.tap(); renderGuru(); } return; }
+  if(t.dataset.aras){
+    if(gEdit){ gEdit.aras=Number(t.dataset.aras); Bunyi.tap(); renderGuru(); }
+    return;
+  }
+  if(t.dataset.set){
+    const k=t.dataset.set;
+    S.tetapan[k] = !S.tetapan[k];
+    if(k==='tts' && !S.tetapan.tts) Cakap.henti();
+    save(); syncChrome(); renderGuru(); Bunyi.tap();
+    return;
+  }
+  if(t.dataset.soalan){ S.tetapan.soalan=Number(t.dataset.soalan); save(); renderGuru(); Bunyi.tap(); return; }
+  if(t.dataset.laju){ S.tetapan.laju=Number(t.dataset.laju); save(); renderGuru(); Bunyi.tap(); return; }
+
+  if(t.dataset.act){
+    const a=t.dataset.act;
+    Bunyi.tap();
+    if(a==='latih') mulaLatih();
+    else if(a.indexOf('kuiz:')===0) mulaKuiz(a.split(':')[1]);
+    else if(a.indexOf('belajar:')===0) renderBelajar(a.split(':')[1]);
+    else if(a.indexOf('go:')===0) pergi(a.split(':')[1]);
+    return;
+  }
+});
+document.addEventListener('click', e=>{
+  if(e.target.closest('#btn-next')) seterusnyaKuiz();
+  if(e.target.closest('#btn-latih-stop')) habisLatih();
+  if(e.target.closest('#btn-say')){
+    const s = $('#s-kuiz').classList.contains('active') ? cur.list[cur.i] : latih.soal;
+    if(s) Cakap.sebut(s.q, e.target.closest('#btn-say'));
+  }
+  if(e.target.closest('#btn-step')){
+    const sisa = $$('#steps .step.hide');
+    if(sisa.length){
+      sisa[0].classList.remove('hide'); Bunyi.tap();
+      Cakap.sebut(sisa[0].textContent);
+    }
+    if(sisa.length<=1){ const b=$('#btn-step'); if(b){ b.disabled=true; b.textContent='Semua langkah ditunjukkan'; } }
+  }
+  if(e.target.closest('#btn-simpan-murid')){
+    const nama = ($('#f-nama').value||'').trim();
+    if(!nama){ toast('Sila isi nama murid.',true); $('#f-nama').focus(); return; }
+    if(gEdit.id==='baharu'){
+      const baru = muridBaharu(nama, gEdit.fc, gEdit.aras);
+      S.murid.push(baru); S.aktif = baru.id;
+      toast('Murid '+nama+' ditambah.');
+    } else {
+      const p = S.murid.find(x=>x.id===gEdit.id);
+      p.nama=nama; p.fc=gEdit.fc; p.aras=gEdit.aras;
+      toast('Maklumat murid dikemas kini.');
+    }
+    gEdit=null; save(); syncChrome(); renderGuru(); Bunyi.betul();
+  }
+  if(e.target.closest('#btn-batal-murid')){ gEdit=null; renderGuru(); }
+  if(e.target.closest('#btn-cetak')){ window.print(); }
+  if(e.target.closest('#btn-csv')){ muatTurunCSV(); }
+  if(e.target.closest('#btn-reset-semua')){
+    if(!confirm('Padam SEMUA murid dan rekod pada peranti ini? Tindakan ini tidak boleh dibatalkan.')) return;
+    try{ localStorage.removeItem(KEY); }catch(e2){}
+    location.reload();
+  }
+});
+
+function init(){
+  load();
+  Cakap.init();
+  $('#splash-art').innerHTML = maskot(200);
+  syncChrome();
+  paintHome();
+
+  $('#btn-start').addEventListener('click', ()=>{
+    Bunyi.on(); Bunyi.tap();
+    $('#topbar').hidden=false; $('#nav').hidden=false;
+    pergi('home');
+  });
+  $('#btn-guru-splash').addEventListener('click', ()=>{
+    Bunyi.tap();
+    $('#topbar').hidden=false; $('#nav').hidden=false;
+    pergi('guru');
+  });
+  $('#avatar').addEventListener('click', ()=>{ Bunyi.tap(); pergi('guru'); });
+  $('#btn-sound').addEventListener('click', ()=>{
+    S.tetapan.bunyi = !S.tetapan.bunyi; save(); syncChrome();
+    if(S.tetapan.bunyi) Bunyi.tap();
+    toast('Bunyi '+(S.tetapan.bunyi?'dihidupkan':'dimatikan'));
+  });
+  $('#btn-tts').addEventListener('click', ()=>{
+    S.tetapan.tts = !S.tetapan.tts; save(); syncChrome();
+    if(!S.tetapan.tts) Cakap.henti(); else Cakap.sebut('Bacaan suara dihidupkan');
+    toast('Bacaan suara '+(S.tetapan.tts?'dihidupkan':'dimatikan'));
+  });
+
+  /* papan kekunci — sokongan guru & murid yang guna papan kekunci luaran */
+  document.addEventListener('keydown', e=>{
+    const dalamKuiz = $('#s-kuiz').classList.contains('active');
+    const dalamLatih = $('#s-latih').classList.contains('active');
+    if(!dalamKuiz && !dalamLatih) return;
+    if(/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))) return;
+    let k = 'abcd'.indexOf(e.key.toLowerCase());
+    if(k<0) k = '1234'.indexOf(e.key);
+    if(k>=0){
+      const sel = dalamKuiz ? '#opts .opt[data-opt="'+k+'"]' : '#latih-opts .opt[data-lopt="'+k+'"]';
+      const b=$(sel); if(b && !b.disabled) b.click();
+    }
+    if(e.key==='Enter'){ const n=$('#btn-next'); if(n) n.click(); }
+    if(e.key===' '){ const s=$('#btn-say'); if(s){ e.preventDefault(); s.click(); } }
+  });
+
+  window.addEventListener('beforeunload', ()=>{ Cakap.henti(); });
+}
+init();
+
+</script>
+</body>
+</html>

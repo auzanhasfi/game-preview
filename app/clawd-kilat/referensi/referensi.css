@@ -1,0 +1,64 @@
+/* Halaman referensi — token warna sama dengan Arena Clawd Pro (biru malam + emas) */
+:root {
+  --bg: #0c1526; --s1: #121d33; --s2: #182641; --ln: #2c3c5c; --ln2: #3d4f74;
+  --gold: #d9b25f; --t0: #efe6d2; --t1: #a9b4c9; --t2: #75839e; --clawd: #e08a66;
+  --font-serif: 'Source Serif 4', Georgia, serif; --font-ui: 'Geist', system-ui, sans-serif; --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--t0); font: 400 16px/1.55 var(--font-ui); }
+a { color: var(--t0); }
+h1, h2 { font-family: var(--font-serif); margin: 0; letter-spacing: -.01em; }
+.ttl { font: 500 11px/1.2 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--t2); }
+.fine { font-size: 13px; color: var(--t2); max-width: 62ch; }
+.hero { max-width: 980px; margin: 0 auto; padding: 64px 16px 32px; display: flex; flex-direction: column; gap: 16px; }
+.hero .ttl { color: var(--gold); }
+.hero h1 { font-size: clamp(48px, 9vw, 104px); line-height: .95; }
+.lead { font-size: 18px; color: var(--t1); max-width: 62ch; margin: 0; }
+.lead b { color: var(--t0); font-family: var(--font-mono); }
+.cta { display: flex; gap: 12px; flex-wrap: wrap; }
+.gbtn, .bbtn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border-radius: 10px; text-decoration: none; font-weight: 600; }
+.gbtn { background: var(--gold); color: #1a1408; }
+.bbtn { border: 1px solid var(--ln2); }
+.bbtn:hover { border-color: var(--gold); }
+.papan { max-width: 980px; margin: 0 auto 24px; padding: 0 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.zona { min-height: 150px; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; border: 1px solid var(--ln); }
+.zona b { font: 700 20px/1.1 var(--font-serif); }
+.zona i { font-style: normal; font-size: 13px; color: rgba(255,255,255,.8); }
+.zona .ttl { color: rgba(255,255,255,.75); }
+.z1 { background: linear-gradient(180deg, #7ec8f0 0%, #9fd8a0 60%, #4f9a4c 100%); color: #10230f; }
+.z1 i, .z1 .ttl { color: #1d3a1b; }
+.z2 { background: linear-gradient(180deg, #f6a96b 0%, #f3d08c 55%, #d9b27a 100%); color: #3a1f0c; }
+.z2 i, .z2 .ttl { color: #5a3518; }
+.z3 { background: linear-gradient(180deg, #1a1440 0%, #3a2a78 55%, #e05fa0 100%); }
+.z4 { background: var(--s2); border-color: var(--gold); }
+.z4 .ttl { color: var(--gold); }
+.blok { max-width: 980px; margin: 0 auto; padding: 32px 16px; }
+.kepala { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.kepala h2 { font-size: 30px; }
+#cari { background: var(--s1); border: 1px solid var(--ln2); color: var(--t0); border-radius: 10px; min-height: 44px; padding: 0 14px; font: inherit; width: min(320px, 100%); }
+.filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.filter button { font: 500 13px var(--font-ui); color: var(--t1); background: transparent; border: 1px solid var(--ln); border-radius: 999px; padding: 8px 14px; cursor: pointer; min-height: 36px; }
+.filter button b { font-family: var(--font-mono); color: var(--t2); margin-left: 4px; }
+.filter button[aria-pressed="true"] { border-color: var(--gold); color: var(--t0); }
+.filter button[aria-pressed="true"] b { color: var(--gold); }
+.daftar { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.daftar li { display: flex; gap: 12px; background: var(--s1); border: 1px solid var(--ln); border-radius: 12px; padding: 14px; }
+.daftar a { font-weight: 600; text-decoration: none; }
+.daftar a:hover { color: var(--gold); text-decoration: underline; }
+.daftar p { margin: 4px 0 6px; font-size: 14px; color: var(--t1); }
+.host { font: 400 11.5px var(--font-mono); color: var(--t2); word-break: break-all; }
+.no { font: 500 12px var(--font-mono); color: var(--gold); padding-top: 3px; flex: none; }
+.tabel { display: flex; flex-direction: column; border-top: 1px solid var(--ln); }
+.baris { display: grid; grid-template-columns: 44px 150px 1fr 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--ln); align-items: start; }
+.kat { font: 500 11px/1.4 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--t2); padding-top: 3px; }
+.amat, .pakai { margin: 0; font-size: 14.5px; }
+.pakai { color: var(--t1); display: flex; flex-direction: column; gap: 3px; }
+.pakai .ttl { color: var(--gold); }
+.kaki { max-width: 980px; margin: 0 auto; padding: 32px 16px 56px; display: flex; justify-content: space-between; gap: 12px; color: var(--t2); font-size: 14px; flex-wrap: wrap; }
+@media (max-width: 760px) {
+  .papan { grid-template-columns: 1fr 1fr; }
+  .daftar { grid-template-columns: 1fr; }
+  .baris { grid-template-columns: 40px 1fr; }
+  .baris .kat { grid-column: 2; }
+  .baris .amat, .baris .pakai { grid-column: 2; }
+}

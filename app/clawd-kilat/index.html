@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Clawd Kilat</title>
+<meta name="description" content="Game lari kilat 3D matematika: Clawd berlari di 3 lajur, lompati rintangan, hancurkan Si Comot, isi meter KILAT, pilih jawaban benar di gerbang angka, dan kalahkan Raja Comot. Bahasa Indonesia dan Melayu.">
+<meta property="og:title" content="Clawd Kilat"><meta property="og:description" content="Lari kilat 3D + soal matematika. Tokoh dari Arena Clawd Pro."><meta property="og:image" content="sampul.jpg">
+<meta name="theme-color" content="#0c1526">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='8' width='24' height='14' fill='%23d8714f' stroke='%232e2620' stroke-width='2'/%3E%3Crect x='10' y='12' width='3' height='5' fill='%232e2620'/%3E%3Crect x='19' y='12' width='3' height='5' fill='%232e2620'/%3E%3Cpath d='M7 22v6M12 22v6M20 22v6M25 22v6' stroke='%232e2620' stroke-width='2.5'/%3E%3Cpath d='M22 1l-4 6h3l-2 5 5-7h-3z' fill='%23ffd23a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=Geist:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/gaya.css">
+<script type="importmap">{ "imports": { "three": "./js/vendor/three/three.module.js", "three/addons/": "./js/vendor/three/addons/" } }</script>
+</head>
+<body>
+<div id="kanvas"></div>
+<div id="vig"></div>
+<div id="fx"></div>
+
+<!-- HUD saat lari -->
+<div id="hud" class="hud" hidden>
+  <div class="hud-kiri">
+    <button id="bJeda" class="xbtn" data-uji="jeda" aria-label="Jeda"></button>
+    <div class="jarak"><b id="hJarak">0<small>m</small></b><span id="hSkor">0</span></div>
+  </div>
+  <div class="hud-kanan">
+    <div class="chip koin" id="hKoinC"><span id="hKoinI"></span><b id="hKoin">0</b></div>
+    <div class="chip mult" id="hMultC"><span id="hMultL"></span><b id="hMult">×1</b></div>
+    <div class="power" id="hPower"></div>
+  </div>
+  <div id="pSoal" class="psoal" hidden aria-live="polite">
+    <span class="ttl" id="pSoalJudul"></span>
+    <div class="soalteks" id="pSoalTeks"></div>
+    <p class="cara" id="pSoalCara" hidden></p>
+    <div class="jarakbar"><i id="pSoalBar"></i></div>
+  </div>
+  <div id="bosBar" class="bosbar" hidden><span>RAJA COMOT</span><span class="nyawa" id="bosNyawa"></span></div>
+  <button id="bKilat" class="btn-kilat" data-uji="kilat" aria-label="Kilat">
+    <svg class="ring" viewBox="0 0 92 92" width="100%" height="100%"><circle cx="46" cy="46" r="42" fill="none" stroke="#2c3c5c" stroke-width="5"/><circle id="ringIsi" cx="46" cy="46" r="42" fill="none" stroke="#ffd86a" stroke-width="5" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264"/></svg>
+    <span class="isi"><span id="kilatIkon"></span><span id="kilatTeks">KILAT</span></span>
+  </button>
+  <div class="sepanduk" id="sepanduk"></div>
+  <div class="petunjuk" id="petunjuk" hidden></div>
+  <div id="toastWadah"></div>
+</div>
+
+<div id="hitung" class="hitung"></div>
+
+<!-- menu -->
+<section id="menu" class="menu pn" aria-labelledby="judul"></section>
+
+<!-- lembar -->
+<div id="lHero" class="lapis" hidden><div class="lembar" role="dialog" aria-modal="true" aria-labelledby="hJudul" id="lHeroIsi"></div></div>
+<div id="lJeda" class="lapis" hidden><div class="lembar kecil" role="dialog" aria-modal="true" id="lJedaIsi"></div></div>
+<div id="lBangkit" class="lapis" hidden><div class="lembar kecil" role="dialog" aria-modal="true" id="lBangkitIsi"></div></div>
+<div id="lHasil" class="lapis" hidden><div class="lembar" role="dialog" aria-modal="true" id="lHasilIsi"></div></div>
+
+<script src="js/00-ikon.js"></script>
+<script type="module" src="js/99-main.js"></script>
+</body></html>

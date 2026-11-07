@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Misi Detektif Nyamuk</title>
+<meta name="description" content="Game detektif Pendidikan Kesihatan Tahun 3: demam denggi dan demam malaria, bersama Clawd.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Nunito:wght@500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+<div id="muat" class="muat">Memuatkan fail kes…</div>
+
+<!-- menu -->
+<section id="skr-menu" class="skr menu" hidden>
+  <div class="menu-seni"><canvas data-seni="menu"></canvas></div>
+  <div class="menu-tks">
+    <span class="eyebrow">Pendidikan Kesihatan · Tahun 3 · Unit 6.0</span>
+    <h1>Misi Detektif Nyamuk</h1>
+    <p class="besar">Ramai penduduk Taman Seri Bersih demam. Bantu Detektif Clawd menyiasat enam lokasi, kumpul bukti tentang <b class="t-d">demam denggi</b> dan <b class="t-m">demam malaria</b>, lalu tumpaskan Raja Comot.</p>
+    <div class="menu-butang">
+      <button type="button" id="btn-mula" class="gbtn" data-uji="mula" data-ic="play">Mula misi</button>
+      <button type="button" id="btn-sambung" class="bbtn" data-uji="sambung" data-ic="next" hidden>Sambung kes</button>
+      <button type="button" id="btn-guru" class="bbtn" data-uji="guru" data-ic="book">Panduan guru</button>
+    </div>
+    <p class="redup kecil">Kawalan: ketik tanah untuk berjalan, atau guna anak panah / WASD. Sesuai di telefon, tablet dan papan pintar.</p>
+  </div>
+</section>
+
+<!-- peta -->
+<section id="skr-peta" class="skr peta" hidden>
+  <canvas id="peta" aria-label="Peta Taman Seri Bersih"></canvas>
+  <div class="hud-atas">
+    <button type="button" id="hud-bukti" class="hchip" data-uji="buku" aria-label="Buku Kes"><span data-ic="notebook"></span>Bukti <b>0/6</b></button>
+    <span id="hud-nyamuk" class="hchip"><span data-ic="bug"></span><b>0</b></span>
+    <span id="hud-bersih" class="hchip"><span data-ic="drop"></span><b>0</b></span>
+    <span class="isi"></span>
+    <button type="button" id="btn-huruf" class="hbtn" aria-label="Besarkan tulisan"></button>
+    <button type="button" id="btn-bunyi" class="hbtn"></button>
+  </div>
+  <p id="hud-misi" class="hud-misi"><span data-ic="target" data-ics="18"></span><span>…</span></p>
+  <button type="button" id="btn-masuk" class="gbtn masuk" data-uji="masuk" hidden><span>Siasat</span></button>
+</section>
+
+<!-- stesen -->
+<div id="lapis" class="lapis" hidden role="dialog" aria-modal="true" aria-labelledby="l-tajuk">
+  <div class="lembar">
+    <div class="l-kepala">
+      <div class="l-nama"><span class="eyebrow"><span id="l-tempat"></span> · <span id="l-tp"></span></span><h2 id="l-tajuk"></h2></div>
+      <button type="button" id="l-tutup" class="xbtn" data-uji="tutup" aria-label="Kembali ke peta" data-ic="close"></button>
+    </div>
+    <div id="l-titik" class="titik-maju"></div>
+    <div id="l-isi" class="l-isi"></div>
+    <div class="l-kaki">
+      <button type="button" id="l-dengar" class="bbtn" data-uji="dengar" data-ic="sound">Dengar</button>
+      <button type="button" id="l-lanjut" class="gbtn" data-uji="lanjut"><span>Seterusnya</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="akhir" class="lapis gelap" hidden></div>
+<div id="laporan" class="lapis" hidden></div>
+<div id="buku" class="lapis" hidden></div>
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script src="js/00-ikon.js"></script>
+<script src="js/01-data.js"></script>
+<script src="js/02-alat-tinta.js"></script>
+<script src="js/03-watak.js"></script>
+<script src="js/04-seni.js"></script>
+<script src="js/05-bunyi.js"></script>
+<script src="js/06-peta.js"></script>
+<script src="js/07-pelajaran.js"></script>
+<script src="js/08-mini-kenal.js"></script>
+<script src="js/09-mini-rantai.js"></script>
+<script src="js/10-mini-simptom.js"></script>
+<script src="js/11-mini-ronda.js"></script>
+<script src="js/12-mini-cerita.js"></script>
+<script src="js/13-mini-poster.js"></script>
+<script src="js/14-akhir.js"></script>
+<script src="js/15-laporan.js"></script>
+<script src="js/99-mulai.js"></script>
+</body>
+</html>

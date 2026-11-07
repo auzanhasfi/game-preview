@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CleanVoice — AI Noise Remover for Video</title>
+<meta name="description" content="Remove background noise from your videos entirely in the browser. Nothing is uploaded, no API keys, no server.">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --blue-1:#1d4ed8; --blue-2:#3b82f6; --blue-3:#93c5fd;
+  --teal-1:#0d9488; --teal-2:#14b8a6; --teal-3:#5eead4;
+
+  --bg:#f4f7fb;
+  --surface:#ffffff;
+  --surface-2:#eef3f9;
+  --line:#dbe4f0;
+  --text:#0b1524;
+  --muted:#5a6b83;
+  --track:#dde6f2;
+  --shadow:0 1px 2px rgba(11,21,36,.05), 0 18px 40px -26px rgba(11,21,36,.45);
+  --ring:0 0 0 3px rgba(59,130,246,.35);
+  --radius:14px;
+}
+html[data-theme="dark"]{
+  --bg:#060b14;
+  --surface:#0d1725;
+  --surface-2:#111f31;
+  --line:#1d3049;
+  --text:#e6eefb;
+  --muted:#8ea3c0;
+  --track:#17263a;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 24px 50px -28px rgba(0,0,0,.9);
+  --ring:0 0 0 3px rgba(45,212,191,.32);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  transition:background .35s ease,color .35s ease;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(760px 420px at 12% -8%, rgba(59,130,246,.18), transparent 62%),
+    radial-gradient(680px 420px at 92% 4%, rgba(20,184,166,.16), transparent 60%);
+}
+.mono{font-family:ui-monospace,"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 72px}
+
+/* ============ HEADER ============ */
+header{
+  position:sticky; top:0; z-index:40;
+  backdrop-filter:blur(14px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line);
+}
+.bar{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:-.02em;font-size:16px}
+.mark{
+  width:32px;height:32px;border-radius:10px;flex:none;
+  background:linear-gradient(135deg,var(--blue-2),var(--teal-2));
+  display:grid;place-items:center;color:#fff;
+  box-shadow:0 6px 16px -8px var(--blue-1);
+}
+.mark svg{width:18px;height:18px}
+.brand small{display:block;font-weight:500;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.spacer{flex:1}
+
+.toggle{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  border:1px solid var(--line);background:var(--surface);color:var(--text);
+  padding:8px 13px;border-radius:999px;font:inherit;font-size:13px;font-weight:600;
+  transition:transform .18s ease,border-color .2s ease,background .2s ease;
+}
+.toggle:hover{transform:translateY(-1px);border-color:var(--blue-2)}
+.toggle:focus-visible{outline:none;box-shadow:var(--ring)}
+.toggle svg{width:16px;height:16px}
+
+/* ============ HERO / DROPZONE ============ */
+.hero{padding:46px 0 8px;max-width:660px}
+.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-1);font-weight:700;margin:0 0 12px}
+html[data-theme="dark"] .eyebrow{color:var(--teal-3)}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.06;letter-spacing:-.035em;margin:0 0 14px;font-weight:800}
+h1 em{font-style:normal;background:linear-gradient(100deg,var(--blue-2),var(--teal-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{color:var(--muted);margin:0;font-size:16px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.pill{
+  font-size:11.5px;font-weight:650;letter-spacing:.02em;padding:6px 11px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);color:var(--muted);
+}
+
+.drop{
+  margin-top:26px;position:relative;
+  border:1.5px dashed var(--line);border-radius:20px;background:var(--surface);
+  padding:44px 24px;text-align:center;cursor:pointer;
+  transition:border-color .2s ease,background .2s ease,transform .2s ease;
+  box-shadow:var(--shadow);
+}
+.drop:hover{border-color:var(--blue-2)}
+.drop.over{border-color:var(--teal-2);background:color-mix(in srgb,var(--teal-2) 8%,var(--surface));transform:scale(1.005)}
+.drop:focus-visible{outline:none;box-shadow:var(--ring)}
+.drop h2{margin:14px 0 6px;font-size:18px;letter-spacing:-.02em}
+.drop p{margin:0;color:var(--muted);font-size:13.5px}
+.drop .film{
+  width:58px;height:58px;margin:0 auto;border-radius:16px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--blue-2) 18%,transparent),color-mix(in srgb,var(--teal-2) 18%,transparent));
+  display:grid;place-items:center;color:var(--blue-2);
+}
+html[data-theme="dark"] .drop .film{color:var(--teal-3)}
+.drop .film svg{width:26px;height:26px}
+.hint{margin-top:14px;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+
+/* ============ LAYOUT ============ */
+.stage{display:none;padding-top:34px}
+.stage.on{display:block;animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.cols{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:900px){.cols{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.card+.card,.card-gap{margin-top:18px}
+.card-head{
+  display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted);
+}
+.card-head .step{
+  width:20px;height:20px;border-radius:6px;display:grid;place-items:center;flex:none;
+  background:linear-gradient(135deg,var(--blue-2),var(--teal-2));color:#fff;font-size:11px;letter-spacing:0;
+}
+.card-body{padding:16px}
+
+video{width:100%;display:block;background:#000;aspect-ratio:16/9;object-fit:contain}
+
+.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}
+@media(min-width:560px){.meta{grid-template-columns:repeat(4,1fr)}}
+.meta div{background:var(--surface);padding:12px 14px}
+.meta dt{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+.meta dd{margin:0;font-size:14px;font-weight:650;letter-spacing:-.01em}
+
+/* ============ CONTROLS ============ */
+.field{margin-bottom:20px}
+.field:last-child{margin-bottom:0}
+.flabel{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:9px}
+.flabel span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.val{font-size:15px;font-weight:700;color:var(--blue-1)}
+html[data-theme="dark"] .val{color:var(--teal-3)}
+.fnote{margin:8px 0 0;font-size:12px;color:var(--muted)}
+
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;display:block}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:var(--track)}
+input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:var(--track)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;margin-top:-7px;
+  background:linear-gradient(135deg,var(--blue-2),var(--teal-2));border:2px solid var(--surface);
+  box-shadow:0 3px 10px -3px var(--blue-1);transition:transform .15s ease;
+}
+input[type=range]::-moz-range-thumb{
+  width:20px;height:20px;border-radius:50%;border:2px solid var(--surface);
+  background:linear-gradient(135deg,var(--blue-2),var(--teal-2));box-shadow:0 3px 10px -3px var(--blue-1);
+}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.14)}
+input[type=range]:focus-visible{outline:none}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:var(--ring)}
+.scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:2px}
+
+.segs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface-2);padding:5px;border-radius:11px}
+.segs.two{grid-template-columns:repeat(2,1fr)}
+.segs button{
+  border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:700;
+  padding:9px 4px;border-radius:8px;cursor:pointer;transition:color .18s ease,background .18s ease,box-shadow .18s ease;
+}
+.segs button[aria-pressed=true]{
+  background:var(--surface);color:var(--text);
+  box-shadow:0 1px 2px rgba(0,0,0,.14),inset 0 0 0 1px var(--line);
+}
+.segs button:focus-visible{outline:none;box-shadow:var(--ring)}
+
+select{
+  width:100%;font:inherit;padding:10px 12px;border-radius:10px;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--text);cursor:pointer;
+}
+select:focus-visible{outline:none;box-shadow:var(--ring)}
+
+.est{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:13px 14px;border-radius:11px;
+  background:linear-gradient(100deg,color-mix(in srgb,var(--blue-2) 12%,transparent),color-mix(in srgb,var(--teal-2) 12%,transparent));
+  border:1px solid var(--line);
+}
+.est b{display:block;font-size:17px;letter-spacing:-.02em}
+.est small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.est .sep{width:1px;align-self:stretch;background:var(--line)}
+
+.btn{
+  width:100%;font:inherit;font-weight:700;font-size:15px;padding:14px 18px;border-radius:12px;border:0;cursor:pointer;
+  background:linear-gradient(100deg,var(--blue-1),var(--teal-1));color:#fff;
+  box-shadow:0 12px 26px -14px var(--blue-1);
+  transition:transform .16s ease,box-shadow .2s ease,filter .2s ease;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+}
+.btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.07)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:none;box-shadow:var(--ring)}
+.btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--line);box-shadow:none;font-size:13.5px;padding:10px 14px;width:auto}
+.btn.ghost:hover:not(:disabled){border-color:var(--blue-2)}
+.btn.danger{background:var(--surface);color:#e11d48;border:1px solid var(--line);box-shadow:none;font-size:13.5px;padding:10px 14px;width:auto}
+.btn svg{width:17px;height:17px}
+
+/* ============ WAVEFORM A/B ============ */
+.ab{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:760px){.ab{grid-template-columns:1fr 1fr}}
+.wavebox{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface-2)}
+.wavehead{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;font-weight:700}
+.wavehead .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.wavehead.a .dot{background:#e11d48}
+.wavehead.b .dot{background:var(--teal-2)}
+.wavehead .db{margin-left:auto;font-weight:600;color:var(--muted);font-size:11.5px}
+.wavewrap{position:relative;height:104px;background:var(--surface)}
+.wavewrap canvas{display:block;width:100%;height:104px}
+.wavewrap .ph{position:absolute;top:0;bottom:0;width:2px;background:var(--text);opacity:.5;left:0;display:none}
+.wavewrap.playing .ph{display:block}
+.wavefoot{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
+
+/* ============ PROGRESS ============ */
+.prog{display:none;margin-top:18px}
+.prog.on{display:block;animation:rise .35s ease both}
+.pbar{height:9px;border-radius:99px;background:var(--track);overflow:hidden}
+.pfill{
+  height:100%;width:0%;border-radius:99px;
+  background:linear-gradient(100deg,var(--blue-2),var(--teal-2));
+  background-size:200% 100%;animation:slide 1.6s linear infinite;
+  transition:width .22s ease;
+}
+@keyframes slide{to{background-position:-200% 0}}
+.pinfo{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-top:12px;font-size:13px;color:var(--muted)}
+.pinfo b{color:var(--text)}
+
+/* ============ RESULT ============ */
+.hidden{display:none!important}
+.results{display:none}
+.results.on{display:block;animation:rise .4s ease both}
+.vidgrid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:760px){.vidgrid{grid-template-columns:1fr 1fr}}
+.vidbox{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface-2)}
+.vidbox h4{margin:0;padding:10px 12px;font-size:12px;font-weight:700;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.vidbox h4 .dot{width:8px;height:8px;border-radius:50%}
+.rowbtns{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+
+.note{
+  margin-top:14px;padding:12px 14px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface-2);font-size:12.5px;color:var(--muted);
+}
+
+/* ============ TOAST ============ */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,140%);
+  background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+  padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:600;z-index:80;max-width:90vw;
+  transition:transform .4s cubic-bezier(.2,.9,.2,1);
+}
+.toast.on{transform:translate(-50%,0)}
+.toast.err{border-color:#e11d48;color:#e11d48}
+
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;display:flex;flex-wrap:wrap;gap:8px 18px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 12h2M7 8v8M11 4v16M15 7v10M19 10v4"/>
+        </svg>
+      </div>
+      <div>CleanVoice<small data-i18n="tagline">AI Noise Remover</small></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="toggle" id="lang" type="button" aria-label="Language">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.8 3.8 9S14.5 18.3 12 21c-2.5-2.7-3.8-5.8-3.8-9S9.5 5.7 12 3z"/></svg>
+      <span id="langText">EN</span>
+    </button>
+    <button class="toggle" id="theme" type="button" aria-label="Theme">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <span id="themeText">Dark</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <p class="eyebrow" data-i18n="heroEyebrow">Runs entirely on your machine</p>
+    <h1 data-i18n-html="heroTitle">Strip the <em>noise</em> out of your video.</h1>
+    <p class="lede" data-i18n="heroLede">Drop in an MP4, MOV or WebM. CleanVoice extracts the audio, removes hiss, hum, fans and room noise, lifts the voice a little, and gives you back the same video with clean sound. Your file never leaves this browser.</p>
+    <div class="pills">
+      <span class="pill" data-i18n="pill1">No upload</span>
+      <span class="pill" data-i18n="pill2">No server</span>
+      <span class="pill" data-i18n="pill3">No API tokens</span>
+      <span class="pill" data-i18n="pill4">Your voice stays yours</span>
+    </div>
+  </section>
+
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a video">
+    <div class="film">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="20" height="16" rx="3"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/>
+      </svg>
+    </div>
+    <h2 data-i18n="dropTitle">Drop your video here</h2>
+    <p data-i18n="dropSub">or click to pick a file from this device</p>
+    <div class="hint">MP4 · MOV · WEBM · M4V</div>
+    <input type="file" id="file" accept="video/*" hidden>
+  </div>
+
+  <section class="stage" id="stage">
+    <div class="cols">
+
+      <div class="card">
+        <div class="card-head" data-i18n="cardPreview">Source</div>
+        <video id="preview" controls playsinline preload="auto"></video>
+        <dl class="meta">
+          <div><dt data-i18n="mDur">Duration</dt><dd class="mono" id="mDur">—</dd></div>
+          <div><dt data-i18n="mRes">Resolution</dt><dd class="mono" id="mRes">—</dd></div>
+          <div><dt data-i18n="mSize">Size</dt><dd class="mono" id="mSize">—</dd></div>
+          <div><dt data-i18n="mName">File</dt><dd id="mName" style="font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</dd></div>
+        </dl>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="step">1</span><span data-i18n="cardSettings">Cleanup settings</span></div>
+        <div class="card-body">
+
+          <div class="field">
+            <div class="flabel"><span data-i18n="sStrength">Noise reduction</span><b class="val mono" id="strengthVal">60</b></div>
+            <input type="range" id="strength" min="10" max="100" step="1" value="60">
+            <div class="scale mono"><span data-i18n="sGentle">gentle</span><span data-i18n="sBalanced">balanced</span><span data-i18n="sMax">maximum</span></div>
+            <p class="fnote" data-i18n="sStrengthNote">Higher removes more hiss but can thin the voice. 50–70 keeps speech natural.</p>
+          </div>
+
+          <div class="field">
+            <div class="flabel"><span data-i18n="sVoice">Voice enhancement</span></div>
+            <div class="segs" role="group" aria-label="Voice enhancement">
+              <button type="button" data-voice="off" aria-pressed="false" data-i18n="vOff">Off</button>
+              <button type="button" data-voice="light" aria-pressed="true" data-i18n="vLight">Light</button>
+              <button type="button" data-voice="warm" aria-pressed="false" data-i18n="vWarm">Clear</button>
+            </div>
+            <p class="fnote" data-i18n="sVoiceNote">A gentle high-pass, presence lift and soft leveller. It never rebuilds your voice — it only shapes what is already there.</p>
+          </div>
+
+          <div class="field">
+            <div class="flabel"><span data-i18n="sFormat">Output format</span></div>
+            <select id="format"></select>
+            <p class="fnote" id="formatNote"></p>
+          </div>
+
+          <div class="field">
+            <div class="flabel"><span data-i18n="sQuality">Video quality</span></div>
+            <select id="quality">
+              <option value="high" data-i18n="qHigh">High — closest to the original</option>
+              <option value="balanced" selected data-i18n="qBalanced">Balanced — good quality, smaller file</option>
+              <option value="small" data-i18n="qSmall">Small — for quick sharing</option>
+            </select>
+          </div>
+
+          <div class="field est">
+            <div><small data-i18n="eAudio">Audio pass</small><b class="mono" id="eAudio">—</b></div>
+            <div class="sep"></div>
+            <div><small data-i18n="eRender">Video render</small><b class="mono" id="eRender">—</b></div>
+          </div>
+
+          <div class="field">
+            <button class="btn" id="clean" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M8 7v10M4 10v4M16 7v10M20 10v4"/></svg>
+              <span data-i18n="btnClean">Remove noise</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 : A/B -->
+    <div class="card card-gap hidden" id="abCard">
+      <div class="card-head"><span class="step">2</span><span data-i18n="cardAB">Listen · before / after</span></div>
+      <div class="card-body">
+        <div class="ab">
+          <div class="wavebox">
+            <div class="wavehead a"><span class="dot"></span><span data-i18n="abBefore">Before — original audio</span><span class="db mono" id="dbBefore">—</span></div>
+            <div class="wavewrap" id="wrapBefore"><canvas id="waveBefore"></canvas><div class="ph" id="phBefore"></div></div>
+            <div class="wavefoot"><button class="btn ghost" id="playBefore" type="button" data-i18n="playBefore">Play original</button></div>
+          </div>
+          <div class="wavebox">
+            <div class="wavehead b"><span class="dot"></span><span data-i18n="abAfter">After — cleaned audio</span><span class="db mono" id="dbAfter">—</span></div>
+            <div class="wavewrap" id="wrapAfter"><canvas id="waveAfter"></canvas><div class="ph" id="phAfter"></div></div>
+            <div class="wavefoot"><button class="btn ghost" id="playAfter" type="button" data-i18n="playAfter">Play cleaned</button></div>
+          </div>
+        </div>
+        <div class="rowbtns">
+          <button class="btn" id="render" type="button" style="width:auto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span data-i18n="btnRender">Build the clean video</span>
+          </button>
+          <button class="btn ghost" id="redo" type="button" data-i18n="btnRedo">Change settings and clean again</button>
+          <button class="btn ghost" id="dlAudio" type="button" data-i18n="btnAudio">Download cleaned audio only</button>
+        </div>
+        <p class="note" data-i18n="renderNote">Building the video plays it through once in real time, so a 5-minute clip takes about 5 minutes. Keep this tab visible while it runs.</p>
+      </div>
+    </div>
+
+    <div class="prog" id="prog">
+      <div class="pbar"><div class="pfill" id="pfill"></div></div>
+      <div class="pinfo">
+        <span><b class="mono" id="pPct">0%</b></span>
+        <span id="pStage">—</span>
+        <span><span data-i18n="pElapsedL">Elapsed</span> <b class="mono" id="pElapsed">0s</b></span>
+        <span><span data-i18n="pLeftL">Remaining</span> <b class="mono" id="pLeft">—</b></span>
+        <span style="flex:1"></span>
+        <button class="btn danger" id="cancel" type="button" data-i18n="btnCancel">Cancel</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 : RESULT -->
+    <section class="results card card-gap" id="results">
+      <div class="card-head"><span class="step">3</span><span data-i18n="cardResult">Result</span></div>
+      <div class="card-body">
+        <div class="vidgrid">
+          <div class="vidbox">
+            <h4><span class="dot" style="background:#e11d48"></span><span data-i18n="vBefore">Before</span></h4>
+            <video id="outBefore" controls playsinline preload="metadata"></video>
+          </div>
+          <div class="vidbox">
+            <h4><span class="dot" style="background:var(--teal-2)"></span><span data-i18n="vAfter">After</span></h4>
+            <video id="outAfter" controls playsinline preload="metadata"></video>
+          </div>
+        </div>
+        <div class="rowbtns">
+          <button class="btn" id="download" type="button" style="width:auto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span id="dlLabel" data-i18n="btnDownload">Download clean video</span>
+          </button>
+          <span class="mono" id="outInfo" style="color:var(--muted);font-size:12.5px"></span>
+        </div>
+      </div>
+    </section>
+
+    <video id="renderVid" playsinline muted class="hidden" style="width:1px;height:1px;opacity:.01;position:fixed;left:0;bottom:0;pointer-events:none"></video>
+  </section>
+
+  <footer>
+    <span data-i18n="f1">Every step runs in your browser.</span>
+    <span data-i18n="f2">No upload, no server, no tokens.</span>
+    <span data-i18n="f3">CleanVoice</span>
+  </footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   CLEANVOICE — browser-only video noise remover
+   Vanilla JS, zero dependencies, zero network calls.
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+const el = {
+  drop:$('drop'), file:$('file'), stage:$('stage'), preview:$('preview'),
+  mDur:$('mDur'), mRes:$('mRes'), mSize:$('mSize'), mName:$('mName'),
+  strength:$('strength'), strengthVal:$('strengthVal'),
+  format:$('format'), formatNote:$('formatNote'), quality:$('quality'),
+  eAudio:$('eAudio'), eRender:$('eRender'), clean:$('clean'),
+  abCard:$('abCard'), waveBefore:$('waveBefore'), waveAfter:$('waveAfter'),
+  wrapBefore:$('wrapBefore'), wrapAfter:$('wrapAfter'), phBefore:$('phBefore'), phAfter:$('phAfter'),
+  playBefore:$('playBefore'), playAfter:$('playAfter'), dbBefore:$('dbBefore'), dbAfter:$('dbAfter'),
+  render:$('render'), redo:$('redo'), dlAudio:$('dlAudio'),
+  prog:$('prog'), pfill:$('pfill'), pPct:$('pPct'), pStage:$('pStage'),
+  pElapsed:$('pElapsed'), pLeft:$('pLeft'), cancel:$('cancel'),
+  results:$('results'), outBefore:$('outBefore'), outAfter:$('outAfter'),
+  download:$('download'), dlLabel:$('dlLabel'), outInfo:$('outInfo'),
+  renderVid:$('renderVid'),
+  toast:$('toast'), theme:$('theme'), themeText:$('themeText'), themeIcon:$('themeIcon'),
+  lang:$('lang'), langText:$('langText')
+};
+
+const state = {
+  file:null, url:null, duration:0, w:0, h:0, baseName:'cleanvoice',
+  origBuf:null, cleanBuf:null, outBlob:null, outUrl:null, outExt:'webm',
+  voice:'light', busy:false, abort:false, lang:'en'
+};
+
+/* ============================================================
+   i18n — English / Bahasa Malaysia
+   ============================================================ */
+const I18N = {
+  en:{
+    tagline:'AI Noise Remover',
+    heroEyebrow:'Runs entirely on your machine',
+    heroTitle:'Strip the <em>noise</em> out of your video.',
+    heroLede:'Drop in an MP4, MOV or WebM. CleanVoice extracts the audio, removes hiss, hum, fans and room noise, lifts the voice a little, and gives you back the same video with clean sound. Your file never leaves this browser.',
+    pill1:'No upload', pill2:'No server', pill3:'No API tokens', pill4:'Your voice stays yours',
+    dropTitle:'Drop your video here', dropSub:'or click to pick a file from this device',
+    cardPreview:'Source', mDur:'Duration', mRes:'Resolution', mSize:'Size', mName:'File',
+    cardSettings:'Cleanup settings',
+    sStrength:'Noise reduction', sGentle:'gentle', sBalanced:'balanced', sMax:'maximum',
+    sStrengthNote:'Higher removes more hiss but can thin the voice. 50–70 keeps speech natural.',
+    sVoice:'Voice enhancement', vOff:'Off', vLight:'Light', vWarm:'Clear',
+    sVoiceNote:'A gentle high-pass, presence lift and soft leveller. It never rebuilds your voice — it only shapes what is already there.',
+    sFormat:'Output format', sQuality:'Video quality',
+    qHigh:'High — closest to the original', qBalanced:'Balanced — good quality, smaller file', qSmall:'Small — for quick sharing',
+    eAudio:'Audio pass', eRender:'Video render',
+    btnClean:'Remove noise',
+    cardAB:'Listen · before / after',
+    abBefore:'Before — original audio', abAfter:'After — cleaned audio',
+    playBefore:'Play original', playAfter:'Play cleaned', stopBtn:'Stop',
+    btnRender:'Build the clean video', btnRedo:'Change settings and clean again', btnAudio:'Download cleaned audio only',
+    renderNote:'Building the video plays it through once in real time, so a 5-minute clip takes about 5 minutes. Keep this tab visible while it runs.',
+    pElapsedL:'Elapsed', pLeftL:'Remaining', btnCancel:'Cancel',
+    cardResult:'Result', vBefore:'Before', vAfter:'After', btnDownload:'Download clean video',
+    f1:'Every step runs in your browser.', f2:'No upload, no server, no tokens.', f3:'CleanVoice',
+    themeDark:'Dark', themeLight:'Light',
+    stAudio:'Cleaning audio', stRender:'Rendering video', stDecode:'Reading audio',
+    tReady:'Video loaded. Choose a strength, then remove the noise.',
+    tNotVideo:'That is not a video file. Choose MP4, MOV, WEBM or M4V.',
+    tUnsupported:'This browser cannot play {type}. Export the clip as MP4 (H.264 + AAC) or WebM first.',
+    tLoadFail:'Could not load the video: {why} (type: {type}).',
+    tSlow:'The video took longer than 30 seconds to load. Try a smaller file.',
+    tNoMeta:'The video loaded but reports no duration or size. Try another file.',
+    tNoAudio:'No audio track was found in this video, so there is nothing to clean.',
+    tDecodeFail:'The audio could not be decoded in this browser. Export the clip as MP4 (H.264 + AAC) or WebM (Opus) and try again.',
+    tCleanDone:'Audio cleaned in {t}. Noise floor {a} → {b}. Listen, then build the video.',
+    tCancelled:'Cancelled.',
+    tRenderDone:'Clean video ready · {size}',
+    tRenderFail:'The video render failed: {why}',
+    tNoRecorder:'This browser cannot record video (MediaRecorder is unavailable). Use Chrome, Edge or Safari on desktop.',
+    tBusy:'Wait for the current job to finish first.',
+    tKeepTab:'Keep this tab in front — background tabs stop the render.',
+    fmtAuto:'Auto — best this browser supports',
+    fmtMp4:'MP4 (H.264 + AAC)', fmtWebm:'WebM (VP9/VP8 + Opus)',
+    noteMp4:'Your browser can write MP4 directly. Plays anywhere.',
+    noteWebmOnly:'This browser can only write WebM. WebM plays in every modern browser, and on Mac in VLC or IINA. Chrome or Edge can produce MP4 directly.',
+    noteBoth:'MP4 plays everywhere. WebM is usually a little smaller.',
+    aboutMin:'about {m} min'
+  },
+  ms:{
+    tagline:'Pembuang Bunyi Bising AI',
+    heroEyebrow:'Berjalan sepenuhnya pada komputer anda',
+    heroTitle:'Buang <em>bunyi bising</em> daripada video anda.',
+    heroLede:'Masukkan fail MP4, MOV atau WebM. CleanVoice mengeluarkan audionya, membuang desis, dengung, bunyi kipas dan bunyi bilik, mengangkat sedikit suara anda, dan memulangkan video yang sama dengan bunyi yang bersih. Fail anda tidak pernah keluar dari pelayar ini.',
+    pill1:'Tiada muat naik', pill2:'Tiada pelayan', pill3:'Tiada token API', pill4:'Suara asal anda kekal',
+    dropTitle:'Lepaskan video anda di sini', dropSub:'atau klik untuk pilih fail dari peranti ini',
+    cardPreview:'Sumber', mDur:'Tempoh', mRes:'Resolusi', mSize:'Saiz', mName:'Fail',
+    cardSettings:'Tetapan pembersihan',
+    sStrength:'Pengurangan bunyi', sGentle:'lembut', sBalanced:'seimbang', sMax:'maksimum',
+    sStrengthNote:'Nilai tinggi membuang lebih banyak desis tetapi boleh menipiskan suara. 50–70 mengekalkan suara yang semula jadi.',
+    sVoice:'Penambahbaikan suara', vOff:'Tutup', vLight:'Ringan', vWarm:'Jelas',
+    sVoiceNote:'Penapis laluan tinggi yang lembut, angkatan kehadiran dan pelaras aras. Ia tidak membina semula suara anda — ia hanya membentuk apa yang sedia ada.',
+    sFormat:'Format keluaran', sQuality:'Kualiti video',
+    qHigh:'Tinggi — paling hampir dengan asal', qBalanced:'Seimbang — kualiti baik, fail lebih kecil', qSmall:'Kecil — untuk perkongsian pantas',
+    eAudio:'Proses audio', eRender:'Bina video',
+    btnClean:'Buang bunyi bising',
+    cardAB:'Dengar · sebelum / selepas',
+    abBefore:'Sebelum — audio asal', abAfter:'Selepas — audio bersih',
+    playBefore:'Main audio asal', playAfter:'Main audio bersih', stopBtn:'Berhenti',
+    btnRender:'Bina video bersih', btnRedo:'Ubah tetapan dan bersihkan semula', btnAudio:'Muat turun audio bersih sahaja',
+    renderNote:'Membina video memainkannya sekali dalam masa sebenar, jadi klip 5 minit mengambil kira-kira 5 minit. Biarkan tab ini di hadapan sepanjang proses.',
+    pElapsedL:'Berjalan', pLeftL:'Baki', btnCancel:'Batal',
+    cardResult:'Hasil', vBefore:'Sebelum', vAfter:'Selepas', btnDownload:'Muat turun video bersih',
+    f1:'Setiap langkah berjalan dalam pelayar anda.', f2:'Tiada muat naik, tiada pelayan, tiada token.', f3:'CleanVoice',
+    themeDark:'Gelap', themeLight:'Cerah',
+    stAudio:'Membersihkan audio', stRender:'Membina video', stDecode:'Membaca audio',
+    tReady:'Video dimuatkan. Pilih kekuatan, kemudian buang bunyi bising.',
+    tNotVideo:'Itu bukan fail video. Pilih MP4, MOV, WEBM atau M4V.',
+    tUnsupported:'Pelayar ini tidak boleh memainkan {type}. Eksport klip sebagai MP4 (H.264 + AAC) atau WebM dahulu.',
+    tLoadFail:'Video tidak dapat dimuatkan: {why} (jenis: {type}).',
+    tSlow:'Video mengambil masa lebih 30 saat untuk dimuatkan. Cuba fail yang lebih kecil.',
+    tNoMeta:'Video dimuatkan tetapi tiada tempoh atau saiz. Cuba fail lain.',
+    tNoAudio:'Tiada trek audio dalam video ini, jadi tiada apa untuk dibersihkan.',
+    tDecodeFail:'Audio tidak dapat dinyahkod dalam pelayar ini. Eksport klip sebagai MP4 (H.264 + AAC) atau WebM (Opus) dan cuba lagi.',
+    tCleanDone:'Audio dibersihkan dalam {t}. Aras bising {a} → {b}. Dengar dahulu, kemudian bina video.',
+    tCancelled:'Dibatalkan.',
+    tRenderDone:'Video bersih siap · {size}',
+    tRenderFail:'Pembinaan video gagal: {why}',
+    tNoRecorder:'Pelayar ini tidak boleh merakam video (MediaRecorder tiada). Gunakan Chrome, Edge atau Safari di desktop.',
+    tBusy:'Tunggu kerja yang sedang berjalan selesai dahulu.',
+    tKeepTab:'Biarkan tab ini di hadapan — tab di belakang menghentikan proses.',
+    fmtAuto:'Auto — terbaik yang disokong pelayar ini',
+    fmtMp4:'MP4 (H.264 + AAC)', fmtWebm:'WebM (VP9/VP8 + Opus)',
+    noteMp4:'Pelayar anda boleh menulis MP4 terus. Boleh dimainkan di mana-mana.',
+    noteWebmOnly:'Pelayar ini hanya boleh menulis WebM. WebM boleh dimainkan dalam semua pelayar moden, dan di Mac melalui VLC atau IINA. Chrome atau Edge boleh menghasilkan MP4 terus.',
+    noteBoth:'MP4 boleh dimainkan di mana-mana. WebM biasanya sedikit lebih kecil.',
+    aboutMin:'lebih kurang {m} min'
+  }
+};
+
+function t(key, vars){
+  let s = (I18N[state.lang] && I18N[state.lang][key]) || I18N.en[key] || key;
+  if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  return s;
+}
+const MEDIA_REASON = {
+  en:{1:'loading was aborted',2:'a network error while reading the file',3:'the file is damaged or its codec cannot be decoded',4:'this browser does not support the video codec'},
+  ms:{1:'pemuatan dibatalkan',2:'ralat rangkaian ketika membaca fail',3:'fail rosak atau kodeknya tidak dapat dinyahkod',4:'pelayar ini tidak menyokong kodek video tersebut'}
+};
+
+function applyLang(){
+  document.documentElement.lang = state.lang === 'ms' ? 'ms' : 'en';
+  el.langText.textContent = state.lang === 'ms' ? 'BM' : 'EN';
+  document.querySelectorAll('[data-i18n]').forEach(n => { n.textContent = t(n.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(n => { n.innerHTML = t(n.dataset.i18nHtml); });
+  el.themeText.textContent = document.documentElement.dataset.theme === 'dark' ? t('themeDark') : t('themeLight');
+  buildFormatOptions();
+  updateEstimates();
+  if(state.cleanBuf){ el.dbBefore.textContent = fmtDb(state.stats && state.stats.a); el.dbAfter.textContent = fmtDb(state.stats && state.stats.b); }
+}
+el.lang.addEventListener('click', () => {
+  state.lang = state.lang === 'en' ? 'ms' : 'en';
+  try{ localStorage.setItem('cv-lang', state.lang); }catch(e){}
+  applyLang();
+});
+
+/* ============================================================
+   Small helpers
+   ============================================================ */
+const pad = (n,l=2) => String(Math.floor(n)).padStart(l,'0');
+const clamp = (v,a,b) => v<a?a:(v>b?b:v);
+const raf = () => new Promise(r => requestAnimationFrame(() => r()));
+
+function timecode(s){
+  const h=Math.floor(s/3600), m=Math.floor(s%3600/60), sec=Math.floor(s%60);
+  return (h?h+':':'')+pad(m)+':'+pad(sec);
+}
+function bytes(b){
+  if(b<1024) return b+' B';
+  if(b<1048576) return (b/1024).toFixed(1)+' KB';
+  if(b<1073741824) return (b/1048576).toFixed(1)+' MB';
+  return (b/1073741824).toFixed(2)+' GB';
+}
+function dur(ms){
+  const s=Math.max(0,Math.round(ms/1000));
+  if(s<60) return s+'s';
+  const m=Math.floor(s/60);
+  if(m<60) return m+'m '+pad(s%60)+'s';
+  return Math.floor(m/60)+'h '+pad(m%60)+'m';
+}
+function fmtDb(v){ return (v==null||!isFinite(v)) ? '—' : (v>0?'+':'')+v.toFixed(1)+' dB'; }
+
+let toastTimer;
+function toast(msg, isErr){
+  el.toast.textContent = msg;
+  el.toast.classList.toggle('err', !!isErr);
+  el.toast.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.toast.classList.remove('on'), 5200);
+}
+window.addEventListener('error', e => { toast('Error: '+(e.message||'unknown'), true); console.error(e.error||e.message); });
+window.addEventListener('unhandledrejection', e => {
+  const m=(e.reason&&e.reason.message)||String(e.reason||'');
+  toast('Error: '+m, true); console.error(e.reason);
+});
+
+/* ============================================================
+   Theme
+   ============================================================ */
+const SUN='M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1';
+const MOON='M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z';
+function setTheme(th){
+  document.documentElement.dataset.theme = th;
+  const dark = th==='dark';
+  el.themeText.textContent = dark ? t('themeDark') : t('themeLight');
+  el.themeIcon.innerHTML = '<path d="'+(dark?MOON:SUN)+'"/>';
+  if(state.origBuf) redrawWaves();
+}
+el.theme.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme==='dark' ? 'light' : 'dark';
+  setTheme(next);
+  try{ localStorage.setItem('cv-theme', next); }catch(e){}
+});
+
+/* ============================================================
+   Output format detection
+   ============================================================ */
+const MP4_CANDS = [
+  'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+  'video/mp4;codecs=avc1,mp4a.40.2',
+  'video/mp4;codecs=h264,aac',
+  'video/mp4'
+];
+const WEBM_CANDS = [
+  'video/webm;codecs=vp9,opus',
+  'video/webm;codecs=vp8,opus',
+  'video/webm'
+];
+function firstSupported(list){
+  if(typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return null;
+  for(const m of list) if(MediaRecorder.isTypeSupported(m)) return m;
+  return null;
+}
+const SUPPORT = { mp4:firstSupported(MP4_CANDS), webm:firstSupported(WEBM_CANDS) };
+
+function buildFormatOptions(){
+  const prev = el.format.value;
+  el.format.innerHTML = '';
+  const add = (v, label) => { const o=document.createElement('option'); o.value=v; o.textContent=label; el.format.appendChild(o); };
+  add('auto', t('fmtAuto'));
+  if(SUPPORT.mp4) add('mp4', t('fmtMp4'));
+  if(SUPPORT.webm) add('webm', t('fmtWebm'));
+  el.format.value = prev && [...el.format.options].some(o=>o.value===prev) ? prev : 'auto';
+  el.formatNote.textContent = SUPPORT.mp4 && SUPPORT.webm ? t('noteBoth') : (SUPPORT.mp4 ? t('noteMp4') : t('noteWebmOnly'));
+}
+function chosenMime(){
+  const pick = el.format.value;
+  if(pick === 'mp4' && SUPPORT.mp4) return { mime:SUPPORT.mp4, ext:'mp4' };
+  if(pick === 'webm' && SUPPORT.webm) return { mime:SUPPORT.webm, ext:'webm' };
+  if(SUPPORT.mp4) return { mime:SUPPORT.mp4, ext:'mp4' };
+  if(SUPPORT.webm) return { mime:SUPPORT.webm, ext:'webm' };
+  return null;
+}
+
+/* ============================================================
+   File intake
+   ============================================================ */
+el.drop.addEventListener('click', () => el.file.click());
+el.drop.addEventListener('keydown', e => {
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); el.file.click(); }
+});
+el.file.addEventListener('change', e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if(f) load(f).catch(err => toast(err.message, true));
+});
+['dragenter','dragover'].forEach(ev => el.drop.addEventListener(ev, e => { e.preventDefault(); el.drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => el.drop.addEventListener(ev, e => {
+  e.preventDefault();
+  if(ev==='dragleave' && el.drop.contains(e.relatedTarget)) return;
+  el.drop.classList.remove('over');
+}));
+el.drop.addEventListener('drop', e => {
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if(f) load(f).catch(err => toast(err.message, true));
+});
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => e.preventDefault());
+
+function realDuration(v){
+  return new Promise(resolve => {
+    if(isFinite(v.duration) && v.duration>0) return resolve(v.duration);
+    const onUpdate = () => {
+      if(isFinite(v.duration) && v.duration>0){
+        v.removeEventListener('timeupdate', onUpdate);
+        v.currentTime = 0;
+        resolve(v.duration);
+      }
+    };
+    v.addEventListener('timeupdate', onUpdate);
+    try{ v.currentTime = 1e101; }catch(err){ resolve(0); }
+    setTimeout(() => resolve(isFinite(v.duration)?v.duration:0), 4000);
+  });
+}
+
+async function load(file){
+  if(state.busy){ toast(t('tBusy'), true); return; }
+  if(!file.type.startsWith('video/') && !/\.(mp4|webm|mov|m4v|mkv|ogv)$/i.test(file.name)){
+    toast(t('tNotVideo'), true); return;
+  }
+  const probe = document.createElement('video');
+  if(file.type && probe.canPlayType(file.type)===''){
+    toast(t('tUnsupported',{type:file.type}), true); return;
+  }
+
+  resetResults();
+  if(state.url) URL.revokeObjectURL(state.url);
+  state.file = file;
+  state.url = URL.createObjectURL(file);
+  state.origBuf = state.cleanBuf = null;
+  state.baseName = (file.name.replace(/\.[^.]+$/,'') || 'video').replace(/[^\w\-]+/g,'_').slice(0,48);
+
+  const v = el.preview;
+  v.removeAttribute('src'); v.load(); v.src = state.url;
+
+  try{
+    await new Promise((res, rej) => {
+      const ok = () => { off(); res(); };
+      const bad = () => {
+        off();
+        const code = v.error && v.error.code;
+        const why = (MEDIA_REASON[state.lang]||MEDIA_REASON.en)[code] || '—';
+        rej(new Error(t('tLoadFail',{why, type:file.type||'?'})));
+      };
+      const late = () => { off(); rej(new Error(t('tSlow'))); };
+      const timer = setTimeout(late, 30000);
+      function off(){ clearTimeout(timer); v.removeEventListener('loadedmetadata', ok); v.removeEventListener('error', bad); }
+      v.addEventListener('loadedmetadata', ok);
+      v.addEventListener('error', bad);
+      v.load();
+    });
+  }catch(err){ toast(err.message, true); return; }
+
+  state.duration = await realDuration(v);
+  state.w = v.videoWidth; state.h = v.videoHeight;
+  if(!state.duration || !state.w){ toast(t('tNoMeta'), true); return; }
+
+  el.mDur.textContent = timecode(state.duration);
+  el.mRes.textContent = state.w+'×'+state.h;
+  el.mSize.textContent = bytes(file.size);
+  el.mName.textContent = file.name; el.mName.title = file.name;
+
+  el.abCard.classList.add('hidden');
+  el.stage.classList.add('on');
+  updateEstimates();
+  el.stage.scrollIntoView({behavior:'smooth', block:'start'});
+  toast(t('tReady'));
+}
+
+/* ============================================================
+   Settings
+   ============================================================ */
+el.strength.addEventListener('input', () => { el.strengthVal.textContent = el.strength.value; });
+el.format.addEventListener('change', updateEstimates);
+el.quality.addEventListener('change', updateEstimates);
+document.querySelectorAll('[data-voice]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-voice]').forEach(x => x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    state.voice = b.dataset.voice;
+  });
+});
+
+function updateEstimates(){
+  el.strengthVal.textContent = el.strength.value;
+  if(!state.duration){ el.eAudio.textContent = el.eRender.textContent = '—'; return; }
+  // The STFT pass runs many times faster than real time on any modern machine.
+  el.eAudio.textContent = '±' + dur(state.duration * 1000 * 0.16 + 1500);
+  el.eRender.textContent = t('aboutMin', {m: Math.max(1, Math.round(state.duration/60))});
+}
+
+function videoBitrate(){
+  const px = state.w * state.h || 1280*720;
+  const base = { high:0.20, balanced:0.11, small:0.055 }[el.quality.value] || 0.11;
+  return clamp(Math.round(px * 30 * base), 800e3, 24e6);
+}
+
+/* ============================================================
+   FFT (iterative radix-2, precomputed twiddles)
+   ============================================================ */
+function makeFFT(n){
+  const levels = Math.round(Math.log2(n));
+  const cosT = new Float32Array(n>>1), sinT = new Float32Array(n>>1);
+  for(let i=0;i<n>>1;i++){ cosT[i]=Math.cos(2*Math.PI*i/n); sinT[i]=Math.sin(2*Math.PI*i/n); }
+  const rev = new Uint32Array(n);
+  for(let i=0;i<n;i++){ let x=i, r=0; for(let j=0;j<levels;j++){ r=(r<<1)|(x&1); x>>=1; } rev[i]=r>>>0; }
+  return function transform(re, im, inverse){
+    for(let i=0;i<n;i++){
+      const j = rev[i];
+      if(j>i){ let tmp=re[i]; re[i]=re[j]; re[j]=tmp; tmp=im[i]; im[i]=im[j]; im[j]=tmp; }
+    }
+    for(let size=2; size<=n; size<<=1){
+      const half = size>>1, step = n/size;
+      for(let i=0;i<n;i+=size){
+        for(let j=i, k=0; j<i+half; j++, k+=step){
+          const l = j+half;
+          const c = cosT[k], s = inverse ? sinT[k] : -sinT[k];
+          const tre = re[l]*c - im[l]*s;
+          const tim = re[l]*s + im[l]*c;
+          re[l] = re[j]-tre; im[l] = im[j]-tim;
+          re[j] += tre;      im[j] += tim;
+        }
+      }
+    }
+    if(inverse){ for(let i=0;i<n;i++){ re[i]/=n; im[i]/=n; } }
+  };
+}
+
+/* ============================================================
+   Spectral noise reduction
+   STFT → adaptive noise-floor tracking → over-subtraction with a
+   smoothed gain mask → overlap-add. No training data, no network.
+   ============================================================ */
+const N = 1024, HOP = 256, BINS = (N>>1)+1;
+const WIN = (() => { const w=new Float32Array(N); for(let i=0;i<N;i++) w[i]=0.5-0.5*Math.cos(2*Math.PI*i/N); return w; })();
+const WOLA_NORM = 1.5; // sum of hann^2 across 75%-overlap hops
+
+async function denoiseChannel(input, opts, onProgress){
+  const fft = opts.fft;
+  const len = input.length;
+  const out = new Float32Array(len + N);
+  const re = new Float32Array(N), im = new Float32Array(N);
+  const mag = new Float32Array(BINS);
+  const npow = new Float32Array(BINS);   // estimated noise power per bin
+  const psm  = new Float32Array(BINS);   // smoothed signal power
+  const pmin = new Float32Array(BINS);   // running minimum of psm
+  const gain = new Float32Array(BINS);
+  const gSm = new Float32Array(BINS).fill(1);
+  const gTmp = new Float32Array(BINS);
+
+  const over = opts.over;        // over-subtraction factor
+  const floor = opts.floor;      // residual gain floor (keeps the room alive)
+  const frames = Math.ceil(len / HOP);
+  const INIT = 8;                // first frames seed the noise estimate
+
+  for(let f=0; f<frames; f++){
+    if(opts.shouldAbort && opts.shouldAbort()) throw new Error('abort');
+    const pos = f*HOP;
+
+    for(let i=0;i<N;i++){ const s = pos+i < len ? input[pos+i] : 0; re[i] = s*WIN[i]; im[i] = 0; }
+    fft(re, im, false);
+
+    for(let b=0;b<BINS;b++){
+      const m = Math.sqrt(re[b]*re[b] + im[b]*im[b]);
+      mag[b] = m;
+      const p = m*m;
+
+      if(f < INIT){
+        // Seed from the opening frames — the mean power, not the minimum.
+        psm[b]  = (psm[b]*f + p) / (f+1);
+        npow[b] = psm[b];
+        pmin[b] = psm[b];
+      }else{
+        psm[b] = 0.75*psm[b] + 0.25*p;
+        // Minimum tracking is only used to decide whether speech is present.
+        pmin[b] = psm[b] < pmin[b] ? psm[b] : pmin[b]*1.0025 + psm[b]*0.0004;
+        // Bin looks like noise only → fold it into the mean-power estimate.
+        if(psm[b] < pmin[b]*5) npow[b] = 0.92*npow[b] + 0.08*psm[b];
+      }
+    }
+
+    for(let b=0;b<BINS;b++){
+      const p = mag[b]*mag[b];
+      const nn = npow[b]*over;
+      let g = (p - nn) / (p + 1e-12);
+      g = g > 0 ? Math.sqrt(g) : 0;
+      gain[b] = clamp(g, floor, 1);
+    }
+    // Smooth across frequency: kills the "musical noise" warble.
+    gTmp[0] = (gain[0]*3 + gain[1]) / 4;
+    for(let b=1;b<BINS-1;b++) gTmp[b] = (gain[b-1] + gain[b]*2 + gain[b+1]) / 4;
+    gTmp[BINS-1] = (gain[BINS-2] + gain[BINS-1]*3) / 4;
+    // Smooth across time: never let a bin slam shut between frames.
+    for(let b=0;b<BINS;b++){
+      const g = Math.max(gTmp[b], gSm[b]*0.62);
+      gSm[b] = g;
+      re[b] *= g; im[b] *= g;
+      if(b>0 && b<BINS-1){ re[N-b] = re[b]; im[N-b] = -im[b]; }
+    }
+
+    fft(re, im, true);
+    const lim = Math.min(N, len + N - pos);
+    for(let i=0;i<lim;i++) out[pos+i] += re[i]*WIN[i]/WOLA_NORM;
+
+    if((f & 63) === 0){
+      if(onProgress) onProgress(f/frames);
+      await raf();
+    }
+  }
+  if(onProgress) onProgress(1);
+  return out.subarray(0, len);
+}
+
+function peakOf(buffer){
+  let peak = 0;
+  for(let c=0;c<buffer.numberOfChannels;c++){
+    const d = buffer.getChannelData(c);
+    for(let i=0;i<d.length;i++){ const a = d[i]<0?-d[i]:d[i]; if(a>peak) peak=a; }
+  }
+  return peak;
+}
+
+/* Voice enhancement: shaping only, never synthesis. */
+async function enhance(buffer, mode, refPeak){
+  const ctx = new OfflineAudioContext(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+  const src = ctx.createBufferSource(); src.buffer = buffer;
+  let node = src;
+  const chain = n => { node.connect(n); node = n; };
+
+  const hp = ctx.createBiquadFilter();
+  hp.type='highpass'; hp.frequency.value = mode==='off' ? 40 : 80; hp.Q.value=0.707;
+  chain(hp);
+
+  if(mode !== 'off'){
+    const mud = ctx.createBiquadFilter();
+    mud.type='peaking'; mud.frequency.value=250; mud.Q.value=1.1;
+    mud.gain.value = mode==='warm' ? -3 : -1.8;
+    chain(mud);
+
+    const pres = ctx.createBiquadFilter();
+    pres.type='peaking'; pres.frequency.value=3200; pres.Q.value=0.9;
+    pres.gain.value = mode==='warm' ? 4 : 2.5;
+    chain(pres);
+
+    const air = ctx.createBiquadFilter();
+    air.type='highshelf'; air.frequency.value=8000;
+    air.gain.value = mode==='warm' ? 2 : 1;
+    chain(air);
+
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = mode==='warm' ? -24 : -20;
+    comp.knee.value = 8;
+    comp.ratio.value = mode==='warm' ? 3.5 : 2.5;
+    comp.attack.value = 0.006;
+    comp.release.value = 0.18;
+    chain(comp);
+
+    const makeup = ctx.createGain();
+    makeup.gain.value = mode==='warm' ? 1.6 : 1.35;
+    chain(makeup);
+  }
+
+  node.connect(ctx.destination);
+  src.start();
+  const rendered = await ctx.startRendering();
+
+  // Level match: bring the cleaned track back to the original's peak so the
+  // A/B comparison is honest, allow a mild lift when enhancement is on, and
+  // never let it clip.
+  const peak = peakOf(rendered);
+  if(peak > 0){
+    let g = (refPeak && refPeak > 0) ? refPeak/peak : 0.891/peak;
+    if(mode !== 'off') g *= 1.4;              // up to +3 dB of gentle lift
+    g = Math.min(g, 0.891/peak, 12);          // hard ceiling at -1 dBFS
+    if(g < 0.999 || g > 1.001){
+      for(let c=0;c<rendered.numberOfChannels;c++){
+        const d = rendered.getChannelData(c);
+        for(let i=0;i<d.length;i++) d[i] *= g;
+      }
+    }
+  }
+  return rendered;
+}
+
+/* Noise floor readout: 10th-percentile frame RMS, in dBFS. */
+function noiseFloorDb(buffer){
+  const d = buffer.getChannelData(0);
+  const F = 2048, n = Math.floor(d.length/F);
+  if(n < 4) return null;
+  const rms = new Float64Array(n);
+  for(let f=0; f<n; f++){
+    let s = 0;
+    for(let i=0;i<F;i+=4){ const v = d[f*F+i]; s += v*v; }
+    rms[f] = Math.sqrt(s/(F/4));
+  }
+  const sorted = Array.from(rms).sort((a,b)=>a-b);
+  const v = sorted[Math.floor(sorted.length*0.10)];
+  return v > 0 ? 20*Math.log10(v) : -120;
+}
+
+/* ============================================================
+   Audio extraction (with a real-time fallback for stubborn files)
+   ============================================================ */
+function makeCtx(){
+  const AC = window.AudioContext || window.webkitAudioContext;
+  return new AC();
+}
+
+async function extractAudio(file, onStage){
+  const ctx = makeCtx();
+  try{
+    const buf = await file.arrayBuffer();
+    const decoded = await new Promise((res, rej) => {
+      const p = ctx.decodeAudioData(buf.slice(0), res, rej);
+      if(p && p.then) p.then(res, rej);
+    });
+    if(decoded && decoded.length) { ctx.close(); return decoded; }
+  }catch(err){ /* fall through to the capture path */ }
+
+  // Fallback: play the file muted and capture its audio track in real time.
+  if(onStage) onStage('capture');
+  try{
+    const v = document.createElement('video');
+    v.src = state.url; v.muted = true; v.playsInline = true;
+    v.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:.01;pointer-events:none';
+    document.body.appendChild(v);
+    await new Promise((r,j) => { v.onloadedmetadata = r; v.onerror = j; });
+    const stream = v.captureStream ? v.captureStream() : v.mozCaptureStream();
+    const at = stream.getAudioTracks()[0];
+    if(!at) throw new Error('no audio track');
+    const rec = new MediaRecorder(new MediaStream([at]), {mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm'});
+    const chunks = [];
+    rec.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
+    const done = new Promise(r => rec.onstop = r);
+    rec.start(500);
+    await v.play();
+    await new Promise(r => { v.onended = r; });
+    rec.stop(); await done;
+    v.remove();
+    const blob = new Blob(chunks, {type:'audio/webm'});
+    const decoded = await ctx.decodeAudioData(await blob.arrayBuffer());
+    ctx.close();
+    return decoded;
+  }catch(err){
+    try{ ctx.close(); }catch(e){}
+    throw new Error(t('tDecodeFail'));
+  }
+}
+
+/* ============================================================
+   STEP 1 — clean the audio
+   ============================================================ */
+el.clean.addEventListener('click', cleanAudio);
+el.redo.addEventListener('click', () => {
+  el.abCard.classList.add('hidden');
+  el.results.classList.remove('on');
+  document.querySelector('.cols').scrollIntoView({behavior:'smooth', block:'center'});
+});
+el.cancel.addEventListener('click', () => { state.abort = true; });
+
+function progress(pct, stageText, t0){
+  el.pfill.style.width = pct+'%';
+  el.pPct.textContent = Math.round(pct)+'%';
+  el.pStage.textContent = stageText;
+  const elapsed = performance.now()-t0;
+  el.pElapsed.textContent = dur(elapsed);
+  el.pLeft.textContent = pct > 3 ? dur(elapsed/pct*(100-pct)) : '—';
+}
+
+async function cleanAudio(){
+  if(state.busy){ toast(t('tBusy'), true); return; }
+  if(!state.file) return;
+  stopPlayback();
+
+  state.busy = true; state.abort = false;
+  el.clean.disabled = true; el.render.disabled = true;
+  el.prog.classList.add('on');
+  el.results.classList.remove('on');
+  const t0 = performance.now();
+  progress(1, t('stDecode'), t0);
+
+  try{
+    const orig = await extractAudio(state.file, () => progress(3, t('stDecode'), t0));
+    if(!orig || !orig.length) throw new Error(t('tNoAudio'));
+    state.origBuf = orig;
+
+    const s = parseInt(el.strength.value,10)/100;
+    const opts = {
+      fft: makeFFT(N),
+      over: 1.0 + s*2.6,                 // 1.0 … 3.6
+      floor: Math.pow(10, -(6 + s*30)/20), // -6 dB … -36 dB residual
+      shouldAbort: () => state.abort
+    };
+
+    const chCount = orig.numberOfChannels;
+    const shell = new OfflineAudioContext(chCount, orig.length, orig.sampleRate);
+    const cleaned = shell.createBuffer(chCount, orig.length, orig.sampleRate);
+    for(let c=0;c<chCount;c++){
+      const res = await denoiseChannel(orig.getChannelData(c), opts, p => {
+        progress(5 + ((c + p)/chCount)*80, t('stAudio'), t0);
+      });
+      cleaned.getChannelData(c).set(res);
+    }
+
+    progress(90, t('stAudio'), t0);
+    const finalBuf = await enhance(cleaned, state.voice, peakOf(orig));
+    state.cleanBuf = finalBuf;
+
+    const a = noiseFloorDb(orig), b = noiseFloorDb(finalBuf);
+    state.stats = {a, b};
+    el.dbBefore.textContent = fmtDb(a);
+    el.dbAfter.textContent = fmtDb(b);
+
+    progress(100, t('stAudio'), t0);
+    redrawWaves();
+    el.abCard.classList.remove('hidden');
+    el.abCard.scrollIntoView({behavior:'smooth', block:'center'});
+    toast(t('tCleanDone', {t:dur(performance.now()-t0), a:fmtDb(a), b:fmtDb(b)}));
+  }catch(err){
+    if(err.message === 'abort') toast(t('tCancelled'));
+    else toast(err.message, true);
+  }finally{
+    state.busy = false; state.abort = false;
+    el.clean.disabled = false; el.render.disabled = false;
+    el.prog.classList.remove('on');
+    el.pfill.style.width = '0%';
+  }
+}
+
+/* ============================================================
+   Waveforms + A/B playback
+   ============================================================ */
+function drawWave(canvas, buffer, color){
+  const w = canvas.clientWidth || 400, h = 104;
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  canvas.width = w*dpr; canvas.height = h*dpr;
+  const c = canvas.getContext('2d');
+  c.setTransform(dpr,0,0,dpr,0,0);
+  c.clearRect(0,0,w,h);
+  const d = buffer.getChannelData(0);
+  const step = Math.max(1, Math.floor(d.length/w));
+  const sub = Math.max(1, Math.floor(step/48));
+  c.fillStyle = color;
+  for(let x=0;x<w;x++){
+    let min=1, max=-1;
+    const s = x*step;
+    for(let i=0;i<step;i+=sub){
+      const v = d[s+i];
+      if(v === undefined) break;
+      if(v<min) min=v;
+      if(v>max) max=v;
+    }
+    if(min>max){ min=max=0; }
+    const y1 = (1-max)*h/2, y2 = (1-min)*h/2;
+    c.fillRect(x, y1, 1, Math.max(1, y2-y1));
+  }
+  c.globalAlpha = .35;
+  c.fillRect(0, h/2, w, 1);
+}
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function redrawWaves(){
+  if(state.origBuf) drawWave(el.waveBefore, state.origBuf, '#e11d48');
+  if(state.cleanBuf) drawWave(el.waveAfter, state.cleanBuf, cssVar('--teal-2') || '#14b8a6');
+}
+let waveResize;
+window.addEventListener('resize', () => { clearTimeout(waveResize); waveResize = setTimeout(redrawWaves, 180); });
+
+let player = null;
+function stopPlayback(){
+  if(player){
+    try{ player.src.stop(); }catch(e){}
+    try{ player.ctx.close(); }catch(e){}
+    cancelAnimationFrame(player.raf);
+    player.wrap.classList.remove('playing');
+    player.btn.textContent = player.label;
+    player = null;
+  }
+}
+function playBuffer(buffer, btn, wrap, ph, labelKey){
+  if(player && player.btn === btn){ stopPlayback(); return; }
+  stopPlayback();
+  const ctx = makeCtx();
+  const src = ctx.createBufferSource();
+  src.buffer = buffer;
+  src.connect(ctx.destination);
+  const startedAt = ctx.currentTime;
+  src.start();
+  const label = t(labelKey);
+  btn.textContent = t('stopBtn');
+  wrap.classList.add('playing');
+  const p = { ctx, src, btn, wrap, label, raf:0 };
+  player = p;
+  const tick = () => {
+    if(player !== p) return;
+    const pos = (ctx.currentTime - startedAt) / buffer.duration;
+    ph.style.left = clamp(pos,0,1)*100 + '%';
+    p.raf = requestAnimationFrame(tick);
+  };
+  tick();
+  src.onended = () => { if(player === p) stopPlayback(); };
+}
+el.playBefore.addEventListener('click', () => state.origBuf && playBuffer(state.origBuf, el.playBefore, el.wrapBefore, el.phBefore, 'playBefore'));
+el.playAfter.addEventListener('click', () => state.cleanBuf && playBuffer(state.cleanBuf, el.playAfter, el.wrapAfter, el.phAfter, 'playAfter'));
+
+/* ============================================================
+   Cleaned audio only (WAV, written by hand)
+   ============================================================ */
+function bufferToWav(buffer){
+  const ch = buffer.numberOfChannels, len = buffer.length, sr = buffer.sampleRate;
+  const data = new DataView(new ArrayBuffer(44 + len*ch*2));
+  const str = (off, s) => { for(let i=0;i<s.length;i++) data.setUint8(off+i, s.charCodeAt(i)); };
+  str(0,'RIFF'); data.setUint32(4, 36 + len*ch*2, true); str(8,'WAVEfmt ');
+  data.setUint32(16, 16, true); data.setUint16(20, 1, true); data.setUint16(22, ch, true);
+  data.setUint32(24, sr, true); data.setUint32(28, sr*ch*2, true);
+  data.setUint16(32, ch*2, true); data.setUint16(34, 16, true);
+  str(36,'data'); data.setUint32(40, len*ch*2, true);
+  const chans = [];
+  for(let c=0;c<ch;c++) chans.push(buffer.getChannelData(c));
+  let off = 44;
+  for(let i=0;i<len;i++){
+    for(let c=0;c<ch;c++){
+      const v = clamp(chans[c][i], -1, 1);
+      data.setInt16(off, v<0 ? v*0x8000 : v*0x7FFF, true);
+      off += 2;
+    }
+  }
+  return new Blob([data.buffer], {type:'audio/wav'});
+}
+el.dlAudio.addEventListener('click', () => {
+  if(!state.cleanBuf) return;
+  save(bufferToWav(state.cleanBuf), state.baseName+'_cleanvoice.wav');
+});
+
+/* ============================================================
+   STEP 2 — render the video with the cleaned audio
+   The picture is passed through captureStream, the cleaned audio is
+   fed in from Web Audio, and MediaRecorder muxes the two.
+   ============================================================ */
+el.render.addEventListener('click', renderVideo);
+
+async function renderVideo(){
+  if(state.busy){ toast(t('tBusy'), true); return; }
+  if(!state.cleanBuf) return;
+  const pick = chosenMime();
+  if(!pick){ toast(t('tNoRecorder'), true); return; }
+  stopPlayback();
+
+  state.busy = true; state.abort = false;
+  el.render.disabled = true; el.clean.disabled = true;
+  el.results.classList.remove('on');
+  el.prog.classList.add('on');
+  const t0 = performance.now();
+  progress(0, t('stRender'), t0);
+  toast(t('tKeepTab'));
+
+  const v = el.renderVid;
+  const actx = makeCtx();
+  let rec = null, srcNode = null, tickId = 0;
+
+  try{
+    v.classList.remove('hidden');
+    v.src = state.url; v.muted = true; v.playbackRate = 1;
+    await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = () => rej(new Error('load')); });
+    v.currentTime = 0;
+    await new Promise(res => { const on = () => { v.removeEventListener('seeked', on); res(); }; v.addEventListener('seeked', on); setTimeout(res, 800); });
+
+    const capture = v.captureStream ? v.captureStream() : (v.mozCaptureStream ? v.mozCaptureStream() : null);
+    if(!capture) throw new Error('captureStream unavailable');
+    const videoTrack = capture.getVideoTracks()[0];
+    if(!videoTrack) throw new Error('no video track');
+
+    const dest = actx.createMediaStreamDestination();
+    srcNode = actx.createBufferSource();
+    srcNode.buffer = state.cleanBuf;
+    srcNode.connect(dest);
+
+    const mixed = new MediaStream([videoTrack, dest.stream.getAudioTracks()[0]]);
+    rec = new MediaRecorder(mixed, {
+      mimeType: pick.mime,
+      videoBitsPerSecond: videoBitrate(),
+      audioBitsPerSecond: 192000
+    });
+    const chunks = [];
+    rec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
+    const stopped = new Promise(res => { rec.onstop = res; });
+
+    rec.start(1000);
+    if(actx.state === 'suspended') await actx.resume();
+    srcNode.start();
+    await v.play();
+
+    const total = state.duration;
+    await new Promise(res => {
+      const finish = () => { clearInterval(tickId); res(); };
+      v.onended = finish;
+      tickId = setInterval(() => {
+        if(state.abort){ try{ v.pause(); }catch(e){} finish(); return; }
+        progress(clamp(v.currentTime/total*100, 0, 99.5), t('stRender'), t0);
+        if(v.currentTime >= total - 0.05) finish();
+      }, 250);
+    });
+
+    await new Promise(r => setTimeout(r, 350));
+    try{ srcNode.stop(); }catch(e){}
+    rec.stop();
+    await stopped;
+
+    const blob = new Blob(chunks, {type: pick.mime.split(';')[0]});
+    if(!blob.size) throw new Error('empty recording');
+
+    if(state.outUrl) URL.revokeObjectURL(state.outUrl);
+    state.outBlob = blob;
+    state.outExt = pick.ext;
+    state.outUrl = URL.createObjectURL(blob);
+
+    el.outBefore.src = state.url;
+    el.outAfter.src = state.outUrl;
+    el.outInfo.textContent = pick.ext.toUpperCase() + ' · ' + bytes(blob.size);
+    el.results.classList.add('on');
+    progress(100, t('stRender'), t0);
+    el.results.scrollIntoView({behavior:'smooth', block:'center'});
+    toast(state.abort ? t('tCancelled') : t('tRenderDone', {size:bytes(blob.size)}));
+  }catch(err){
+    toast(t('tRenderFail', {why: err.message}), true);
+  }finally{
+    clearInterval(tickId);
+    try{ v.pause(); }catch(e){}
+    v.removeAttribute('src'); v.load(); v.classList.add('hidden');
+    try{ actx.close(); }catch(e){}
+    state.busy = false; state.abort = false;
+    el.render.disabled = false; el.clean.disabled = false;
+    el.prog.classList.remove('on');
+    el.pfill.style.width = '0%';
+  }
+}
+
+/* ============================================================
+   Download / reset
+   ============================================================ */
+function save(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 6000);
+}
+el.download.addEventListener('click', () => {
+  if(!state.outBlob) return;
+  save(state.outBlob, state.baseName + '_cleanvoice.' + state.outExt);
+});
+function resetResults(){
+  el.results.classList.remove('on');
+  if(state.outUrl){ URL.revokeObjectURL(state.outUrl); state.outUrl = null; }
+  state.outBlob = null;
+  el.outBefore.removeAttribute('src');
+  el.outAfter.removeAttribute('src');
+}
+window.addEventListener('beforeunload', e => { if(state.busy){ e.preventDefault(); e.returnValue=''; } });
+
+/* ============================================================
+   Boot
+   ============================================================ */
+(function boot(){
+  try{
+    const savedLang = localStorage.getItem('cv-lang');
+    if(savedLang === 'ms' || savedLang === 'en') state.lang = savedLang;
+    else if((navigator.language||'').toLowerCase().startsWith('ms')) state.lang = 'ms';
+  }catch(e){}
+  let th = 'dark';
+  try{
+    const saved = localStorage.getItem('cv-theme');
+    if(saved) th = saved;
+    else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) th = 'light';
+  }catch(e){}
+  document.documentElement.dataset.theme = th;
+  applyLang();
+  setTheme(th);
+  if(typeof MediaRecorder === 'undefined') toast(t('tNoRecorder'), true);
+})();
+</script>
+</body>
+</html>
