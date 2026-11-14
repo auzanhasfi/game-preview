@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Liga Stik Pro · Bola Matematika</title>
+<meta name="description" content="Game sepak bola stickman gaya konsol: Manchester City, Manchester United, Real Madrid, Barcelona dan klub lain. Umpan, terobosan, tembakan bertenaga, adu penalti, dan soal matematika di tengah pertandingan. Bahasa Indonesia dan English.">
+<meta property="og:title" content="Liga Stik Pro · Bola Matematika"><meta property="og:image" content="sampul.jpg">
+<meta name="theme-color" content="#0c1526">
+<link rel="icon" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=IBM+Plex+Mono:wght@500&family=Geist:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<canvas id="kanvas" aria-label="Lapangan"></canvas>
+<div id="redup" class="redup"></div>
+
+<section id="layarMenu" class="layar" aria-labelledby="judul"></section>
+<section id="layarTim" class="layar" hidden></section>
+<section id="layarCara" class="layar" hidden></section>
+<section id="layarHasil" class="layar" hidden></section>
+
+<div id="modalSoal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="soalTeks"></div>
+<div id="modalJeda" class="modal" hidden role="dialog" aria-modal="true"></div>
+
+<div id="sentuh" hidden>
+  <div id="joyZona"><div id="joyDasar"><div id="joyKnob"></div></div></div>
+  <div id="tombolSentuh">
+    <button data-k="lari" class="tb tb-lari" data-uji="t-lari"></button>
+    <button data-k="lambung" class="tb tb-lambung" data-uji="t-lambung"></button>
+    <button data-k="terobos" class="tb tb-terobos" data-uji="t-terobos"></button>
+    <button data-k="umpan" class="tb tb-umpan" data-uji="t-umpan"></button>
+    <button data-k="tembak" class="tb tb-tembak" data-uji="t-tembak"></button>
+  </div>
+</div>
+<button id="btnJeda" class="btn-ikon" hidden data-uji="jeda" aria-label="Jeda"></button>
+<div id="toast" aria-live="polite"></div>
+<div id="putar" hidden></div>
+
+<script src="js/00-util.js"></script>
+<script src="js/01-ikon.js"></script>
+<script src="js/02-teks.js"></script>
+<script src="js/03-klub.js"></script>
+<script src="js/04-soal.js"></script>
+<script src="js/05-bunyi.js"></script>
+<script src="js/06-kamera.js"></script>
+<script src="js/07-lapangan.js"></script>
+<script src="js/08-stik.js"></script>
+<script src="js/09-bola.js"></script>
+<script src="js/10-ai.js"></script>
+<script src="js/11-laga.js"></script>
+<script src="js/12-penalti.js"></script>
+<script src="js/13-input.js"></script>
+<script src="js/14-hud.js"></script>
+<script src="js/15-layar.js"></script>
+<script src="js/99-mulai.js"></script>
+</body></html>
