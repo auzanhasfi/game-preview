@@ -30,7 +30,7 @@ function renderHasil() {
     '<p class="ttl">' + L('Item akhir', 'Item akhir') + '</p><div class="slots">' + [0, 1, 2, 3, 4, 5].map(function (i) { var it = itemById(g.items[i]); return '<span class="slot" style="cursor:default">' + (it ? ic(it.ikon, 22) : '') + '</span>'; }).join('') + '</div>';
   var lap = '<div class="lap">';
   if (g.asked) lap += '<p class="tag">' + L('Akurasi per topik', 'Ketepatan ikut topik') + '</p>' + topicBars(R.stat);
-  if (R.wrong.length) lap += '<p class="tag">' + L('Soal yang perlu diulang', 'Soalan yang perlu diulang') + '</p><ul class="mist">' + R.wrong.slice(0, 5).map(function (q) { return '<li><b>' + qText(q).replace('?', q.c).replace('□', '<u>' + q.ans + '</u>') + '</b> · ' + L('kamu jawab ', 'kamu jawab ') + q.chosen + explainHtml(q) + '</li>'; }).join('') + '</ul>';
+  if (R.wrong.length) lap += '<p class="tag">' + L('Soal yang perlu diulang', 'Soalan yang perlu diulang') + '</p><ul class="mist">' + R.wrong.slice(0, 5).map(function (q) { return '<li><b>' + teksJawab(q) + '</b> · ' + L('kamu jawab ', 'kamu jawab ') + esc2(q.chosen) + explainHtml(q) + '</li>'; }).join('') + '</ul>';
   else if (g.asked) lap += '<p class="note">' + L('Semua soal benar — hebat!', 'Semua soalan betul — hebat!') + '</p>';
   else lap += '<p>' + L('Belum ada soal yang dijawab. Dekati menara musuh dan tekan tombol SOAL.', 'Belum ada soalan dijawab. Dekati menara musuh dan tekan butang SOALAN.') + '</p>';
   lap += '</div>';
@@ -46,5 +46,5 @@ function renderHasil() {
   onAll('[data-ht]', function (b) { hasilTab = b.getAttribute('data-ht'); renderHasil(); });
   document.getElementById('hsLagi').onclick = function () { cariLawan(); };
   document.getElementById('hsLobi').onclick = function () { mlLobi(); };
-  var hs = document.getElementById('hsSalah'); if (hs) hs.onclick = function () { bukaAkademi('latihan'); startPractice({ list: R.wrong.map(function (q) { var c = Object.assign({}, q); c.opts = mkOpts(c); return c; }), title: L('Soal yang salah tadi', 'Soalan yang salah tadi') }); };
+  var hs = document.getElementById('hsSalah'); if (hs) hs.onclick = function () { bukaAkademi('latihan'); startPractice({ list: R.wrong.map(function (q) { var c = Object.assign({}, q); c.opts = c.custom ? q.opts.slice() : mkOpts(c); return c; }), title: L('Soal yang salah tadi', 'Soalan yang salah tadi') }); };
 }

@@ -1,7 +1,7 @@
 /* Dunia Clawd: bahasa (Melayu lalai, English, Indonesia) */
 export const BAHASA = { ms: 'Melayu', en: 'English', id: 'Indonesia' };
 let kini = 'ms';
-export function setBahasa(l) { kini = BAHASA[l] ? l : 'ms'; document.documentElement.lang = kini; }
+export function setBahasa(l) { kini = BAHASA[l] ? l : 'ms'; document.documentElement.lang = kini; window.SoalGuru?.bahasa(kini); }
 export function bahasa() { return kini; }
 /* t('melayu', 'english', 'indonesia'); nilai ketiga boleh ditinggal kalau sama dengan Melayu */
 export function t(ms, en, id) { return kini === 'en' ? en : kini === 'id' ? (id ?? ms) : ms; }

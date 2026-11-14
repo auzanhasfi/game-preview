@@ -50,7 +50,16 @@ function mkQ(topik, diff, tier) {
   q.opts = mkOpts(q);
   return q;
 }
+/* soal guru (js/soal-guru.js): dipakai bila guru mengaktifkannya, selain itu soal matematika */
+function sgBahasa() { if (window.SoalGuru) SoalGuru.bahasa(lang === 'ms' ? 'ms' : 'id'); return window.SoalGuru; }
+function soalBaru(topik, diff, tier) { var g = sgBahasa(); if (g && g.guna()) { var q = g.ambil(); if (q) { q.ty = 'guru'; q.lv = 0; return q; } } return mkQ(topik, diff, tier); }
+function sgRingkas() { var g = sgBahasa(); return g ? g.ringkas() : L('Matematika', 'Matematik'); }
+function bukaGuru(after, tab) { var g = sgBahasa(); if (g) g.buka({ tab: tab, selepas: after }); }
+function samaJawab(q, el) { return q.custom ? el.getAttribute('data-v') === q.ans : +el.getAttribute('data-v') === q.ans; }
+function teksJawab(q) { return q.custom ? esc2(q.teks) + ' → <u>' + esc2(q.ans) + '</u>' : qText(q).replace('?', q.c).replace('□', '<u>' + q.ans + '</u>'); }
+function esc2(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 function mkOpts(q) {
+  if (q.custom) return q.opts;
   var n = q.lv === 0 ? 3 : 4, set = [q.ans], spread = [1, 2, 10, 1, 2], tries = 0;
   if (q.ty === 'kali' && !q.miss) spread = spread.concat([q.a, q.b]);
   if (q.ans >= 100) spread = spread.concat([100, 20]);
@@ -59,6 +68,7 @@ function mkOpts(q) {
   return shuffle(set);
 }
 function qText(q) {
+  if (q.custom) return esc2(q.teks);
   var s = SYM[q.ty];
   if (q.miss === 1) return '□ ' + s + ' ' + q.b + ' = ' + q.c;
   if (q.miss === 2) return q.a + ' ' + s + ' □ = ' + q.c;
@@ -66,6 +76,7 @@ function qText(q) {
 }
 /* penjelasan cara: puluhan/satuan, penjumlahan berulang, cek dengan kebalikan */
 function explain(q) {
+  if (q.custom) return [L('Jawaban: ', 'Jawapan: ') + '<b>' + esc2(q.ans) + '</b>'].concat(q.penjelasan ? [esc2(q.penjelasan)] : []);
   var a = q.a, b = q.b, c = q.c, out = [], i;
   function split(n) { var p = n >= 100 ? 100 : 10, big = n - n % p; if (n >= 100 && n % 100 === 0) return [n, 0]; return [big, n - big]; }
   if (q.miss) {
@@ -98,7 +109,7 @@ function explain(q) {
   }
   return out;
 }
-function explainHtml(q) { return '<div class="ex"><b>' + L('Cara menghitung', 'Cara mengira') + '</b><ol>' + explain(q).map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol></div>'; }
+function explainHtml(q) { return '<div class="ex"><b>' + (q.custom ? L('Jawaban yang benar', 'Jawapan yang betul') : L('Cara menghitung', 'Cara mengira')) + '</b><ol>' + explain(q).map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol></div>'; }
 
 /* ---------- kemajuan (localStorage) ---------- */
 var PROG_KEY = 'arena-pro-kemajuan';
@@ -107,9 +118,11 @@ var prog = blankProg();
 try { var sv = JSON.parse(localStorage.getItem(PROG_KEY) || 'null'); if (sv && sv.topik) prog = Object.assign(blankProg(), sv); } catch (e) {}
 function saveProg() { try { localStorage.setItem(PROG_KEY, JSON.stringify(prog)); } catch (e) {} }
 function record(q, ok) {
+  if (q.custom) { if (window.SoalGuru) SoalGuru.rekod(q, ok); return; }
   var tp = prog.topik[q.ty]; tp[1]++; if (ok) tp[0]++;
   var key = qText(q), keep = prog.salah.filter(function (m) { return qText(m) !== key; });
   if (!ok) keep.unshift({ ty: q.ty, a: q.a, b: q.b, c: q.c, miss: q.miss, ans: q.ans, lv: q.lv });
   prog.salah = keep.slice(0, 8); saveProg();
 }
 function reviveQ(m) { var q = { ty: m.ty, a: m.a, b: m.b, c: m.c, miss: m.miss || 0, ans: m.ans, lv: m.lv || 3 }; q.opts = mkOpts(q); return q; }
+sgBahasa();

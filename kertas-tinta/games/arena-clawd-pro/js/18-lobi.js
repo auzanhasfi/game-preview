@@ -78,15 +78,21 @@ function setelan() {
 }
 /* pengaturan soal: topik + tingkat */
 function aturSoal(after) {
-  mlSheet('<h2>' + L('Soal matematika', 'Soalan matematik') + '</h2><p class="dim">' + L('Soal muncul saat menyerang menara, mengeluarkan ultimate, dan saat tumbang.', 'Soalan muncul semasa menyerang menara, mengeluarkan ultimate dan semasa tumbang.') + '</p>' + soalPilih() + '<button class="gbtn" id="soOk" data-uji="soal-ok">' + L('Simpan', 'Simpan') + '</button>');
+  mlSheet('<h2>' + L('Soal dalam game', 'Soalan dalam game') + '</h2><p class="dim">' + L('Soal muncul saat menyerang menara, mengeluarkan ultimate, dan saat tumbang. Guru bisa memakai soal sendiri untuk mata pelajaran apa saja.', 'Soalan muncul semasa menyerang menara, mengeluarkan ultimate dan semasa tumbang. Guru boleh guna soalan sendiri untuk apa-apa mata pelajaran.') + '</p>' + soalPilih() + '<button class="gbtn" id="soOk" data-uji="soal-ok">' + L('Simpan', 'Simpan') + '</button>');
   bindSoal(function () { aturSoal(after); });
   document.getElementById('soOk').onclick = function () { sfx('tap'); mlSheetClose(); if (after) after(); };
 }
 function soalPilih() {
-  return '<p class="ttl">' + L('Topik', 'Topik') + '</p><div class="chips2">' + TOPICS.map(function (k) { return '<button data-tp="' + k + '" data-uji="topik-' + k + '" aria-pressed="' + (k === SET.topik) + '">' + tx(TOPIC_TX[k]) + (SYM[k] ? ' ' + SYM[k] : '') + '</button>'; }).join('') + '</div>' +
+  var md = window.SoalGuru ? SoalGuru.mod() : 'mtk';
+  return '<div class="sgl pn"><p class="ttl">' + L('Soal guru · semua mata pelajaran', 'Soalan guru · semua mata pelajaran') + '</p><b>' + esc2(sgRingkas()) + '</b>' +
+    '<div class="chips2">' + [['mtk', L('Matematika saja', 'Matematik sahaja')], ['guru', L('Soal guru saja', 'Soalan guru sahaja')], ['campur', L('Campur', 'Campur')]].map(function (m) { return '<button data-sgm="' + m[0] + '" data-uji="sgm-' + m[0] + '" aria-pressed="' + (md === m[0]) + '">' + m[1] + '</button>'; }).join('') + '</div>' +
+    '<div class="chips2"><button data-sgbuka="set" data-uji="sg-buka">' + ic('pencil', 15) + ' ' + L('Tulis / ubah soal', 'Tulis / ubah soalan') + '</button><button data-sgbuka="tampal">' + L('Tempel dari Excel', 'Tampal dari Excel') + '</button><button data-sgbuka="kongsi">' + L('Link untuk murid', 'Pautan untuk murid') + '</button><button data-sgbuka="laporan">' + L('Laporan', 'Laporan') + '</button></div></div>' +
+    '<p class="ttl">' + L('Topik', 'Topik') + '</p><div class="chips2">' + TOPICS.map(function (k) { return '<button data-tp="' + k + '" data-uji="topik-' + k + '" aria-pressed="' + (k === SET.topik) + '">' + tx(TOPIC_TX[k]) + (SYM[k] ? ' ' + SYM[k] : '') + '</button>'; }).join('') + '</div>' +
     '<p class="ttl">' + L('Tingkat (naik sendiri tiap 5 level hero)', 'Tahap (naik sendiri setiap 5 tahap hero)') + '</p><div class="chips2">' + DIFFS.map(function (d) { return '<button data-df="' + d + '" data-uji="tingkat-' + d + '" aria-pressed="' + (d === SET.diff) + '">' + tx(DIFF_TX[d]) + '</button>'; }).join('') + '</div>';
 }
 function bindSoal(redraw) {
+  onAll('[data-sgm]', function (b) { var m = b.getAttribute('data-sgm'); sgBahasa(); SoalGuru.mod(m); var s = SoalGuru.setAktif(); if (m !== 'mtk' && (!s || !s.soal.some(function (q) { return q.t && q.j; }))) bukaGuru(redraw, 'set'); else redraw(); });
+  onAll('[data-sgbuka]', function (b) { bukaGuru(redraw, b.getAttribute('data-sgbuka')); });
   onAll('[data-tp]', function (b) { SET.topik = b.getAttribute('data-tp'); saveSet(); redraw(); });
   onAll('[data-df]', function (b) { SET.diff = b.getAttribute('data-df'); saveSet(); redraw(); });
 }

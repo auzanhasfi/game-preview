@@ -10,7 +10,18 @@ export const NAMA_DIFF = { mudah: ['Mudah · Tahun 1–2', 'Easy · Year 1–2',
 export const NAMA_TOPIK = { campur: ['Campur', 'Mixed', 'Campuran'], tambah: ['Tambah', 'Addition', 'Penjumlahan'], kurang: ['Tolak', 'Subtraction', 'Pengurangan'], kali: ['Darab', 'Multiplication', 'Perkalian'], bagi: ['Bahagi', 'Division', 'Pembagian'] };
 
 /* tier naik sedikit di tahap permainan yang lebih jauh; lv gabungan 0..9 */
-export function buatSoal(topik = 'campur', diff = 'mudah', tier = 0) {
+/* soalan guru (modul js/soal-guru.js) atau matematik */
+export const SG = () => window.SoalGuru || null;
+export function buatSoal(topik = 'campur', diff = 'mudah', tier = 0) { const g = SG(); if (g && g.guna()) { const q = g.ambil(); if (q) return q; } return buatSoalMtk(topik, diff, tier); }
+export function modGuru() { const g = SG(); return g && g.setAktif() && soalGuruAda() ? g.mod() : 'mtk'; }
+function soalGuruAda() { const s = SG()?.setAktif(); return !!(s && s.soal.some((q) => q.t && q.j && (q.s || []).some(Boolean))); }
+/* baris untuk papan 3D: soalan panjang dipecah jadi maks 3 baris */
+export function barisSoal(q, maks = 26) {
+  const s = teksSoal(q); if (s.length <= maks) return [s];
+  const kata = s.split(/\s+/), out = ['']; for (const k of kata) { if ((out[out.length - 1] + ' ' + k).trim().length > maks && out.length < 3 && out[out.length - 1]) out.push(k); else out[out.length - 1] = (out[out.length - 1] + ' ' + k).trim(); }
+  return out.map((t) => ({ t, s: 1 }));
+}
+export function buatSoalMtk(topik = 'campur', diff = 'mudah', tier = 0) {
   const ty = topik === 'campur' ? (diff === 'mudah' && tier === 0 ? pick(['tambah', 'kurang', 'tambah', 'kurang', 'kali']) : pick(['tambah', 'kurang', 'kali', 'bagi'])) : topik;
   const lv = Math.min(9, DIFFS.indexOf(diff) * 3 + Math.max(0, tier));
   let a, b, c; const q = { ty, miss: 0, lv };
@@ -55,6 +66,7 @@ export function pilihan(q, n = 4) {
   return shuffle(set);
 }
 export function teksSoal(q) {
+  if (q.custom) return q.teks;
   const s = SYM[q.ty];
   if (q.miss === 1) return '□ ' + s + ' ' + q.b + ' = ' + q.c;
   if (q.miss === 2) return q.a + ' ' + s + ' □ = ' + q.c;
@@ -64,6 +76,7 @@ function pecah(n) { const p = n >= 100 ? 100 : 10, besar = n - n % p; return n %
 
 /* cara mengira: senarai baris (boleh mengandungi <b>) */
 export function caraKira(q) {
+  if (q.custom) { const e = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); return [t('Jawapan: ', 'Answer: ', 'Jawaban: ') + '<b>' + e(q.ans) + '</b>', ...(q.penjelasan ? [e(q.penjelasan)] : [])]; }
   const { a, b, c } = q, out = [];
   if (q.miss) {
     const inv = { tambah: q.miss === 1 ? [c, '−', b] : [c, '−', a], kurang: q.miss === 1 ? [c, '+', b] : [a, '−', c], kali: q.miss === 1 ? [c, '÷', b] : [c, '÷', a], bagi: q.miss === 1 ? [c, '×', b] : [a, '÷', c] }[q.ty];

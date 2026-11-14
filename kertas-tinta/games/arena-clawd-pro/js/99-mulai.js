@@ -21,7 +21,7 @@ window.__game = {
   skill: function (n, direct) { return skill(n, direct); }, spell: useSpell, naik: upSkill, beli: buy, kedai: openShop, tutupKedai: closeShop, balik: startRecall,
   xp: function (n) { gainXp(n); return G.hero.lvl; }, emas: function (n) { G.gold += n; },
   soalan: function () { G.qT = 0; },
-  jawabUji: function (betul) { if (!curQ || curQ.done) return false; var b = [].filter.call(document.querySelectorAll('#opts button'), function (x) { return (+x.getAttribute('data-v') === curQ.ans) === !!betul; })[0]; if (b) answer(b); return !!b; },
+  jawabUji: function (betul) { if (!curQ || curQ.done) return false; var b = [].filter.call(document.querySelectorAll('#opts button'), function (x) { return samaJawab(curQ, x) === !!betul; })[0]; if (b) answer(b); return !!b; },
   lanjut: function () { if (curQ && curQ.done && !curQ.closed) { finishQ(); return true; } return false; },
   runtuh: function (n) { for (var i = 0; i < n; i++) { var s = G.structs.filter(function (x) { return x.team === 1 && x.kind === 'turret' && x.hp > 0 && !shielded(x); }).sort(function (a, b) { return a.tier - b.tier; })[0]; if (!s) break; s.hp = 1; hurt(s, 5, G.hero); } return G.towers; },
   gempur: function () { G.gempurCd = 0; return gempur(); },

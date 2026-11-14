@@ -111,7 +111,7 @@ export class Dunia {
 /* ---------- pemain ---------- */
 export function buatPemain(cfg) {
   const av = buatAvatar(cfg);
-  return { av, pos: V(0, 1, 0), vel: V(0, 0, 0), yaw: 0, diTanah: false, tanah: null, mati: false, tMati: 0, kebal: 0, laju: FIZIK.jalan, kuasaLompat: FIZIK.lompat, panjat: false, sorak: 0, tpk: 0, lonjak: 0 };
+  return { av, pos: V(0, 1, 0), vel: V(0, 0, 0), yaw: 0, diTanah: false, tanah: null, mati: false, tMati: 0, kebal: 0, laju: FIZIK.jalan, kuasaLompat: FIZIK.lompat, panjat: false, sorak: 0, tpk: 0, lonjak: 0, hp: 100, terbang: false, sekat: false, tCedera: 0 };
 }
 function bertindih(p, s, e = 0) {
   const h = FIZIK.separuh + e;
@@ -119,7 +119,8 @@ function bertindih(p, s, e = 0) {
 }
 function geser(P, paksi, delta, D, adaTanah) {
   const p = P.pos; p[paksi] += delta;
-  for (const s of D.solid) {
+  const senarai = D.vox ? D.solid.concat(D.vox.sekitar(p)) : D.solid;
+  for (const s of senarai) {
     if (!s.aktif || s.tembus || !bertindih(p, s)) continue;
     if (paksi === 'y') {
       if (delta <= 0) { p.y = s.max.y; P.diTanah = true; P.tanah = s; if (P.vel.y < -70 && P.tpk <= 0) { bunyi('tapak', 120); P.tpk = 0.2; } }
@@ -130,9 +131,10 @@ function geser(P, paksi, delta, D, adaTanah) {
       const beza = s.max.y - p.y;
       if (beza > 0 && beza <= 1.15 && (adaTanah || P.vel.y <= 0)) {
         const lama = p.y; p.y = s.max.y + 0.001;
-        if (!D.solid.some((q) => q !== s && q.aktif && !q.tembus && bertindih(p, q))) { continue; }
+        if (!senarai.some((q) => q !== s && q.aktif && !q.tembus && bertindih(p, q))) { continue; }
         p.y = lama;
       }
+      if (s.vox) P.sekat = true;
       p[paksi] = delta > 0 ? s.min[paksi] - FIZIK.separuh - 0.001 : s.max[paksi] + FIZIK.separuh + 0.001;
     }
   }
@@ -164,10 +166,16 @@ function langkahPemain(dt) {
     P.vel.y = nak ? 14 : 0; break;
   }
   // lompat
-  const lompatTekan = i.lompat;
-  if (lompatTekan && P.diTanah && P.lonjak <= 0) { P.vel.y = P.kuasaLompat; P.diTanah = false; P.tanah = null; P.lonjak = 0.12; bunyi('lompat'); }
-  P.lonjak -= dt; P.tpk -= dt;
-  if (!P.panjat) P.vel.y = Math.max(-FIZIK.jatuhMaks, P.vel.y - FIZIK.graviti * dt);
+  const lompatTekan = i.lompat, air = D.mod.dalamAir?.(p);
+  if (P.sekat && adaInput && P.diTanah && D.autoLompat && !P.terbang) { P.vel.y = P.kuasaLompat * 0.92; P.diTanah = false; P.tanah = null; }
+  P.sekat = false;
+  if (P.terbang) { P.vel.y += (((lompatTekan ? 1 : 0) - (i.turun ? 1 : 0)) * 26 - P.vel.y) * Math.min(1, dt * 10); P.vel.x *= 1.0; }
+  else if (air) { if (lompatTekan) P.vel.y = Math.min(P.vel.y + 120 * dt, 16); P.vel.y = Math.max(-18, P.vel.y - FIZIK.graviti * 0.22 * dt); P.vel.x *= 0.92; P.vel.z *= 0.92; }
+  else {
+    if (lompatTekan && P.diTanah && P.lonjak <= 0) { P.vel.y = P.kuasaLompat; P.diTanah = false; P.tanah = null; P.lonjak = 0.12; bunyi('lompat'); }
+    if (!P.panjat) P.vel.y = Math.max(-FIZIK.jatuhMaks, P.vel.y - FIZIK.graviti * dt);
+  }
+  P.lonjak -= dt; P.tpk -= dt; P.tCedera -= dt;
 
   const adaTanah = P.diTanah; P.diTanah = false; const tnh = P.tanah; P.tanah = null;
   geser(P, 'x', P.vel.x * dt, D, adaTanah); geser(P, 'z', P.vel.z * dt, D, adaTanah); geser(P, 'y', P.vel.y * dt, D, adaTanah);
@@ -194,6 +202,7 @@ function langkahPemain(dt) {
 }
 export function lantaiDi(x, y, z) {
   let t = -Infinity; for (const s of E.dunia.solid) if (s.aktif && !s.tembus && x > s.min.x && x < s.max.x && z > s.min.z && z < s.max.z && s.max.y <= y + 1 && s.max.y > t) t = s.max.y;
+  if (E.dunia.vox) t = Math.max(t, E.dunia.vox.tanahDi(x, y + 1, z));
   return t === -Infinity ? E.dunia.lantaiMati - 2 : t;
 }
 export function bunuhPemain() {
@@ -202,10 +211,19 @@ export function bunuhPemain() {
   bunyi('oof'); pecahkan(P.av, E.dunia.grup, lantaiDi(P.pos.x, P.pos.y, P.pos.z));
   E.ui.kesihatan?.(0); E.dunia.mod.onMati?.();
 }
+/* kecederaan (arena bertarung, malam, bencana): hp 0 = mati */
+export function cederakan(n, dari) {
+  const P = E.P; if (!P || P.mati || P.kebal > 0 || E.tahan) return false;
+  P.hp = Math.max(0, P.hp - n); P.tCedera = 0.4; E.ui.kesihatan?.(P.hp); bunyi('pukul');
+  if (dari) { const dx = P.pos.x - dari.x, dz = P.pos.z - dari.z, l = Math.hypot(dx, dz) || 1; P.vel.x += dx / l * 26; P.vel.z += dz / l * 26; P.vel.y = Math.max(P.vel.y, 18); P.diTanah = false; }
+  if (P.hp <= 0) bunuhPemain();
+  return true;
+}
+export function rawat(n) { const P = E.P; if (!P || P.mati) return; P.hp = Math.min(100, P.hp + n); E.ui.kesihatan?.(P.hp); }
 export async function munculSemula() {
   const P = E.P, D = E.dunia; if (!P || !D) return;
   if (D.mod.sebelumMuncul) { E.tahan++; try { await D.mod.sebelumMuncul(); } finally { E.tahan--; } if (E.dunia !== D) return; }
-  pulihkan(P.av); P.mati = false; P.vel.set(0, 0, 0); P.kebal = 0.6;
+  pulihkan(P.av); P.mati = false; P.vel.set(0, 0, 0); P.kebal = 0.6; P.hp = 100;
   const sp = D.spawn; P.pos.set(sp.x, sp.y + 0.05, sp.z); P.yaw = sp.yaw || 0; E.kam.yaw = sp.yaw || 0; P.diTanah = false; P.tanah = null;
   D.mod.selepasMuncul?.(); E.ui.kesihatan?.(100); bunyi('checkpoint');
 }
@@ -228,8 +246,14 @@ function kemasKamera(dt) {
   _sasar.set(P.pos.x, P.pos.y + 4.4, P.pos.z);
   if (P.mati && P.av.pecah) _sasar.copy(P.av.pecah.serpih[1].o.position).setY(Math.max(P.av.pecah.lantai + 2, P.av.pecah.serpih[1].o.position.y));
   let jar = K.dist;
+  if (K.fp && !P.mati) {
+    _sasar.y = P.pos.y + 4.6; c.position.copy(_sasar); c.lookAt(_sasar.x - _d.x, _sasar.y - _d.y, _sasar.z - _d.z);
+    kubah.position.copy(c.position); matahari.position.set(P.pos.x + 70, P.pos.y + 150, P.pos.z + 50); matahari.target.position.copy(P.pos);
+    P.av.akar.visible = false; K.jarak = 0; return;
+  }
   for (const s of E.dunia.solid) { if (!s.aktif || s.tembus || s.kamera === false || s.truss) continue; const h = rayKotak(_sasar, _d, s, jar); if (h > 0 && h < jar) jar = h - 0.5; }
-  jar = Math.max(jar, 2.5);
+  if (E.dunia.vox) { const h = E.dunia.vox.ray(_sasar, _d, jar); if (h >= 0 && h < jar) jar = h - 0.6; }
+  jar = Math.max(jar, E.dunia.vox ? 1.2 : 2.5);
   K.jarak = jar < K.jarak ? jar : K.jarak + (jar - K.jarak) * Math.min(1, dt * 5);
   c.position.copy(_sasar).addScaledVector(_d, K.jarak); c.lookAt(_sasar);
   kubah.position.copy(c.position);
@@ -246,12 +270,14 @@ function pasangInput(kv) {
     if (peta[e.code]) { E.inp[peta[e.code]] = 1; e.preventDefault(); }
     if (e.code === 'ArrowLeft') E.inp.pusingKi = 1; if (e.code === 'ArrowRight') E.inp.pusingKa = 1;
     if (e.code === 'Space') { E.inp.lompat = true; e.preventDefault(); }
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') E.inp.turun = true;
     E.ui.kekunci?.(e);
   });
   addEventListener('keyup', (e) => {
     if (peta[e.code]) E.inp[peta[e.code]] = 0;
     if (e.code === 'ArrowLeft') E.inp.pusingKi = 0; if (e.code === 'ArrowRight') E.inp.pusingKa = 0;
     if (e.code === 'Space') E.inp.lompat = false;
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') E.inp.turun = false;
   });
   addEventListener('blur', kosongInput);
   const ptr = new Map(); let seretPutar = null;
@@ -261,14 +287,14 @@ function pasangInput(kv) {
     if (e.pointerType === 'touch' && e.clientX < innerWidth * 0.45 && JOY.id === null) {
       JOY.id = e.pointerId; JOY.x0 = e.clientX; JOY.y0 = e.clientY; if (JOY.el) { JOY.el.hidden = false; JOY.el.style.left = e.clientX + 'px'; JOY.el.style.top = e.clientY + 'px'; JOY.ib.style.transform = ''; } return;
     }
-    ptr.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t: performance.now() });
+    ptr.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t: performance.now(), btn: e.button });
   });
   kv.addEventListener('pointermove', (e) => {
     if (e.pointerId === JOY.id) {
       let dx = e.clientX - JOY.x0, dy = e.clientY - JOY.y0; const r = Math.hypot(dx, dy), mx = 52; if (r > mx) { dx *= mx / r; dy *= mx / r; }
       E.inp.jx = dx / mx; E.inp.jy = -dy / mx; if (JOY.ib) JOY.ib.style.transform = `translate(${dx}px,${dy}px)`; return;
     }
-    const q = ptr.get(e.pointerId); if (!q) return;
+    const q = ptr.get(e.pointerId); if (!q) { if (e.pointerType === 'mouse' && E.aktif) hover(e.clientX, e.clientY); return; }
     const dx = e.clientX - q.x, dy = e.clientY - q.y; q.x = e.clientX; q.y = e.clientY;
     if (ptr.size >= 2) { // cubit = zum
       const [a, b] = [...ptr.values()], baru = Math.hypot(a.x - b.x, a.y - b.y); if (seretPutar) E.kam.dist = Math.min(60, Math.max(5, E.kam.dist * seretPutar / baru)); seretPutar = baru; return;
@@ -278,18 +304,27 @@ function pasangInput(kv) {
   const lepas = (e) => {
     if (e.pointerId === JOY.id) { JOY.id = null; E.inp.jx = E.inp.jy = 0; if (JOY.el) JOY.el.hidden = true; return; }
     const q = ptr.get(e.pointerId); seretPutar = null;
-    if (q && Math.hypot(q.x - q.x0, q.y - q.y0) < 7 && performance.now() - q.t < 350) klik(e.clientX, e.clientY);
+    if (q && Math.hypot(q.x - q.x0, q.y - q.y0) < 7 && performance.now() - q.t < 350) klik(e.clientX, e.clientY, q.btn);
     ptr.delete(e.pointerId);
   };
   kv.addEventListener('pointerup', lepas); kv.addEventListener('pointercancel', lepas);
   kv.addEventListener('wheel', (e) => { if (E.aktif) { E.kam.dist = Math.min(60, Math.max(5, E.kam.dist * (1 + Math.sign(e.deltaY) * 0.1))); e.preventDefault(); } }, { passive: false });
 }
 export function pasangJoystik(el, ib) { JOY.el = el; JOY.ib = ib; }
-export function kosongInput() { Object.assign(E.inp, { kiri: 0, kanan: 0, depan: 0, belakang: 0, lompat: false, jx: 0, jy: 0, pusingKi: 0, pusingKa: 0 }); }
+export function kosongInput() { Object.assign(E.inp, { kiri: 0, kanan: 0, depan: 0, belakang: 0, lompat: false, turun: false, jx: 0, jy: 0, pusingKi: 0, pusingKa: 0 }); }
 const ray = new THREE.Raycaster(), _n = new THREE.Vector2();
-function klik(x, y) {
+function klik(x, y, btn = 0) {
   const D = E.dunia; if (!D?.mod.onKlik || E.tahan) return;
-  _n.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(_n, E.camera); D.mod.onKlik(ray);
+  if (E.kam.fp) { x = innerWidth / 2; y = innerHeight / 2; }
+  _n.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(_n, E.camera); D.mod.onKlik(ray, btn);
+}
+export function klikTengah(btn = 0) { klik(innerWidth / 2, innerHeight / 2, btn); }
+export function rayDari(x, y) { _n.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(_n, E.camera); return ray; }
+let tHover = 0;
+function hover(x, y) {
+  const D = E.dunia; if (!D?.mod.onHover || E.tahan) return; const k = performance.now(); if (k - tHover < 40) return; tHover = k;
+  if (E.kam.fp) { x = innerWidth / 2; y = innerHeight / 2; }
+  D.mod.onHover(rayDari(x, y));
 }
 
 /* ---------- pemain lain (bot) ---------- */
@@ -361,7 +396,7 @@ export function masukDunia(mod) {
   mod.bina(D); D.selesai();
   E.P = buatPemain(S.avatar); D.grup.add(E.P.av.akar);
   const sp = D.spawn; E.P.pos.set(sp.x, sp.y + 0.05, sp.z); E.P.yaw = sp.yaw || 0;
-  E.kam.yaw = sp.yaw || 0; E.kam.pitch = 0.34; E.kam.dist = 22; E.kam.jarak = 22;
+  E.kam.yaw = sp.yaw || 0; E.kam.pitch = 0.34; E.kam.dist = mod.jarakKamera || 22; E.kam.jarak = E.kam.dist; E.kam.fp = false;
   E.tahan = 0; E.aktif = true; kosongInput(); muzik(mod.tema || 'obby');
 }
 export function keluarDunia() {
@@ -425,7 +460,7 @@ function gelung(ms) {
         if (P.tMati <= 0 && !P.menunggu) { P.menunggu = true; munculSemula().finally(() => { P.menunggu = false; }); }
       } else {
         P.av.akar.position.copy(P.pos); P.av.akar.rotation.y = P.yaw; P.sorak -= dt;
-        animasi(P.av, dt, { laju: Math.hypot(P.vel.x, P.vel.z), diTanah: P.diTanah, vy: P.vel.y, panjat: P.panjat, sorak: P.sorak > 0 });
+        P.ayun = Math.max(0, (P.ayun || 0) - dt * 3.2); animasi(P.av, dt, { laju: Math.hypot(P.vel.x, P.vel.z), diTanah: P.diTanah, vy: P.vel.y, panjat: P.panjat, sorak: P.sorak > 0, ayun: P.ayun });
       }
     }
     kemasKamera(dt); E.renderer.render(E.scene, E.camera);
@@ -436,4 +471,4 @@ function autoKualiti() {
   if (E.fps < 26) rendahKali++; else rendahKali = 0;
   if (rendahKali >= 4) { E.ringan = true; E.bayang = false; E.renderer.setPixelRatio(1); E.renderer.shadowMap.enabled = false; matahari.castShadow = false; ukurSemula(); E.scene.traverse((o) => { if (o.material) { (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { m.needsUpdate = true; }); } }); }
 }
-export { buatPet, tukarTeks, isyarat };
+export { buatPet, tukarTeks, isyarat, matahari, hemi };

@@ -36,27 +36,27 @@ var BUFFS = [
   { id: 'emas', ikon: 'coin', nama: ['Peti Koin', 'Peti Syiling'], teks: ['Dapat 200 koin untuk membeli item.', 'Dapat 200 syiling untuk beli item.'] },
   { id: 'meriam', ikon: 'bomb', nama: ['Meriam Bonus', 'Meriam Bonus'], teks: ['1 minion meriam + 1 minion super keluar di setiap lorong.', '1 minion meriam + 1 minion super keluar di setiap lorong.'] }
 ];
-function optsHtml(q) { return '<div class="opts ' + (q.opts.length === 3 ? 'n3' : '') + '" id="opts">' + q.opts.map(function (v) { return '<button data-uji="opt" data-v="' + v + '">' + v + '</button>'; }).join('') + '</div>'; }
+function optsHtml(q) { return '<div class="opts ' + (q.opts.length === 3 ? 'n3' : '') + (q.custom ? ' teks' : '') + '" id="opts">' + q.opts.map(function (v) { return '<button data-uji="opt" data-v="' + esc2(v) + '" data-betul="' + (v === q.ans) + '">' + esc2(v) + '</button>'; }).join('') + '</div>'; }
 function ask(why, target) {
   if (!G || G.state !== 'main') return;
   G.state = 'soalan'; stopInput();
   var tier = qTier() + (why === 'ult' ? 1 : 0);
-  curQ = mkQ(SET.topik, SET.diff, tier); curQ.why = why; curQ.target = target; curQ.done = false; curQ.closed = false; curQ.buff = pick(BUFFS);
-  var h = G.hero, hd = '', lvTag = '<span class="lvl">' + tx(TOPIC_TX[curQ.ty]) + ' · ' + tx(DIFF_TX[SET.diff]).split(' · ')[0] + ' · ' + L('tingkat ', 'tahap ') + (Math.min(3, tier) + 1) + '</span>';
+  curQ = soalBaru(SET.topik, SET.diff, tier); curQ.why = why; curQ.target = target; curQ.done = false; curQ.closed = false; curQ.buff = pick(BUFFS);
+  var h = G.hero, hd = '', lvTag = curQ.custom ? '<span class="lvl">' + esc2(curQ.mapel || L('Soal guru', 'Soalan guru')) + '</span>' : '<span class="lvl">' + tx(TOPIC_TX[curQ.ty]) + ' · ' + tx(DIFF_TX[SET.diff]).split(' · ')[0] + ' · ' + L('tingkat ', 'tahap ') + (Math.min(3, tier) + 1) + '</span>';
   if (why === 'mati') hd = '<p class="tag">' + L('Clawd tumbang', 'Clawd tumbang') + '</p><h2>' + L('Jawab benar untuk bangkit sekarang!', 'Jawab betul untuk bangkit segera!') + '</h2><div class="reward"><span>' + ic('zap', 28) + '</span><p>' + L('Benar = Clawd langsung kembali ke markas. Salah = tunggu ' + Math.ceil(h.respT) + ' detik.', 'Betul = Clawd terus kembali ke pangkalan. Salah = tunggu ' + Math.ceil(h.respT) + ' saat.') + '</p></div>';
   else if (why === 'gempur') hd = '<p class="tag">' + L('Soal Gempur', 'Soalan Gempur') + '</p><h2>' + L('Jawab untuk menjatuhkan pensil raksasa!', 'Jawab untuk jatuhkan pensel gergasi!') + '</h2><div class="reward"><span>' + ic('pencil', 28) + '</span><p>' + L('Benar = ', 'Betul = ') + (target.kind === 'core' ? L('Inti Istana Comot −12% nyawa', 'Inti Istana Comot −12% nyawa') : L('menara −18% nyawa', 'menara −18% nyawa')) + L('. Soal Gempur siap lagi 20 detik (salah: 12 detik).', '. Soalan Gempur sedia semula 20 saat (salah: 12 saat).') + '</p></div>';
   else if (why === 'ult') hd = '<p class="tag">' + L('Ultimate Matematika', 'Ultimate Matematik') + '</p><h2>' + tx(HEROES[h.id].sk[2].n) + '</h2><div class="reward"><span>' + ic(HEROES[h.id].sk[2].i, 26) + '</span><p>' + L('Soal lebih sulit. Benar = ultimate 150% kuat. Salah = 70% (tetap keluar).', 'Soalan lebih sukar. Betul = ultimate 150% kuat. Salah = 70% (tetap keluar).') + '</p></div>';
   else hd = '<p class="tag">' + L('Soal kilat · game berhenti sebentar', 'Soalan kilat · game berhenti sekejap') + '</p><h2>' + L('Jawab untuk mendapat kekuatan!', 'Jawab untuk dapat kuasa!') + '</h2><div class="reward"><span>' + ic(curQ.buff.ikon, 22) + '</span><p><b>' + tx(curQ.buff.nama) + '</b>: ' + tx(curQ.buff.teks) + '</p></div>';
   var html = hd + lvTag;
   if (curQ.vis) html += '<div class="vis">' + curQ.vis + '</div>';
-  html += '<p class="q">' + qText(curQ) + '</p>' + optsHtml(curQ) + '<p class="fb" id="fb" aria-live="polite"></p><div id="after"></div><p class="prog">' + L('Kombo ', 'Kombo ') + '<span class="kdot on"></span>'.repeat(G.combo) + '<span class="kdot"></span>'.repeat(Math.max(0, 3 - G.combo)) + L('· 3 benar beruntun = Ledakan Kombo', '· 3 betul berturut = Letupan Kombo') + '</p><div class="confetti" id="conf"></div>';
+  html += '<p class="q' + (curQ.custom ? ' teks' : '') + '">' + qText(curQ) + '</p>' + optsHtml(curQ) + '<p class="fb" id="fb" aria-live="polite"></p><div id="after"></div><p class="prog">' + L('Kombo ', 'Kombo ') + '<span class="kdot on"></span>'.repeat(G.combo) + '<span class="kdot"></span>'.repeat(Math.max(0, 3 - G.combo)) + L('· 3 benar beruntun = Ledakan Kombo', '· 3 betul berturut = Letupan Kombo') + '</p><div class="confetti" id="conf"></div>';
   paperEl.innerHTML = html; sheet.hidden = false; musicStop();
   paperEl.querySelectorAll('#opts button').forEach(function (b) { b.onclick = function () { answer(b); }; });
 }
 function answer(b) {
   if (!curQ || curQ.done) return; curQ.done = true; G.asked++;
-  var ok = +b.getAttribute('data-v') === curQ.ans, fb = document.getElementById('fb'), h = G.hero;
-  curQ.chosen = +b.getAttribute('data-v');
+  var ok = samaJawab(curQ, b), fb = document.getElementById('fb'), h = G.hero;
+  curQ.chosen = curQ.custom ? b.getAttribute('data-v') : +b.getAttribute('data-v');
   G.log.push({ q: curQ, ok: ok }); record(curQ, ok);
   document.getElementById('opts').classList.add('done');
   if (ok) {
@@ -66,8 +66,8 @@ function answer(b) {
     setTimeout(finishQ, 1250);
   } else {
     G.combo = 0;
-    b.classList.add('no'); sfx('wrong'); paperEl.querySelectorAll('#opts button').forEach(function (x) { if (+x.getAttribute('data-v') === curQ.ans) x.classList.add('ok'); });
-    fb.className = 'fb no'; fb.textContent = L('Jawabannya ', 'Jawapannya ') + curQ.ans + L('. Tidak apa-apa, lihat caranya:', '. Tak apa, lihat caranya:');
+    b.classList.add('no'); sfx('wrong'); paperEl.querySelectorAll('#opts button').forEach(function (x) { if (samaJawab(curQ, x)) x.classList.add('ok'); });
+    fb.className = 'fb no'; fb.textContent = L('Jawabannya ', 'Jawapannya ') + curQ.ans + (curQ.custom ? '.' : L('. Tidak apa-apa, lihat caranya:', '. Tak apa, lihat caranya:'));
     document.getElementById('after').innerHTML = explainHtml(curQ) + '<div class="row" style="margin-top:12px"><button class="primary" id="qNext" data-uji="lanjut">' + (curQ.why === 'ult' ? L('Lanjut · ultimate 70% ▸', 'Teruskan · ultimate 70% ▸') : L('Lanjut ▸', 'Teruskan ▸')) + '</button></div>';
     document.getElementById('qNext').onclick = finishQ;
   }

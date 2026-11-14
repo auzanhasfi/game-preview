@@ -66,7 +66,7 @@ function renderBelajar() {
 /* latihan tanpa tekanan: 10 soal, ada penjelasan */
 function startPractice(o) {
   var list = o.list || [];
-  if (!list.length) for (var i = 0; i < (o.n || 10); i++) list.push(mkQ(o.topik || SET.topik, SET.diff, i < 4 ? 0 : 1));
+  if (!list.length) for (var i = 0; i < (o.n || 10); i++) list.push(o.topik ? mkQ(o.topik, SET.diff, i < 4 ? 0 : 1) : soalBaru(SET.topik, SET.diff, i < 4 ? 0 : 1));
   P = { qs: list, i: 0, ok: 0, done: false, title: o.title || L('Latihan 10 soal', 'Latihan 10 soalan') };
   showTab('latihan'); window.scrollTo({ top: 0 });
 }
@@ -86,14 +86,14 @@ function renderLatihan() {
     return;
   }
   var q = P.qs[P.i];
-  el.innerHTML = '<p class="prog">' + P.title + ' · ' + L('Soal ', 'Soalan ') + (P.i + 1) + '/' + P.qs.length + ' · ' + L('benar ', 'betul ') + P.ok + '</p>' + (q.vis ? '<div class="vis">' + q.vis + '</div>' : '') + '<p class="q">' + qText(q) + '</p>' + optsHtml(q).replace('id="opts"', 'id="popts"') + '<p class="fb" id="pfb" aria-live="polite"></p><div id="pafter"></div>';
+  el.innerHTML = '<p class="prog">' + P.title + ' · ' + L('Soal ', 'Soalan ') + (P.i + 1) + '/' + P.qs.length + ' · ' + L('benar ', 'betul ') + P.ok + '</p>' + (q.vis ? '<div class="vis">' + q.vis + '</div>' : '') + '<p class="q' + (q.custom ? ' teks' : '') + '">' + qText(q) + '</p>' + optsHtml(q).replace('id="opts"', 'id="popts"') + '<p class="fb" id="pfb" aria-live="polite"></p><div id="pafter"></div>';
   el.querySelectorAll('#popts button').forEach(function (b) {
     b.onclick = function () {
       if (P.done) return; P.done = true;
-      var v = +b.getAttribute('data-v'), ok = v === q.ans, fb = document.getElementById('pfb');
+      var ok = samaJawab(q, b), fb = document.getElementById('pfb');
       record(q, ok); document.getElementById('popts').classList.add('done');
       if (ok) { P.ok++; b.classList.add('ok'); sfx('correct'); fb.className = 'fb ok'; fb.textContent = L('Benar!', 'Betul!'); }
-      else { b.classList.add('no'); sfx('wrong'); el.querySelectorAll('#popts button').forEach(function (x) { if (+x.getAttribute('data-v') === q.ans) x.classList.add('ok'); }); fb.className = 'fb no'; fb.textContent = L('Jawabannya ', 'Jawapannya ') + q.ans + '.'; }
+      else { b.classList.add('no'); sfx('wrong'); el.querySelectorAll('#popts button').forEach(function (x) { if (samaJawab(q, x)) x.classList.add('ok'); }); fb.className = 'fb no'; fb.textContent = L('Jawabannya ', 'Jawapannya ') + q.ans + '.'; }
       document.getElementById('pafter').innerHTML = (ok ? '' : explainHtml(q)) + '<div class="row" style="margin-top:12px;display:flex"><button class="primary" id="pNext" data-uji="latihan-lanjut" style="flex:1;text-align:center">' + L('Lanjut ▸', 'Teruskan ▸') + '</button></div>';
       document.getElementById('pNext').onclick = function () { P.i++; P.done = false; renderLatihan(); };
     };

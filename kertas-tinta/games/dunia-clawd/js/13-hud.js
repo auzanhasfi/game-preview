@@ -3,7 +3,7 @@ import { E, setSemula, pasangJoystik, kosongInput } from './08-enjin.js';
 import { S, simpan, rekod, tambahCbux, dengar, LENCANA, KATALOG, beriLencana } from './05-simpan.js';
 import { t, tx, nombor, BAHASA, setBahasa } from './01-teks.js';
 import { ic } from './02-ikon.js';
-import { buatSoal, teksSoal, caraKira, NAMA_DIFF, NAMA_TOPIK, DIFFS } from './03-soal.js';
+import { buatSoal, buatSoalMtk, teksSoal, caraKira, NAMA_DIFF, NAMA_TOPIK, DIFFS, modGuru } from './03-soal.js';
 import { bunyi, muzik, henti, mulaAudio } from './04-bunyi.js';
 
 const $ = (s) => document.querySelector(s);
@@ -14,7 +14,7 @@ export function pasangHud(keluarFn, segarFn, masukSemulaFn) {
   onKeluar = keluarFn; onSegarPlatform = segarFn;
   H = $('#hud');
   E.ui = {
-    toast, banner, info, tanya, cara, chat, segar: segarSenarai, kesihatan, konfeti, soalanSemasa, tawarLangkau, butangAksi, kekunci, masukSemula: masukSemulaFn, syiling: (n) => tambahCbux(0)
+    toast, banner, info, tanya, cara, chat, segar: segarSenarai, kesihatan, konfeti, soalanSemasa, tawarLangkau, butangAksi, kekunci, masukSemula: masukSemulaFn, syiling: (n) => tambahCbux(0), panel, butangSentuh, silang, terapung, tanyaPilihan, modal
   };
   dengar('lencana', (id) => paparLencana(id));
   dengar('cbux', (n) => { if (n > 0 && E.aktif) terapung('+' + n + ' CBux'); });
@@ -38,6 +38,9 @@ export function bukaHud(nama) {
       <div class="h-beg" id="hBeg"></div>
       <div class="h-hp"><i id="hHp"></i></div>
     </div>
+    <div class="h-panel" id="hPanel" hidden></div>
+    <div class="h-silang" id="hSilang" hidden></div>
+    <div class="h-sentuh" id="hSentuh"></div>
     <div id="hJoy" class="h-joy" hidden><i></i></div>
     <button id="hLompat" class="h-lompat" ${sentuh ? '' : 'hidden'} aria-label="${t('Lompat', 'Jump', 'Lompat')}">${ic('stairs', 30)}</button>
     <button id="hAksi" class="h-aksi" hidden></button>
@@ -56,7 +59,7 @@ export function bukaHud(nama) {
   setTimeout(soalanChat, 25000);
 }
 let tSenarai = 0;
-export function tutupHud() { H.hidden = true; H.innerHTML = ''; clearInterval(tSenarai); $('#hMenuBox')?.remove(); $('#hSoalBox')?.remove(); soalChat = null; }
+export function tutupHud() { H.hidden = true; H.innerHTML = ''; $('#hModal')?.remove(); clearInterval(tSenarai); $('#hMenuBox')?.remove(); $('#hSoalBox')?.remove(); soalChat = null; }
 
 /* ---------- beg alat: gegelung dibeli di Kedai ---------- */
 function binaBeg() {
@@ -75,10 +78,32 @@ function segarSenarai() {
   const baris = [{ n: S.nama, v: st.map((s) => s.v), saya: true }, ...D.bots.map((b) => ({ n: b.nama, v: D.mod.statistikBot(b), bot: true }))];
   L.innerHTML = `<div class="h-tajuk"><span>${t('Pemain', 'Players', 'Pemain')}</span>${st.map((s) => `<span>${esc(s.k)}</span>`).join('')}</div>` + baris.map((b) => `<div class="h-baris ${b.saya ? 'saya' : ''}"><span class="n">${b.bot ? ic('bot', 12) : ''}${esc(b.n)}</span>${b.v.map((v) => `<span>${esc(v)}</span>`).join('')}</div>`).join('');
 }
-function kesihatan(n) { const h = $('#hHp'); if (h) h.style.width = n + '%'; }
+function kesihatan(n) { const h = $('#hHp'); if (h) { h.style.width = n + '%'; h.style.background = n > 50 ? '' : n > 25 ? '#e3b04b' : 'var(--bad)'; } }
+/* panel kecil khas dunia (hotbar blok, misi, skor) di atas bar bawah */
+function panel(html) { const p = $('#hPanel'); if (!p) return null; p.hidden = !html; if (html !== undefined && html !== null) p.innerHTML = html; return p; }
+function silang(v) { const s = $('#hSilang'); if (s) s.hidden = !v; }
+/* butang sentuh tambahan di kanan: [{id, ikon, label, fn, tahan, on}] */
+function butangSentuh(senarai) {
+  const B = $('#hSentuh'); if (!B) return; B.innerHTML = '';
+  for (const b of senarai || []) {
+    const el = document.createElement('button'); el.className = 'h-sb' + (b.on ? ' on' : ''); el.dataset.uji = 'sb-' + b.id; el.setAttribute('aria-label', b.label);
+    el.innerHTML = ic(b.ikon, 22) + `<span>${esc(b.label)}</span>`;
+    if (b.tahan) { el.addEventListener('pointerdown', (e) => { e.preventDefault(); b.fn(true); }); for (const n of ['pointerup', 'pointercancel', 'pointerleave']) el.addEventListener(n, () => b.fn(false)); }
+    else el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); b.fn(); });
+    B.appendChild(el);
+  }
+}
+/* modal bebas (beg, rakit, pilihan): kembali fungsi tutup */
+function modal(html, ikat) {
+  E.tahan++; kosongInput(); const B = document.createElement('div'); B.className = 'soalbox'; B.id = 'hModal';
+  B.innerHTML = `<div class="sb mdl">${html}</div>`; document.body.appendChild(B);
+  let tutup = false; const t2 = () => { if (tutup) return; tutup = true; B.remove(); E.tahan = Math.max(0, E.tahan - 1); };
+  B.addEventListener('pointerdown', (e) => { if (e.target === B) t2(); });
+  ikat?.(B, t2); return t2;
+}
 function banner(s) { const b = $('#hBanner'); if (b) { b.hidden = !s; b.textContent = s; } }
 function info(s) { const b = $('#hInfo'); if (b) { b.hidden = !s; if (b.textContent !== s) b.textContent = s; } }
-function soalanSemasa(s) { const b = $('#hSoal'); if (b) { b.hidden = !s; if (s) { b.innerHTML = `<small>${t('Pijak jawapan yang betul', 'Step on the right answer', 'Injak jawaban yang benar')}</small><b>${esc(s)}</b>`; } } }
+function soalanSemasa(s) { const b = $('#hSoal'); if (b) { b.hidden = !s; if (s) { b.innerHTML = `<small>${t('Pijak jawapan yang betul', 'Step on the right answer', 'Injak jawaban yang benar')}</small><b class="${s.length > 18 ? 'panjang' : ''}">${esc(s)}</b>`; } } }
 function toast(s, jenis = '') {
   const T = $('#hToast'); if (!T) return; const d = document.createElement('div'); d.className = 'tt ' + jenis; d.textContent = s; T.appendChild(d);
   while (T.children.length > 3) T.firstChild.remove(); setTimeout(() => d.remove(), 3200);
@@ -105,7 +130,7 @@ let soalChat = null;
 /* bot bertanya dalam sembang: taip jawapan = bonus CBux */
 function soalanChat() {
   if (!E.aktif || !E.dunia?.bots.length) return;
-  if (!E.tahan) { const q = buatSoal(S.topik, S.diff, 0); q.miss = 0; q.ans = q.c; soalChat = q; const b = E.dunia.bots[Math.floor(Math.random() * E.dunia.bots.length)], tx2 = t(`siapa tahu ${q.a} ${SIMBOL[q.ty]} ${q.b}? taip jawapan`, `who knows ${q.a} ${SIMBOL[q.ty]} ${q.b}? type the answer`, `siapa tahu ${q.a} ${SIMBOL[q.ty]} ${q.b}? ketik jawabannya`); chat(b.nama, tx2); b.cakap(`${q.a} ${SIMBOL[q.ty]} ${q.b} = ?`); }
+  if (!E.tahan && modGuru() !== 'guru') { const q = buatSoalMtk(S.topik, S.diff, 0); q.miss = 0; q.ans = q.c; soalChat = q; const b = E.dunia.bots[Math.floor(Math.random() * E.dunia.bots.length)], tx2 = t(`siapa tahu ${q.a} ${SIMBOL[q.ty]} ${q.b}? taip jawapan`, `who knows ${q.a} ${SIMBOL[q.ty]} ${q.b}? type the answer`, `siapa tahu ${q.a} ${SIMBOL[q.ty]} ${q.b}? ketik jawabannya`); chat(b.nama, tx2); b.cakap(`${q.a} ${SIMBOL[q.ty]} ${q.b} = ?`); }
   setTimeout(soalanChat, 45000 + Math.random() * 30000);
 }
 const SIMBOL = { tambah: '+', kurang: '−', kali: '×', bagi: '÷' };
@@ -124,7 +149,8 @@ function kekunci(e) {
   if ($('#hMenuBox')) { if (e.code === 'KeyR') { tutupMenu(); setSemula(); } if (e.code === 'KeyL') { tutupMenu(); onKeluar(); } return; }
   if (e.key === '/') { e.preventDefault(); $('#chatBox').classList.remove('tutup'); $('#chatIn').focus(); kosongInput(); return; }
   if (e.code === 'Tab') { e.preventDefault(); $('#hSenarai').classList.toggle('tutup'); return; }
-  const n = Number(e.key); if (n >= 1 && n <= 9) { const a = KATALOG.filter((k) => k.jenis === 'alat' && S.milik.includes(k.id))[n - 1]; if (a) pakaiAlat(a.id); }
+  if ($('#hModal')) { if (e.code === 'Escape') $('#hModal')?.dispatchEvent(new PointerEvent('pointerdown')); return; }
+  const n = Number(e.key); if (n >= 1 && n <= 9 && !E.dunia?.mod.hotbar) { const a = KATALOG.filter((k) => k.jenis === 'alat' && S.milik.includes(k.id))[n - 1]; if (a) pakaiAlat(a.id); }
   E.dunia?.mod.kekunci?.(e);
 }
 
@@ -132,20 +158,23 @@ function kekunci(e) {
 export function tanya(o = {}) {
   return new Promise((selesai) => {
     E.tahan++; kosongInput();
-    const q = o.q || buatSoal(S.topik, S.diff, o.tier || 0), B = document.createElement('div');
+    let q = o.q, nota = o.nota;
+    if (!q) q = buatSoal(S.topik, S.diff, o.tier || 0);
+    else if (!q.custom && o.boleh !== false && modGuru() === 'guru') { const g = window.SoalGuru.ambil(); if (g) { q = g; nota = null; } }
+    const B = document.createElement('div');
     B.id = 'hSoalBox'; B.className = 'soalbox'; B.setAttribute('role', 'dialog'); B.setAttribute('aria-modal', 'true');
     const akhir = (ok) => { B.remove(); E.tahan = Math.max(0, E.tahan - 1); selesai(ok); };
-    B.innerHTML = `<div class="sb"><small class="sb-t">${esc(o.tajuk || t('Soalan', 'Question', 'Soal'))}</small><div class="sb-q">${esc(teksSoal(q))}</div>${o.nota ? `<p class="sb-n">${esc(o.nota)}</p>` : ''}
-      <div class="sb-j">${q.opts.map((v, i) => `<button class="j" data-uji="jawapan" data-v="${v}" data-betul="${v === q.ans}"><small>${i + 1}</small>${nombor(v)}</button>`).join('')}</div></div>`;
+    B.innerHTML = `<div class="sb"><small class="sb-t">${esc(o.tajuk || t('Soalan', 'Question', 'Soal'))}</small><div class="sb-q ${q.custom ? 'teks' : ''}">${esc(teksSoal(q))}</div>${nota ? `<p class="sb-n">${esc(nota)}</p>` : ''}
+      <div class="sb-j ${q.custom ? 'teks' : ''}">${q.opts.map((v, i) => `<button class="j" data-uji="jawapan" data-v="${esc(v)}" data-betul="${v === q.ans}"><small>${i + 1}</small>${q.custom ? esc(v) : nombor(v)}</button>`).join('')}</div></div>`;
     document.body.appendChild(B);
     B.querySelectorAll('.j').forEach((b) => {
       b.onclick = () => {
-        if (b.disabled) return; const ok = Number(b.dataset.v) === q.ans; rekod(q, ok);
-        B.querySelectorAll('.j').forEach((x) => { x.disabled = true; if (Number(x.dataset.v) === q.ans) x.classList.add('ok'); });
+        if (b.disabled) return; const sama = (x) => (q.custom ? x.dataset.v === q.ans : Number(x.dataset.v) === q.ans); const ok = sama(b); rekod(q, ok);
+        B.querySelectorAll('.j').forEach((x) => { x.disabled = true; if (sama(x)) x.classList.add('ok'); });
         if (ok) { bunyi('betul'); b.classList.add('ok'); tambahCbux(1); setTimeout(() => akhir(true), 420); return; }
         b.classList.add('no'); bunyi('salah');
         const sb = B.querySelector('.sb'), c = document.createElement('div'); c.className = 'sb-c';
-        c.innerHTML = `<b>${t('Cara mengira', 'How to solve it', 'Cara menghitung')}</b><ol>${caraKira(q).map((x) => `<li>${x}</li>`).join('')}</ol><button class="gbtn tutupCara" data-uji="faham">${t('Faham', 'Got it', 'Paham')}</button>`;
+        c.innerHTML = `<b>${q.custom ? t('Jawapan yang betul', 'The right answer', 'Jawaban yang benar') : t('Cara mengira', 'How to solve it', 'Cara menghitung')}</b><ol>${caraKira(q).map((x) => `<li>${x}</li>`).join('')}</ol><button class="gbtn tutupCara" data-uji="faham">${t('Faham', 'Got it', 'Paham')}</button>`;
         sb.appendChild(c); c.querySelector('button').onclick = () => akhir(false); c.querySelector('button').focus();
       };
     });
@@ -154,7 +183,7 @@ export function tanya(o = {}) {
 /* jawapan salah di dunia (jambatan/pintu): papar cara tanpa memberhentikan permainan */
 function cara(teks, jawapan, baris) {
   const T = $('#hToast'); if (!T) return; const d = document.createElement('div'); d.className = 'tt cara';
-  d.innerHTML = `<b>${esc(teks.replace('?', jawapan))}</b>${baris.map((x) => `<span>${x}</span>`).join('')}`; T.appendChild(d); setTimeout(() => d.remove(), 5200);
+  d.innerHTML = `<b>${esc(/=\s*\?$|□/.test(teks) ? teks.replace('?', jawapan).replace('□', jawapan) : teks + ' → ' + jawapan)}</b>${baris.map((x) => `<span>${x}</span>`).join('')}`; T.appendChild(d); setTimeout(() => d.remove(), 5200);
 }
 /* jatuh 5 kali: tawaran langkau dengan 3 soalan */
 function tawarLangkau(fn) {
@@ -193,7 +222,9 @@ export function kawalanTetapan(R, selepas) {
     baris(t('Topik', 'Topic', 'Topik'), Object.keys(NAMA_TOPIK).map((d) => pilih('topik', d, tx(NAMA_TOPIK[d]))).join('')) +
     baris(t('Bunyi', 'Sound', 'Suara'), pilih('bunyi', true, t('Hidup', 'On', 'Nyala')) + pilih('bunyi', false, t('Tutup', 'Off', 'Mati'))) +
     baris(t('Muzik', 'Music', 'Musik'), pilih('muzik', true, t('Hidup', 'On', 'Nyala')) + pilih('muzik', false, t('Tutup', 'Off', 'Mati'))) +
-    baris(t('Grafik', 'Graphics', 'Grafik'), pilih('grafik', 'auto', 'Auto') + pilih('grafik', 'rendah', t('Ringan', 'Light', 'Ringan')));
+    baris(t('Grafik', 'Graphics', 'Grafik'), pilih('grafik', 'auto', 'Auto') + pilih('grafik', 'rendah', t('Ringan', 'Light', 'Ringan'))) +
+    `<div class="tp"><span>${t('Soalan guru', 'Teacher questions', 'Soal guru')}</span><div class="seg"><button data-guru data-uji="tetapan-guru">${ic('book', 16)} ${esc(window.SoalGuru ? window.SoalGuru.ringkas() : '')}</button></div></div>`;
+  R.querySelector('[data-guru]')?.addEventListener('click', () => { window.SoalGuru?.buka({ selepas: selepas }); });
   R.querySelectorAll('button[data-k]').forEach((b) => {
     b.onclick = () => {
       const k = b.dataset.k; let v = b.dataset.v; if (v === 'true') v = true; if (v === 'false') v = false;
@@ -219,7 +250,7 @@ function lukisMenu(B, tab) {
     const D = E.dunia; I.innerHTML = [S.nama, ...D.bots.map((b) => b.nama)].map((n, i) => `<div class="mp"><span>${i ? ic('bot', 16) : ic('user', 16)}</span><b>${esc(n)}</b><small>${i ? t('Bot AI', 'AI bot', 'Bot AI') : t('Anda', 'You', 'Kamu')}</small></div>`).join('');
   } else if (tab === 'tetapan') { kawalanTetapan(I, () => lukisMenu(B, 'tetapan')); }
   else {
-    I.innerHTML = `<dl class="kw"><dt>W A S D</dt><dd>${t('Bergerak', 'Move', 'Bergerak')}</dd><dt>Space</dt><dd>${t('Lompat', 'Jump', 'Lompat')}</dd><dt>${t('Seret tetikus', 'Drag mouse', 'Seret mouse')}</dt><dd>${t('Pusing kamera', 'Rotate camera', 'Putar kamera')}</dd><dt>${t('Roda tetikus', 'Mouse wheel', 'Roda mouse')}</dt><dd>${t('Zum', 'Zoom', 'Zoom')}</dd><dt>← →</dt><dd>${t('Pusing kamera', 'Rotate camera', 'Putar kamera')}</dd><dt>/</dt><dd>${t('Sembang', 'Chat', 'Obrolan')}</dd><dt>Tab</dt><dd>${t('Senarai pemain', 'Player list', 'Daftar pemain')}</dd><dt>1–4</dt><dd>${t('Jawab soalan / alat', 'Answer / tools', 'Jawab soal / alat')}</dd><dt>F</dt><dd>${t('Kutip kristal (Simulator)', 'Mine crystal (Simulator)', 'Ambil kristal (Simulator)')}</dd></dl>`;
+    I.innerHTML = `<dl class="kw"><dt>W A S D</dt><dd>${t('Bergerak', 'Move', 'Bergerak')}</dd><dt>Space</dt><dd>${t('Lompat', 'Jump', 'Lompat')}</dd><dt>${t('Seret tetikus', 'Drag mouse', 'Seret mouse')}</dt><dd>${t('Pusing kamera', 'Rotate camera', 'Putar kamera')}</dd><dt>${t('Roda tetikus', 'Mouse wheel', 'Roda mouse')}</dt><dd>${t('Zum', 'Zoom', 'Zoom')}</dd><dt>← →</dt><dd>${t('Pusing kamera', 'Rotate camera', 'Putar kamera')}</dd><dt>/</dt><dd>${t('Sembang', 'Chat', 'Obrolan')}</dd><dt>Tab</dt><dd>${t('Senarai pemain', 'Player list', 'Daftar pemain')}</dd><dt>1–4</dt><dd>${t('Jawab soalan / alat', 'Answer / tools', 'Jawab soal / alat')}</dd><dt>F</dt><dd>${t('Kutip kristal (Simulator) / terbang (Kreatif)', 'Mine crystal (Simulator) / fly (Creative)', 'Ambil kristal (Simulator) / terbang (Kreatif)')}</dd><dt>${t('Klik kiri / kanan', 'Left / right click', 'Klik kiri / kanan')}</dt><dd>${t('Gali blok / letak blok', 'Break block / place block', 'Gali blok / taruh blok')}</dd><dt>1–9</dt><dd>${t('Pilih blok di hotbar', 'Pick a hotbar block', 'Pilih blok di hotbar')}</dd><dt>B</dt><dd>${t('Beg & rakit', 'Bag & crafting', 'Tas & rakit')}</dd><dt>E</dt><dd>${t('Serang', 'Attack', 'Serang')}</dd><dt>V</dt><dd>${t('Kamera orang pertama', 'First-person camera', 'Kamera orang pertama')}</dd><dt>Shift</dt><dd>${t('Turun (terbang)', 'Descend (flying)', 'Turun (terbang)')}</dd></dl>`;
   }
   $('#mReset').onclick = () => { tutupMenu(); setSemula(); };
   $('#mKeluar').onclick = () => { tutupMenu(); onKeluar(); };

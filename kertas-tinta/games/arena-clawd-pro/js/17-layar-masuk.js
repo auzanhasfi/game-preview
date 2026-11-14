@@ -60,6 +60,7 @@ function mlLogin(ganti) {
     '<label>' + L('Pilih avatar', 'Pilih avatar') + '</label><div class="avs">' + HERO_IDS.map(function (h) { return '<button data-av="' + h + '" aria-pressed="' + (h === av) + '" aria-label="' + tx(HEROES[h].nama) + '"><canvas data-art="face" data-hero="' + h + '" style="aspect-ratio:1"></canvas></button>'; }).join('') + '</div>' +
     '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span class="seg2" role="group" aria-label="Bahasa"><button data-lg="id" aria-pressed="' + (lang === 'id') + '">Indonesia</button><button data-lg="ms" aria-pressed="' + (lang === 'ms') + '">Melayu</button></span>' +
     (ganti ? '' : '<button class="bbtn" id="lgTamu" data-uji="tamu">' + L('Main sebagai Tamu', 'Main sebagai Tetamu') + '</button>') + '</div>' +
+    '<div class="sgl pn"><p class="ttl">' + L('Untuk guru', 'Untuk guru') + '</p><b id="lgSg">' + esc2(sgRingkas()) + '</b><p class="fine" style="margin:0">' + L('Masukkan soal dan mata pelajaranmu sendiri. Murid cukup membuka link darimu.', 'Masukkan soalan dan mata pelajaran anda sendiri. Murid hanya buka pautan daripada anda.') + '</p><button class="bbtn" id="lgGuru" data-uji="guru-masuk">' + ic('pencil', 16) + ' ' + L('Saya guru: masukkan soal', 'Saya guru: masukkan soalan') + '</button></div>' +
     '<button class="gbtn" id="lgGo" data-uji="masuk">' + (ganti ? L('Simpan', 'Simpan') : L('Masuk ke arena', 'Masuk ke arena')) + '</button>' +
     '<p class="fine">' + L('Tanpa kata sandi. Nama, koin, dan skin hanya tersimpan di perangkat ini.', 'Tanpa kata laluan. Nama, syiling dan skin hanya disimpan di peranti ini.') + '</p></div></div>');
   var inp = document.getElementById('lgNama'), go = document.getElementById('lgGo');
@@ -70,5 +71,6 @@ function mlLogin(ganti) {
   function masuk(nm) { AKUN.nama = nm; AKUN.avatar = av; if (!ganti) SET.hero = av; saveAkun(); saveSet(); sfx('lvl'); mlLobi(); }
   go.onclick = function () { if (!go.disabled) masuk(inp.value.trim().slice(0, 12)); };
   inp.onkeydown = function (e) { if (e.key === 'Enter' && !go.disabled) go.onclick(); };
+  document.getElementById('lgGuru').onclick = function () { sfx('tap'); bukaGuru(function () { var e = document.getElementById('lgSg'); if (e) e.textContent = sgRingkas(); }); };
   var tm = document.getElementById('lgTamu'); if (tm) tm.onclick = function () { masuk(L('Tamu', 'Tetamu') + Math.floor(1000 + Math.random() * 9000)); };
 }

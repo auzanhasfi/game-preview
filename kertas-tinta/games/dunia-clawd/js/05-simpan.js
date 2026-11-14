@@ -18,7 +18,10 @@ function kosong() {
     nama: '', bahasa: 'ms', diff: 'mudah', topik: 'campur', cbux: 40, bunyi: true, muzik: true, sens: 1, grafik: 'auto',
     avatar: { ...PRESET.pahlawan }, milik: [], lencana: [], suka: {}, terakhir: [], masuk: 0, oof: 0,
     prog: { topik: { tambah: [0, 0], kurang: [0, 0], kali: [0, 0], bagi: [0, 0] }, salah: [], betul: 0, jumlah: 0, kombo: 0, komboTerbaik: 0 },
-    x: { obby: { stage: 0, menang: 0 }, menara: { menang: 0, terbaik: 0 }, tycoon: { wang: 10, simpan: 0, beli: [] }, sim: { bintang: 0, wang: 0, kuasa: 0, beg: 0, laju: 0, zon: 0, pet: [], lahir: 0 } }
+    x: { obby: { stage: 0, menang: 0 }, menara: { menang: 0, terbaik: 0 }, tycoon: { wang: 10, simpan: 0, beli: [] }, sim: { bintang: 0, wang: 0, kuasa: 0, beg: 0, laju: 0, zon: 0, pet: [], lahir: 0 },
+      blok: { buka: [], diletak: 0, kreatif: { jenis: 'padang', seed: 0, ubah: [], hot: null }, bertahan: { seed: 0, ubah: [], inv: {}, hot: null, malam: 0, misi: 0, kira: {}, alat: [] }, gua: { terbaik: 0, main: 0 }, malam: { terbaik: 0, menang: 0 } },
+      kebun: { wang: 20, benih: { lobak: 3 }, petak: [], buka: 6, alat: [], jual: 0 }, kubu: { terbaik: 0, menang: 0 }, bencana: { hidup: 0, terbaik: 0 }, pedang: { ko: 0, menang: 0, terbaik: 0 } },
+    harian: { tarikh: '', jawab: 0, blok: 0, dunia: [], ambil: [], streak: 0, hadiah: '' }
   };
 }
 export const S = kosong();
@@ -37,7 +40,10 @@ export function tambahCbux(n) { if (!n) return; S.cbux = Math.max(0, Math.round(
 
 /* kemajuan soal */
 export function rekod(q, betul) {
-  const p = S.prog, tp = p.topik[q.ty]; tp[1]++; p.jumlah++;
+  const p = S.prog;
+  if (q.custom) { window.SoalGuru?.rekod(q, betul); p.jumlah++; if (betul) { p.betul++; p.kombo++; p.komboTerbaik = Math.max(p.komboTerbaik, p.kombo); if (S.harian) { const k = new Date().toISOString().slice(0, 10); if (S.harian.tarikh !== k) Object.assign(S.harian, { tarikh: k, jawab: 0, blok: 0, dunia: [], ambil: [] }); S.harian.jawab++; } } else p.kombo = 0; if (betul && p.betul >= 10) beriLencana('j10'); if (betul && p.betul >= 50) beriLencana('j50'); if (betul && p.betul >= 100) beriLencana('j100'); if (p.kombo >= 5) beriLencana('k5'); if (p.kombo >= 10) beriLencana('k10'); simpan(); return; }
+  const tp = p.topik[q.ty]; tp[1]++; p.jumlah++;
+  if (betul && S.harian) { const k = new Date().toISOString().slice(0, 10); if (S.harian.tarikh !== k) Object.assign(S.harian, { tarikh: k, jawab: 0, blok: 0, dunia: [], ambil: [] }); S.harian.jawab++; }
   if (betul) { tp[0]++; p.betul++; p.kombo++; p.komboTerbaik = Math.max(p.komboTerbaik, p.kombo); }
   else { p.kombo = 0; const k = q.a + q.ty + q.b; p.salah = [{ ty: q.ty, a: q.a, b: q.b, c: q.c, miss: q.miss, ans: q.ans }, ...p.salah.filter((m) => m.a + m.ty + m.b !== k)].slice(0, 8); }
   if (betul && p.betul >= 10) beriLencana('j10'); if (betul && p.betul >= 50) beriLencana('j50'); if (betul && p.betul >= 100) beriLencana('j100');
@@ -60,6 +66,17 @@ export const LENCANA = {
   k5: { n: ['Kombo 5', 'Combo 5', 'Kombo 5'], d: ['Betul 5 kali berturut-turut.', 'Get 5 right in a row.', 'Benar 5 kali berturut-turut.'], i: 'zap', cb: 10 },
   k10: { n: ['Kombo 10', 'Combo 10', 'Kombo 10'], d: ['Betul 10 kali berturut-turut.', 'Get 10 right in a row.', 'Benar 10 kali berturut-turut.'], i: 'flame', cb: 30 },
   gaya: { n: ['Bergaya', 'Stylish', 'Bergaya'], d: ['Beli barang pertama di Kedai.', 'Buy your first item in the Shop.', 'Beli barang pertama di Toko.'], i: 'shirt', cb: 5 },
+  blok: { n: ['Peneroka Blok', 'Block Explorer', 'Penjelajah Blok'], d: ['Tamatkan semua misi Dunia Blok: Bertahan.', 'Finish every Block World: Survival quest.', 'Selesaikan semua misi Dunia Blok: Bertahan.'], i: 'bricks', cb: 80 },
+  kreatif: { n: ['Arkitek', 'Architect', 'Arsitek'], d: ['Letak 300 blok dalam dunia blok.', 'Place 300 blocks in block worlds.', 'Taruh 300 blok di dunia blok.'], i: 'box', cb: 40 },
+  gua: { n: ['Pemburu Permata', 'Gem Hunter', 'Pemburu Permata'], d: ['Kutip 6 permata dalam satu pusingan Gua Permata.', 'Collect 6 gems in one Gem Cave run.', 'Ambil 6 permata dalam satu putaran Gua Permata.'], i: 'gem', cb: 50 },
+  malam10: { n: ['10 Malam', '10 Nights', '10 Malam'], d: ['Bertahan 10 malam di hutan.', 'Survive 10 nights in the forest.', 'Bertahan 10 malam di hutan.'], i: 'flame', cb: 90 },
+  selamat: { n: ['Penyelamat', 'Rescuer', 'Penyelamat'], d: ['Bawa pulang keempat-empat anak Clawd yang hilang.', 'Bring home all four lost little Clawds.', 'Bawa pulang keempat anak Clawd yang hilang.'], i: 'heart', cb: 40 },
+  kebun: { n: ['Petani Hebat', 'Great Farmer', 'Petani Hebat'], d: ['Jual hasil kebun bernilai 500 syiling.', 'Sell 500 coins of harvest.', 'Jual hasil kebun senilai 500 koin.'], i: 'leaf', cb: 50 },
+  emas: { n: ['Tuaian Emas', 'Golden Harvest', 'Panen Emas'], d: ['Tuai tanaman emas pertama.', 'Harvest your first golden crop.', 'Panen tanaman emas pertama.'], i: 'sparkle', cb: 20 },
+  kubu: { n: ['Penjaga Kubu', 'Fort Keeper', 'Penjaga Benteng'], d: ['Tahan 10 gelombang di Pertahanan Kubu.', 'Hold 10 waves in Fort Defense.', 'Tahan 10 gelombang di Pertahanan Benteng.'], i: 'castle', cb: 80 },
+  bencana: { n: ['Mangsa Terselamat', 'Survivor', 'Penyintas'], d: ['Selamat daripada 5 bencana berturut-turut.', 'Survive 5 disasters in a row.', 'Selamat dari 5 bencana berturut-turut.'], i: 'storm', cb: 50 },
+  pedang: { n: ['Pendekar', 'Swordmaster', 'Pendekar'], d: ['Menang satu pusingan Arena Pedang.', 'Win a round of Sword Arena.', 'Menang satu ronde Arena Pedang.'], i: 'swords', cb: 50 },
+  harian: { n: ['Rajin Setiap Hari', 'Daily Player', 'Rajin Tiap Hari'], d: ['Siapkan semua misi harian.', 'Complete all daily quests.', 'Selesaikan semua misi harian.'], i: 'check', cb: 20 },
   oof: { n: ['Tak Putus Asa', 'Never Give Up', 'Pantang Menyerah'], d: ['Jatuh 25 kali dan terus mencuba.', 'Fall 25 times and keep trying.', 'Jatuh 25 kali dan terus mencoba.'], i: 'heart', cb: 10 }
 };
 export function beriLencana(id) {
@@ -85,6 +102,9 @@ export const KATALOG = [
   { id: 'jubah', jenis: 'belakang', n: ['Jubah', 'Cape', 'Jubah'], h: 0 },
   { id: 'sayap', jenis: 'belakang', n: ['Sayap', 'Wings', 'Sayap'], h: 120 },
   { id: 'beg', jenis: 'belakang', n: ['Beg Sekolah', 'School Bag', 'Tas Sekolah'], h: 35 },
+  { id: 'lombong', jenis: 'topi', n: ['Topi Pelombong', 'Miner Helmet', 'Helm Penambang'], h: 60 },
+  { id: 'jerami', jenis: 'topi', n: ['Topi Jerami', 'Straw Hat', 'Topi Jerami'], h: 45 },
+  { id: 'tanduk', jenis: 'topi', n: ['Tanduk Naga', 'Dragon Horns', 'Tanduk Naga'], h: 110 },
   { id: 'coilLaju', jenis: 'alat', n: ['Gegelung Laju', 'Speed Coil', 'Kumparan Cepat'], d: ['Lari 1.5× lebih laju.', 'Run 1.5× faster.', 'Lari 1,5× lebih cepat.'], h: 90, ikon: 'wind' },
   { id: 'coilLompat', jenis: 'alat', n: ['Gegelung Lompat', 'Jump Coil', 'Kumparan Lompat'], d: ['Lompat lebih tinggi.', 'Jump higher.', 'Lompat lebih tinggi.'], h: 90, ikon: 'stairs' }
 ];

@@ -4,7 +4,7 @@ import { E, Bot, tukarTeks, bunuhPemain } from './08-enjin.js';
 import { labelRata, labelTegak, papanTeks } from './06-bahan.js';
 import { S, simpan, tambahCbux, beriLencana, rekod } from './05-simpan.js';
 import { t, tx } from './01-teks.js';
-import { buatSoal, teksSoal, caraKira } from './03-soal.js';
+import { buatSoal, teksSoal, caraKira, barisSoal } from './03-soal.js';
 import { bunyi } from './04-bunyi.js';
 
 const PAL = ['#d8714f', '#f2c14e', '#a3b86c', '#7f9fd9', '#8a78b8', '#f19bb4', '#6fa8dc'];
@@ -60,7 +60,7 @@ function barisJawapan(x, y, z, tier, warna, st) {
 function soalBaru(B) {
   const q = buatSoal(S.topik, S.diff, B.tier); while (q.opts.length > 3) q.opts.splice(q.opts.findIndex((v) => v !== q.ans), 1);
   B.q = q; B.siap = false;
-  tukarTeks(B.papan.userData.tx, [teksSoal(q)]);
+  tukarTeks(B.papan.userData.tx, barisSoal(q));
   B.petak.forEach((p, i) => { p.nilai = q.opts[i]; p.jatuh = 0; p.pecah = false; D.setAktif(p, true); D.setPos(p, p.x, p.y0, p.z); warnaMesh(p, 0xffffff); if (p.lab) tukarTeks(p.lab.userData.tx, [{ t: String(q.opts[i]), c: '#0c1526' }]); });
 }
 function warnaMesh(p, w) { if (Array.isArray(p.mesh.material)) { if (!p.mesh.userData.milik) { p.mesh.material = p.mesh.material.map((m) => m.clone()); p.mesh.userData.milik = true; } p.mesh.material.forEach((m) => m.color.set(w)); } }
@@ -103,7 +103,7 @@ function pintuJawapan(x, y, z, tier, warna, st) {
 }
 function soalPintu(P) {
   const q = buatSoal(S.topik, S.diff, P.tier); while (q.opts.length > 3) q.opts.splice(q.opts.findIndex((v) => v !== q.ans), 1);
-  P.q = q; tukarTeks(P.papan.userData.tx, [teksSoal(q)]);
+  P.q = q; tukarTeks(P.papan.userData.tx, barisSoal(q));
   P.pintu.forEach((b, i) => { b.nilai = q.opts[i]; D.setAktif(b, true); warnaMesh(b, 0xffffff); if (b.lab) tukarTeks(b.lab.userData.tx, [{ t: String(q.opts[i]), c: '#0c1526' }]); });
 }
 function ketuk(P, i) {

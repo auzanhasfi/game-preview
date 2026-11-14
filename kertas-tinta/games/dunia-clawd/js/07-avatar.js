@@ -34,6 +34,9 @@ function aksesoriTopi(id, kepala, kk) {
   if (id === 'mahkota') { const m = mat('#d9b25f', { r: 0.25, m: 0.7 }); a(kp(kk.w * 0.9, 0.22, kk.d * 0.9, m, 0, y + 0.11)); for (const [px, pz] of [[-0.7, -0.4], [0, -0.4], [0.7, -0.4], [-0.7, 0.4], [0, 0.4], [0.7, 0.4]]) { const c = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.42, 4), m); c.position.set(px * kk.w / 2, y + 0.42, pz * 1.1); a(c); } a(kp(0.16, 0.16, 0.05, mat('#c0392b', { e: '#c0392b', ei: 0.5 }), 0, y + 0.12, -kk.d * 0.46)); }
   if (id === 'sarjana') { a(kp(kk.w + 0.04, 0.3, kk.d + 0.04, mat('#1c1828'), 0, y + 0.05)); const p = kp(2.1, 0.08, 2.1, mat('#1c1828'), 0, y + 0.28); p.rotation.y = Math.PI / 4; a(p); a(kp(0.08, 0.7, 0.08, mat('#d9b25f'), 0.8, y - 0.05, 0)); }
   if (id === 'kon') { const c = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.2, 12), mat('#e8732c')); c.position.y = y + 0.66; c.castShadow = true; a(c); const r = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.2, 12), mat('#ffffff')); r.position.y = y + 0.6; a(r); a(kp(1.5, 0.1, 1.5, mat('#e8732c'), 0, y + 0.08)); }
+  if (id === 'lombong') { a(kp(kk.w + 0.16, 0.55, kk.d + 0.16, mat('#e3b04b', { r: 0.4, m: 0.2 }), 0, y + 0.12)); a(kp(0.5, 0.36, 0.16, mat('#fff4c2', { e: '#fff4c2', ei: 1.2 }), 0, y + 0.18, -kk.d / 2 - 0.12)); }
+  if (id === 'jerami') { const m = mat('#e3c27a', { r: 0.9 }); const p = new THREE.Mesh(new THREE.CylinderGeometry(1.75, 1.75, 0.08, 20), m); p.position.y = y + 0.06; a(p); const k = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.9, 0.6, 16), m); k.position.y = y + 0.38; a(k); const r2 = new THREE.Mesh(new THREE.CylinderGeometry(0.92, 0.92, 0.14, 16), mat('#c0392b')); r2.position.y = y + 0.18; a(r2); }
+  if (id === 'tanduk') { for (const s2 of [-1, 1]) { const c = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.8, 8), mat('#efe6d2')); c.position.set(s2 * 0.75, y + 0.36, 0); c.rotation.z = -s2 * 0.35; a(c); } }
   if (id === 'songkok') { a(kp(kk.w + 0.06, 0.55, kk.d + 0.06, mat('#1c1828', { r: 0.9 }), 0, y + 0.22)); }
 }
 function aksesoriBelakang(id, badan) {
@@ -75,6 +78,7 @@ export function animasi(av, dt, k) {
   if (!k.diTanah) { const naik = k.vy > 0; sa = naik ? 3 : 2.6; sb = naik ? 3 : 2.6; le = naik ? 0.45 : 0.2; av.lenKi.rotation.x = lerp(av.lenKi.rotation.x, sa, dt * 14); av.lenKa.rotation.x = lerp(av.lenKa.rotation.x, sb, dt * 14); av.kakiKi.rotation.x = lerp(av.kakiKi.rotation.x, le, dt * 14); av.kakiKa.rotation.x = lerp(av.kakiKa.rotation.x, -le * 0.4, dt * 14); return; }
   if (k.laju > 0.5) { const a = Math.sin(av.fasa) * 1.05; av.lenKi.rotation.x = a; av.lenKa.rotation.x = -a; av.kakiKi.rotation.x = -a; av.kakiKa.rotation.x = a; }
   else { const n = Math.sin(av.fasa) * 0.035; av.lenKi.rotation.x = lerp(av.lenKi.rotation.x, n, dt * 10); av.lenKa.rotation.x = lerp(av.lenKa.rotation.x, -n, dt * 10); av.kakiKi.rotation.x = lerp(av.kakiKi.rotation.x, 0, dt * 12); av.kakiKa.rotation.x = lerp(av.kakiKa.rotation.x, 0, dt * 12); }
+  if (k.ayun > 0) { av.lenKa.rotation.x = -2.3 * Math.sin(Math.min(1, k.ayun) * Math.PI); av.lenKa.rotation.z = 0.25; }
   const j = av.badanG.userData.jubah; if (j) j.rotation.x = lerp(j.rotation.x, Math.min(0.9, k.laju * 0.05) + Math.sin(av.fasa * 0.5) * 0.04, dt * 8);
   const s = av.badanG.userData.sayap; if (s) s.forEach((w, i) => { w.rotation.z = (i ? 1 : -1) * Math.sin(av.fasa * 0.4) * 0.12; });
 }
