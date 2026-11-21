@@ -1,0 +1,45 @@
+'use strict';
+var I18N = {
+  ms: {
+    tajuk: 'Kedai Pantas', kedai: 'Kedai Runcit Si Bulat',
+    sub: 'Layan pelanggan, kira wang dan beri baki dengan tepat!',
+    bahasa: 'Bahasa', pilihTahap: 'Pilih tahap', tahapN: 'Tahap',
+    t1: 'Satu jenis barang', t2: 'Dua atau tiga barang', t3: 'Diskaun peratus',
+    pelanggan: 'pelanggan', terbaik: 'Terbaik',
+    cara: 'Cara main', cara1: 'Ketik barang pesanan', cara2: 'Terima wang pelanggan', cara3: 'Beri baki yang tepat',
+    bunyi: 'Bunyi', jeda: 'Berhenti sebentar', jedaTajuk: 'Berhenti sebentar', sambung: 'Teruskan', keluar: 'Ke menu',
+    skor: 'Skor', kombo: 'Kombo',
+    arah_barang: 'Ketik barang di rak ikut pesanan', arah_diskaun: 'Pilih jumlah bayaran selepas diskaun',
+    arah_terima: 'Ketik wang pelanggan untuk menerimanya', arah_baki: 'Beri baki: ketik syiling dan not',
+    siap: 'Siap, kira', kosong: 'Kosongkan', beri: 'Beri baki',
+    jumlah: 'Jumlah', bayar: 'Perlu bayar', diterima: 'Wang diterima', diberi: 'Baki diberi', begKosong: 'Beg masih kosong',
+    diskaun: 'Diskaun', wangSaya: 'Ini wang saya', buang: 'Buang satu',
+    s_barang: 'Barang belum sama dengan pesanan', s_disk: 'Kira semula diskaun',
+    s_lebih: 'Terlalu banyak, kurangkan', s_kurang: 'Belum cukup, tambah lagi',
+    puji: ['Pantas!', 'Tepat sekali!', 'Hebat!', 'Terima kasih!'], lari: 'Pelanggan pergi...',
+    menang: 'Kedai laris!', kalah: 'Pelanggan sudah pergi', ulang: 'Main semula', seterusnya: 'Tahap seterusnya', menu: 'Menu',
+    dilayan: 'Dilayan', tepat: 'Tanpa silap', rekodBaru: 'Rekod baharu!', bintang: 'bintang', nyawa: 'Nyawa',
+    syarat: '2 bintang: skor {a}. 3 bintang: skor {b}.'
+  },
+  id: {
+    tajuk: 'Warung Cepat', kedai: 'Warung Si Bulat',
+    sub: 'Layani pembeli, hitung uang, dan beri kembalian dengan tepat!',
+    bahasa: 'Bahasa', pilihTahap: 'Pilih level', tahapN: 'Level',
+    t1: 'Satu jenis barang', t2: 'Dua atau tiga barang', t3: 'Diskon persen',
+    pelanggan: 'pembeli', terbaik: 'Terbaik',
+    cara: 'Cara main', cara1: 'Ketuk barang pesanan', cara2: 'Terima uang pembeli', cara3: 'Beri kembalian yang tepat',
+    bunyi: 'Suara', jeda: 'Jeda', jedaTajuk: 'Jeda sebentar', sambung: 'Lanjut', keluar: 'Ke menu',
+    skor: 'Skor', kombo: 'Kombo',
+    arah_barang: 'Ketuk barang di rak sesuai pesanan', arah_diskaun: 'Pilih jumlah bayar setelah diskon',
+    arah_terima: 'Ketuk uang pembeli untuk menerimanya', arah_baki: 'Beri kembalian: ketuk koin dan uang kertas',
+    siap: 'Selesai, hitung', kosong: 'Kosongkan', beri: 'Beri kembalian',
+    jumlah: 'Jumlah', bayar: 'Harus bayar', diterima: 'Uang diterima', diberi: 'Kembalian diberi', begKosong: 'Keranjang masih kosong',
+    diskaun: 'Diskon', wangSaya: 'Ini uang saya', buang: 'Buang satu',
+    s_barang: 'Barang belum sama dengan pesanan', s_disk: 'Hitung ulang diskonnya',
+    s_lebih: 'Terlalu banyak, kurangi', s_kurang: 'Belum cukup, tambah lagi',
+    puji: ['Cepat!', 'Tepat sekali!', 'Hebat!', 'Terima kasih!'], lari: 'Pembeli pergi...',
+    menang: 'Warung laris!', kalah: 'Pembeli sudah pergi', ulang: 'Main lagi', seterusnya: 'Level berikutnya', menu: 'Menu',
+    dilayan: 'Dilayani', tepat: 'Tanpa salah', rekodBaru: 'Rekor baru!', bintang: 'bintang', nyawa: 'Nyawa',
+    syarat: '2 bintang: skor {a}. 3 bintang: skor {b}.'
+  }
+};

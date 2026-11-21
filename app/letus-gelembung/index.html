@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clawd Letus Gelembung</title>
+<meta name="theme-color" content="#0c3b5c">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <button class="ib" id="btnBack" data-uji="kembali" hidden></button>
+    <span class="bar-gap"></span>
+    <button class="ib teks" id="btnLang" data-uji="tukar-bahasa"></button>
+    <button class="ib" id="btnSnd" data-uji="bunyi"></button>
+  </header>
+
+  <section class="skrin" id="menu">
+    <div class="hero" id="mMenu"></div>
+    <h1 data-t="tajuk"></h1>
+    <p class="sub" data-t="sub"></p>
+    <div class="bahasa" role="group" aria-label="Bahasa">
+      <button class="pil" data-uji="bm" data-loc="ms"></button>
+      <button class="pil" data-uji="id" data-loc="id"></button>
+    </div>
+    <button class="btn utama" data-uji="mula" id="btnMula"></button>
+    <p class="cara" data-t="cara"></p>
+  </section>
+
+  <section class="skrin" id="peta" hidden>
+    <h2 data-t="peta"></h2>
+    <div id="petaIsi" class="grid-tahap"></div>
+  </section>
+
+  <section class="skrin" id="main" hidden>
+    <div class="hud">
+      <div class="soal"><div id="soalQ" data-uji="soalan">?</div></div>
+      <div class="stat">
+        <div><small data-t="skor"></small><b id="vSkor" data-uji="skor">0</b></div>
+        <div><small data-t="soalan"></small><b id="vSoalan">0/0</b></div>
+        <div id="kombo"><small data-t="kombo"></small><b id="vKombo">x1</b></div>
+      </div>
+      <div class="desak" aria-hidden="true"><i id="desakBar"></i></div>
+    </div>
+    <div class="arena" id="arena">
+      <div class="stage" id="stage">
+        <div class="clawd" id="clawd"></div>
+        <canvas id="cv" data-uji="arena"></canvas>
+      </div>
+    </div>
+    <p class="petunjuk" id="petunjuk"></p>
+  </section>
+
+  <section class="hasil" id="hasil" hidden>
+    <div class="kad">
+      <div class="maskot" id="mHasil"></div>
+      <h2 id="hTajuk"></h2>
+      <div class="bintang" id="hBintang" data-uji="bintang"></div>
+      <div class="hrow"><span data-t="skor"></span><b id="hSkor" data-uji="hasil-skor">0</b></div>
+      <div class="hrow"><span data-t="terbaik"></span><b id="hBest">0</b></div>
+      <div class="hbtn">
+        <button class="btn utama" id="btnNext" data-uji="seterusnya"></button>
+        <button class="btn" id="btnUlang" data-uji="ulang"></button>
+        <button class="btn" id="btnPeta" data-uji="ke-peta"></button>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="js/data.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/maskot.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

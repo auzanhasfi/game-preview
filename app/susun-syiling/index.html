@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff6e5">
+<title>Susun Syiling</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23f4c542' stroke='%234a2a14' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+<div id="app">
+
+  <section id="skrin-menu" class="skrin" hidden>
+    <div class="menu-atas">
+      <button class="ikon-btn" data-uji="bunyi-menu" id="bunyi-menu" aria-label="Bunyi"></button>
+    </div>
+    <div class="clawd besar" id="clawd-menu"></div>
+    <h1 data-i18n="judul">Susun Syiling</h1>
+    <p class="tagline" data-i18n="tagline"></p>
+    <div class="bahasa" role="group" aria-label="Bahasa">
+      <button class="chip" data-uji="bm" data-bhs="ms">BM</button>
+      <button class="chip" data-uji="id" data-bhs="id">ID</button>
+    </div>
+    <button class="btn utama" data-uji="mula"><span data-i18n="mula">Mula Main</span></button>
+    <div class="tahap-pilih">
+      <div class="label" data-i18n="pilihTahap">Pilih tahap</div>
+      <div class="chips" id="chips-tahap"></div>
+    </div>
+    <ol class="cara">
+      <li data-i18n="cara1"></li>
+      <li data-i18n="cara2"></li>
+      <li data-i18n="cara3"></li>
+    </ol>
+    <div class="papan" id="papan-menu"></div>
+  </section>
+
+  <section id="skrin-main" class="skrin" hidden>
+    <header class="hud">
+      <div class="hud-baris">
+        <button class="ikon-btn" data-uji="rumah" id="btn-rumah" aria-label="Menu"></button>
+        <div class="pil" id="hud-tahap"></div>
+        <div class="pil skor"><span data-i18n="skor">Skor</span> <b id="hud-skor">0</b></div>
+        <button class="ikon-btn" data-uji="bunyi" id="btn-bunyi" aria-label="Bunyi"></button>
+        <button class="ikon-btn teks" data-uji="bahasa-tukar" id="btn-bahasa" aria-label="Bahasa"></button>
+      </div>
+      <div class="hud-baris2">
+        <div id="nyawa" class="nyawa" aria-live="polite"></div>
+        <div id="hud-matlamat" class="matlamat"></div>
+        <div id="hud-masa" class="masa"></div>
+      </div>
+      <div class="bar"><i id="bar-masa"></i></div>
+    </header>
+    <div class="juru">
+      <div class="clawd" id="clawd-main"></div>
+      <div class="gelembung" id="gelembung" aria-live="polite"></div>
+    </div>
+    <div class="tong-grid" id="tong-grid"></div>
+    <div class="dulang-kotak">
+      <div class="dulang" id="dulang"></div>
+      <button class="btn kecil" data-uji="tukar" id="btn-tukar"></button>
+    </div>
+    <div class="tabir" id="tabir-tahap" hidden>
+      <div class="kad-tahap">
+        <div class="clawd sederhana" id="clawd-tahap"></div>
+        <h2 id="tahap-judul"></h2>
+        <div class="bintang" id="tahap-bintang"></div>
+        <p id="tahap-bonus"></p>
+        <button class="btn utama" data-uji="seterusnya" id="btn-seterusnya"></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="skrin-hasil" class="skrin" hidden>
+    <div class="clawd besar" id="clawd-hasil"></div>
+    <h1 id="hasil-judul"></h1>
+    <div class="bintang besar" id="hasil-bintang"></div>
+    <div class="hasil-info">
+      <div><span data-i18n="skor">Skor</span><b id="hasil-skor">0</b></div>
+      <div><span data-i18n="tahapCapai">Tahap dicapai</span><b id="hasil-tahap">0</b></div>
+    </div>
+    <p class="rekod" id="hasil-rekod" hidden></p>
+    <div class="papan" id="papan-hasil"></div>
+    <div class="baris-btn">
+      <button class="btn utama" data-uji="main-semula" data-i18n="mainSemula">Main semula</button>
+      <button class="btn" data-uji="menu" data-i18n="menuUtama">Menu</button>
+    </div>
+  </section>
+
+</div>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/seni.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teka Ejaan Harian</title>
+<meta name="theme-color" content="#fff4e6">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <button class="ib" id="btnBack" data-uji="kembali" hidden></button>
+    <span class="bar-judul" id="barJudul"></span>
+    <button class="ib" id="btnHint" data-uji="petunjuk" hidden></button>
+    <button class="ib" id="btnStat" data-uji="statistik"></button>
+    <button class="ib teks" id="btnLang" data-uji="tukar-bahasa"></button>
+    <button class="ib" id="btnSnd" data-uji="bunyi"></button>
+  </header>
+
+  <section class="skrin" id="menu">
+    <div class="maskot besar" id="mMenu"></div>
+    <h1 data-t="tajuk"></h1>
+    <p class="sub" data-t="sub"></p>
+    <div class="bahasa" role="group" aria-label="Bahasa">
+      <button class="pil" data-uji="bm" data-loc="ms">BM</button>
+      <button class="pil" data-uji="id" data-loc="id">ID</button>
+    </div>
+    <div class="menu-btn">
+      <button class="btn utama" data-uji="harian" id="btnHarian"></button>
+      <button class="btn" data-uji="latihan" id="btnLatihan"></button>
+      <button class="btn lembut" data-uji="cikgu" id="btnCikgu"></button>
+    </div>
+    <p class="cara" data-t="cara"></p>
+    <div class="legenda"><span class="pt t">A</span><b data-t="lt"></b><span class="pt a">B</span><b data-t="la"></b><span class="pt x">C</span><b data-t="lx"></b></div>
+  </section>
+
+  <section class="skrin" id="main" hidden>
+    <div class="atas">
+      <div class="maskot kecil" id="mMain"></div>
+      <div class="gelembung" id="bubble" aria-live="polite"></div>
+    </div>
+    <div class="grid" id="grid" data-uji="grid"></div>
+    <div class="kbd" id="kbd" data-uji="papan-kekunci"></div>
+  </section>
+
+  <section class="skrin" id="cikgu" hidden>
+    <h2 data-t="cT"></h2>
+    <p class="arah" data-t="cArah"></p>
+    <textarea id="cTeks" data-uji="cikgu-teks" rows="7" spellcheck="false"></textarea>
+    <p class="info" id="cInfo" aria-live="polite"></p>
+    <button class="btn utama" data-uji="cikgu-buat" id="cBuat"></button>
+    <div id="cHasil" hidden>
+      <label class="arah" for="cPaut" data-t="cPaut"></label>
+      <input id="cPaut" data-uji="cikgu-paut" readonly>
+      <div class="baris2"><button class="btn" data-uji="cikgu-salin" id="cSalin"></button><button class="btn lembut" data-uji="cikgu-cuba" id="cCuba"></button></div>
+    </div>
+  </section>
+</div>
+
+<div class="sheet" id="sheetHasil" hidden role="dialog" aria-modal="true">
+  <div class="kad">
+    <div class="maskot sedang" id="mHasil"></div>
+    <h2 id="hTajuk"></h2>
+    <div class="kata-besar" id="hKata" data-uji="hasil-kata"></div>
+    <p class="makna" id="hMakna"></p>
+    <pre class="kongsi" id="hKongsi" data-uji="hasil-kongsi"></pre>
+    <p class="info" id="hInfo"></p>
+    <div class="baris2">
+      <button class="btn utama" id="hKongsiBtn" data-uji="kongsi"></button>
+      <button class="btn" id="hLagi" data-uji="lagi"></button>
+    </div>
+    <div class="baris2"><button class="btn lembut" id="hStat" data-uji="hasil-statistik"></button><button class="btn lembut" id="hMenu" data-uji="hasil-menu"></button></div>
+  </div>
+</div>
+<div class="sheet" id="sheetStat" hidden role="dialog" aria-modal="true">
+  <div class="kad">
+    <h2 data-t="stat"></h2>
+    <div class="stat4" id="stat4"></div>
+    <h3 data-t="agihan"></h3>
+    <div id="agihan"></div>
+    <button class="btn" id="sTutup" data-uji="stat-tutup"></button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="js/data.js"></script><script src="js/logic.js"></script><script src="js/i18n.js"></script>
+<script src="js/maskot.js"></script><script src="js/audio.js"></script><script src="js/game.js"></script>
+</body>
+</html>

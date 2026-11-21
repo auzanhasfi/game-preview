@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kedai Pantas</title>
+<meta name="theme-color" content="#FFF3DC">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700&display=swap">
+<link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+<main id="app">
+  <!-- MENU -->
+  <section class="skrin" id="menu">
+    <div class="menu-atas">
+      <button class="ikon-btn" id="btnBunyi" data-uji="bunyi" data-aksi="bunyi" aria-label="Bunyi"></button>
+    </div>
+    <div class="maskot-besar" id="maskotMenu"></div>
+    <div class="papan-tajuk"><h1 data-t="tajuk"></h1><p data-t="kedai"></p></div>
+    <p class="sub" data-t="sub"></p>
+    <div class="bahasa" role="group" aria-label="Bahasa">
+      <button class="pil" data-uji="bm" data-loc="ms">Bahasa Melayu</button>
+      <button class="pil" data-uji="id" data-loc="id">Bahasa Indonesia</button>
+    </div>
+    <h2 class="label" data-t="pilihTahap"></h2>
+    <div class="kad-tahap" id="kadTahap"></div>
+    <ol class="cara" id="cara"></ol>
+  </section>
+
+  <!-- MAIN -->
+  <section class="skrin" id="main" hidden>
+    <header class="hud">
+      <button class="ikon-btn" data-uji="jeda" data-aksi="jeda" id="btnJeda"></button>
+      <span class="nyawa" id="nyawa" data-uji="nyawa"></span>
+      <span class="kombo" id="kombo" data-uji="kombo" hidden></span>
+      <span class="skor"><small data-t="skor"></small><b id="skor" data-uji="skor">0</b></span>
+    </header>
+    <div class="medan">
+      <div class="adegan" id="adegan">
+        <div class="papan-kedai" id="papanKedai"></div>
+        <div class="giliran" id="giliran" data-uji="giliran"></div>
+        <div class="pelanggan" id="pelanggan"></div>
+        <div class="gelembung" id="gelembung" data-uji="gelembung"></div>
+        <div class="sabar" aria-hidden="true"><i id="sabar"></i></div>
+        <div class="kaunter"></div>
+        <div class="penjual" id="penjual"></div>
+        <div class="toast" id="toast" role="status"></div>
+      </div>
+      <div class="kawalan">
+        <div class="resit" id="resit" data-uji="resit"></div>
+        <p class="arahan" id="arahan" data-uji="arahan"></p>
+        <div class="panel" id="panel"></div>
+      </div>
+    </div>
+    <div class="tirai" id="tirai" hidden>
+      <div class="kotak">
+        <h2 data-t="jedaTajuk"></h2>
+        <button class="btn utama" data-uji="sambung" data-aksi="sambung" data-t="sambung"></button>
+        <button class="btn" data-uji="keluar" data-aksi="keluar" data-t="keluar"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HASIL -->
+  <section class="skrin" id="hasil" hidden>
+    <div class="maskot-besar" id="maskotHasil"></div>
+    <div class="bintang" id="bintang" data-uji="bintang"></div>
+    <h2 id="hasilTajuk" data-uji="hasil-tajuk"></h2>
+    <div class="statistik" id="statistik" data-uji="statistik"></div>
+    <button class="btn utama" data-uji="ulang" data-aksi="ulang" data-t="ulang"></button>
+    <button class="btn utama sekunder" id="btnSeterusnya" data-uji="seterusnya" data-aksi="seterusnya" data-t="seterusnya"></button>
+    <button class="btn" data-uji="menu" data-aksi="menu" data-t="menu"></button>
+  </section>
+</main>
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/seni.js"></script>
+<script src="js/bunyi.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

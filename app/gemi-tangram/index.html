@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gemi Tangram</title>
+<meta name="theme-color" content="#fdf7ea">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <button class="ib" id="btnBack" data-uji="kembali" hidden></button>
+    <span class="bar-gap"></span>
+    <button class="ib teks" id="btnLang" data-uji="tukar-bahasa"></button>
+    <button class="ib" id="btnSnd" data-uji="bunyi"></button>
+  </header>
+
+  <!-- MENU -->
+  <section class="skrin" id="menu">
+    <div class="maskot besar" id="mMenu"></div>
+    <h1 data-t="tajuk"></h1>
+    <p class="sub" data-t="sub"></p>
+    <div class="bahasa" role="group" aria-label="Bahasa">
+      <button class="pil" data-uji="bm" data-loc="ms"></button>
+      <button class="pil" data-uji="id" data-loc="id"></button>
+    </div>
+    <button class="btn utama" data-uji="mula" id="btnMula"></button>
+    <p class="cara" data-t="cara"></p>
+  </section>
+
+  <!-- PETA SILUET -->
+  <section class="skrin" id="peta" hidden>
+    <h2 data-t="peta"></h2>
+    <p class="cara" data-t="aturBintang" style="margin:0 0 12px"></p>
+    <div id="petaIsi" class="lv-grid"></div>
+  </section>
+
+  <!-- MAIN -->
+  <section class="skrin" id="main" hidden>
+    <div class="kiri">
+      <div class="atas">
+        <div class="maskot kecil" id="mMain"></div>
+        <div class="info">
+          <div class="nama" id="namaSil"></div>
+          <div class="chips">
+            <span class="chip" title="Masa"><span id="icJam"></span><b id="vMasa" data-uji="masa">0:00</b></span>
+            <span class="chip"><span data-t="kepingan"></span> <b id="vKep" data-uji="kep">0/7</b></span>
+            <span class="chip"><span id="icPet"></span><b id="vPet" data-uji="pet">0</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="gelembung" id="bubble" aria-live="polite"></div>
+      <div class="alat" id="alat">
+        <button class="btn kecil" id="btnPutar" data-uji="putar"></button>
+        <button class="btn kecil" id="btnBalik" data-uji="balik"></button>
+        <button class="btn kecil" id="btnPet" data-uji="petunjuk"></button>
+        <button class="btn kecil sek" id="btnUlang" data-uji="ulang"></button>
+      </div>
+    </div>
+    <div class="papan-wrap">
+      <svg id="papan" data-uji="papan" viewBox="0 0 8 11" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Papan tangram"></svg>
+    </div>
+  </section>
+
+  <!-- HASIL -->
+  <section class="hasil" id="hasil" hidden>
+    <div class="kad">
+      <div class="maskot sederhana" id="mHasil"></div>
+      <h2 id="hTajuk"></h2>
+      <div class="bintang-baris" id="hBintang"></div>
+      <p class="hs" id="hStat"></p>
+      <div class="pecahan" id="hPecahan"></div>
+      <p class="fakta" id="hFakta"></p>
+      <div class="btn-baris">
+        <button class="btn utama" id="btnNext" data-uji="seterusnya"></button>
+        <div class="dua">
+          <button class="btn" id="btnUlang2" data-uji="ulang-hasil"></button>
+          <button class="btn" id="btnPeta" data-uji="peta-hasil"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="js/geo.js"></script>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/maskot.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

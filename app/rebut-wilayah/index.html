@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bulat Rebut Wilayah</title>
+<meta name="theme-color" content="#f3efe3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <button class="ib" id="btnBack" data-uji="kembali" hidden></button>
+    <span class="bar-gap"></span>
+    <button class="ib teks" id="btnLang" data-uji="tukar-bahasa"></button>
+    <button class="ib" id="btnSnd" data-uji="bunyi"></button>
+  </header>
+
+  <section class="skrin" id="menu">
+    <canvas class="mas besar" id="mMenu" data-uji="maskot-menu"></canvas>
+    <h1 data-t="tajuk"></h1>
+    <p class="sub" data-t="sub"></p>
+    <div class="bahasa" role="group" aria-label="Bahasa">
+      <button class="pil" data-uji="bm" data-loc="ms"></button>
+      <button class="pil" data-uji="id" data-loc="id"></button>
+    </div>
+    <button class="btn utama" data-uji="mula" id="btnMula"></button>
+    <ul class="cara" id="cara"></ul>
+  </section>
+
+  <section class="skrin" id="peta" hidden>
+    <h2 data-t="petaT"></h2>
+    <div id="petaIsi" class="peta-grid"></div>
+  </section>
+
+  <section class="skrin main" id="main" hidden>
+    <div class="panel">
+      <div class="kad sasaran-kad">
+        <canvas class="mas kecil" id="mMain"></canvas>
+        <div class="sas-teks">
+          <small id="sasLabel"></small>
+          <div class="sas-nilai" id="sasNilai" data-uji="sasaran"></div>
+          <div class="sas-setara" id="sasSetara"></div>
+        </div>
+      </div>
+      <div class="gelembung" id="bubble" aria-live="polite"></div>
+      <div class="stat">
+        <div class="kad st-pct"><small id="stKawasan"></small><b id="vPct" data-uji="peratus">4%</b><span id="vSetara"></span></div>
+        <div class="kad"><small id="stNyawa"></small><div id="vNyawa" class="hati-baris" data-uji="nyawa"></div></div>
+        <div class="kad"><small id="stSkor"></small><b id="vSkor" data-uji="skor">0</b></div>
+      </div>
+      <div class="band-wrap">
+        <div class="band" id="band"><i class="julat" id="bandJulat"></i><i class="isi" id="bandIsi"></i><i class="penanda" id="bandTanda"></i></div>
+        <div class="band-ket"><span id="bandBaki"></span><span id="bandJulatTeks"></span></div>
+      </div>
+      <div class="alat">
+        <button class="btn kecil" id="btnJeda" data-uji="jeda"></button>
+        <button class="btn kecil" id="btnUlang" data-uji="ulang"></button>
+      </div>
+    </div>
+    <div class="medan" id="medan">
+      <canvas id="kanvas" data-uji="kanvas" aria-label="Peta permainan"></canvas>
+      <div class="lapis" id="lapisMula"><div class="lapis-kad"><span id="mulaIk"></span><p id="mulaTeks"></p></div></div>
+      <div class="lapis" id="lapisJeda" hidden><div class="lapis-kad"><h3 id="jedaT"></h3>
+        <button class="btn utama" id="btnLanjut" data-uji="lanjut"></button>
+        <button class="btn" id="btnUlangJ" data-uji="ulang-jeda"></button>
+        <button class="btn" id="btnPetaJ" data-uji="peta-jeda"></button></div></div>
+    </div>
+  </section>
+
+  <section class="hasil" id="hasil" hidden>
+    <div class="kad-hasil">
+      <canvas class="mas sederhana" id="mHasil"></canvas>
+      <h2 id="hTajuk" data-uji="hasil-tajuk"></h2>
+      <div class="bintang-baris" id="hBintang"></div>
+      <div class="hs" id="hStat"></div>
+      <div class="kerja" id="hKerja"></div>
+      <div class="btn-baris">
+        <button class="btn utama" id="btnNext" data-uji="seterusnya"></button>
+        <button class="btn" id="btnUlang2" data-uji="ulang-hasil"></button>
+        <button class="btn" id="btnPeta" data-uji="peta-hasil"></button>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="js/logic.js"></script>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/seni.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

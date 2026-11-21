@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Menara Si Bulat</title>
+<meta name="theme-color" content="#cfe6ff">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <button class="ib" id="btnBack" data-uji="kembali" hidden></button>
+    <span class="gap"></span>
+    <button class="ib teks" id="btnLang" data-uji="tukar-bahasa"></button>
+    <button class="ib" id="btnSnd" data-uji="bunyi"></button>
+  </header>
+
+  <section class="skrin" id="menu">
+    <canvas id="cMenu" width="150" height="150"></canvas>
+    <h1 data-t="tajuk"></h1>
+    <p class="sub" data-t="sub"></p>
+    <div class="bahasa" role="group" aria-label="Bahasa">
+      <button class="pil" data-uji="bm" data-loc="ms">Bahasa Melayu</button>
+      <button class="pil" data-uji="id" data-loc="id">Bahasa Indonesia</button>
+    </div>
+    <button class="btn utama" data-uji="mula" id="btnMula"></button>
+    <p class="cara" data-t="cara"></p>
+  </section>
+
+  <section class="skrin" id="peta" hidden>
+    <h2 data-t="peta"></h2>
+    <div id="petaIsi"></div>
+  </section>
+
+  <section class="skrin" id="main" hidden>
+    <div class="hud">
+      <canvas id="cHud" width="52" height="52"></canvas>
+      <div class="misi"><b id="misiA"></b><span id="misiB"></span></div>
+    </div>
+    <div class="chips">
+      <div><small data-t="tinggi"></small><b id="vTinggi" data-uji="tinggi">0</b></div>
+      <div><small data-t="lebar"></small><b id="vLebar">0</b></div>
+      <div><small data-t="skor"></small><b id="vSkor" data-uji="skor">0</b></div>
+    </div>
+    <div id="stage"><canvas id="cv" data-uji="kanvas"></canvas><div id="bubble" aria-live="polite"></div></div>
+    <button class="btn utama besar" id="btnDrop" data-uji="jatuhkan"></button>
+  </section>
+
+  <section class="hasil" id="hasil" role="dialog" aria-modal="true" hidden>
+    <div class="kad">
+      <canvas id="cHasil" width="110" height="110"></canvas>
+      <h2 id="hTajuk"></h2>
+      <div class="bintang-baris" id="hBintang"></div>
+      <p class="hs" id="hAlasan"></p>
+      <p class="hs" id="hStat"></p>
+      <div class="btn-baris">
+        <button class="btn utama" id="btnNext" data-uji="seterusnya"></button>
+        <button class="btn" id="btnUlang" data-uji="ulang"></button>
+        <button class="btn" id="btnPeta" data-uji="peta-hasil"></button>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="js/logic.js"></script>
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/maskot.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
