@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#5B9BE0">
+<title>RekaKu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F8FE;--surf:#FFFFFF;--tint:#E6F0FC;--line:#BFD6F2;--blue:#2F6FBF;--blue-l:#7DB3F0;--text:#1C2B3F;--mut:#53647C;
+--ok:#2E8B63;--ok-t:#E3F5EC;--no:#C2462D;--no-t:#FCEBE6;--r:16px;--f:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.55 var(--f);overflow-x:hidden}
+h1,h2,h3{margin:0 0 8px;font-weight:800;line-height:1.25}
+h1{font-size:28px}h2{font-size:22px}h3{font-size:18px}
+p{margin:0 0 12px}
+svg{display:block}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+#shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+#shell.focus{display:block}
+#nav{position:sticky;top:0;height:100vh;background:var(--surf);border-right:1.5px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:6px}
+#shell.focus #nav{display:none}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;margin:0 6px 18px}
+.nb{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 14px;border-radius:14px;border:1.5px solid transparent;background:none;cursor:pointer;font-weight:700;text-align:left;color:var(--mut);transition:background-color .2s ease,color .2s ease}
+.nb:hover{background:var(--tint)}
+.nb[aria-current=page]{background:var(--tint);border-color:var(--line);color:var(--blue)}
+#app{width:100%;max-width:780px;margin:0 auto;padding:22px 16px 40px;min-width:0}
+.btn{min-height:52px;padding:0 22px;border-radius:14px;border:1.5px solid var(--blue);background:var(--blue);color:#fff;font-weight:800;font-size:17px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background-color .2s ease,transform .15s ease}
+.btn:hover{background:#265E9F}.btn:active{transform:translateY(1px)}
+.btn.o{background:var(--surf);color:var(--blue)}.btn.o:hover{background:var(--tint)}
+.btn.t{border-color:transparent;background:none;color:var(--blue);min-height:48px;padding:0 10px}
+.btn.t:hover{background:var(--tint)}
+.btn.d{background:var(--surf);color:var(--no);border-color:var(--no)}.btn.d:hover{background:var(--no-t)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn.w{width:100%}
+.card{background:var(--surf);border:1.5px solid var(--line);border-radius:var(--r);padding:16px}
+.cards{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:12px;align-items:center}.wrap{flex-wrap:wrap}.sp{flex:1}
+.mut{color:var(--mut)}.sm{font-size:15px}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 12px;border-radius:999px;background:var(--tint);border:1.5px solid var(--line);font-weight:700;font-size:14px;white-space:nowrap}
+.chip.ok{background:var(--ok-t);border-color:#9AD3B7;color:#1E6E4B}
+.chip.go{background:var(--surf);color:var(--blue)}
+.itm{display:flex;gap:14px;align-items:center;width:100%;text-align:left;min-height:84px;cursor:pointer;transition:background-color .2s ease}
+.itm:hover{background:var(--tint)}
+.ico{flex:none;width:52px;height:52px;border-radius:14px;background:var(--tint);border:1.5px solid var(--line);display:grid;place-items:center;color:var(--blue)}
+.itm .b{flex:1;min-width:0}.itm b{display:block;font-size:18px;line-height:1.3}
+.bar{height:10px;border-radius:999px;background:var(--tint);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue-l);transition:width .3s ease}
+.field{width:100%;min-height:52px;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--surf);font-size:18px}
+.field:focus{border-color:var(--blue);outline:3px solid var(--tint)}
+textarea.field{min-height:96px;resize:vertical}
+label.l{display:block;font-weight:700;margin:12px 0 6px}
+.msg{border-radius:12px;padding:12px 14px;border:1.5px solid var(--line);margin:12px 0;background:var(--tint)}
+.msg.ok{background:var(--ok-t);border-color:#9AD3B7}.msg.no{background:var(--no-t);border-color:#E8A898}
+.top{display:flex;align-items:center;gap:12px;max-width:780px;margin:0 auto;padding:14px 16px}
+.ib{width:48px;height:48px;border-radius:12px;border:1.5px solid var(--line);background:var(--surf);display:grid;place-items:center;cursor:pointer;color:var(--text);flex:none}
+.ib:hover{background:var(--tint)}
+.main{max-width:780px;margin:0 auto;padding:0 16px 150px}
+.foot{position:fixed;left:0;right:0;bottom:0;background:var(--surf);border-top:1.5px solid var(--line);padding:12px 16px}
+.foot .in{max-width:748px;margin:0 auto;display:flex;gap:12px}.foot .btn{flex:1}
+.hero{display:flex;gap:16px;align-items:center;background:var(--tint);border:1.5px solid var(--line);border-radius:20px;padding:18px}
+.ring{position:relative;width:112px;height:112px;flex:none}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:26px;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{text-align:center;padding:12px 6px}.stat b{display:block;font-size:24px;line-height:1.2}.stat span{font-size:14px;color:var(--mut)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.sel{min-height:48px;padding:0 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--surf);font-weight:700;cursor:pointer;transition:background-color .2s ease}
+.sel:hover{background:var(--tint)}.sel[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+.step{border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--surf);display:flex;gap:12px;align-items:center}
+.step .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--tint);border:1.5px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:14px;color:var(--blue)}
+.tip{border-left:5px solid var(--blue-l);background:var(--tint);border-radius:0 12px 12px 0;padding:10px 14px;margin:12px 0}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;min-height:56px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surf);cursor:pointer;font-size:17px;transition:background-color .2s ease,transform .15s ease}
+.opt:hover{background:var(--tint)}.opt:active{transform:translateY(1px)}
+.opt .k{flex:none;width:30px;height:30px;border-radius:8px;background:var(--tint);display:grid;place-items:center;font-weight:800;font-size:14px}
+.opt.ok{background:var(--ok-t);border-color:var(--ok);border-width:2px}
+.opt.no{background:var(--no-t);border-color:var(--no);border-width:2px;animation:shake .3s ease}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;animation:rise .25s ease}
+.badge{text-align:center;padding:14px 8px}
+.badge .ico{margin:0 auto 8px;width:56px;height:56px}
+.badge.on .ico{background:var(--blue);color:#fff;border-color:var(--blue)}
+.badge.off{opacity:.6}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;z-index:30;background:var(--text);color:#fff;border-radius:14px;padding:12px 18px;max-width:calc(100vw - 32px);font-weight:700;animation:rise .25s ease}
+#shell.focus ~ .toast{bottom:100px}
+.res{font:800 20px var(--f);background:var(--tint);border:1.5px solid var(--line);border-radius:12px;padding:8px 14px;display:inline-block}
+.viz{margin:14px 0;background:var(--surf);border:1.5px solid var(--line);border-radius:14px;padding:12px;overflow-x:auto}
+.viz svg{max-width:100%;height:auto;margin:0 auto}
+.viz text{font-family:var(--f);fill:var(--text)}
+@keyframes rise{from{opacity:0;transform:translate(var(--tx,0),8px)}to{opacity:1;transform:translate(var(--tx,0),0)}}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.toast{--tx:-50%}
+.pop{animation:pop .3s ease}
+@media(max-width:899px){
+#shell{display:block}
+#nav{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;padding:6px 8px;border-right:0;border-top:1.5px solid var(--line);z-index:10;gap:4px}
+.brand{display:none}
+.nb{flex:1;flex-direction:column;gap:2px;justify-content:center;min-height:56px;padding:0 2px;font-size:13px}
+#app{padding-bottom:100px}
+}
+@media(max-width:420px){h1{font-size:24px}.hero{flex-direction:column;align-items:flex-start}.itm{gap:10px}.stats{gap:6px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="shell"><nav id="nav" aria-label="Menu utama"></nav><main id="app" tabindex="-1"><p class="mut">Memuat…</p></main></div>
+<div id="tw" aria-live="polite"></div>
+<noscript><p style="padding:16px">Aplikasi ini memerlukan JavaScript. Aktifkan JavaScript lalu muat ulang halaman.</p></noscript>
+<script>
+/*DATA-START*/
+const BADGES=[
+{id:'pertama',n:'Langkah Pertama',d:'Selesaikan 1 pelajaran.',i:'book'},
+{id:'satu',n:'Modul Pertama',d:'Selesaikan 1 modul.',i:'check'},
+{id:'separuh',n:'Setengah Jalan',d:'Selesaikan 4 modul.',i:'flag'},
+{id:'semua',n:'Jago Reka Bentuk',d:'Selesaikan semua modul.',i:'award'},
+{id:'sempurna',n:'Nilai Sempurna',d:'Dapat 5 dari 5 di sebuah kuis.',i:'star'},
+{id:'teknisi',n:'Teknisi Cilik',d:'Pakai Kalkulator Hukum Ohm.',i:'bolt'},
+{id:'juru',n:'Juru Gambar',d:'Pakai Kalkulator Skala.',i:'ruler'},
+{id:'pencatat',n:'Pencatat Projek',d:'Simpan 1 catatan projek.',i:'pen'},
+{id:'rajin',n:'Rajin Belajar',d:'Belajar 3 hari berturut-turut.',i:'flame'}];
+const MODUL=[
+{id:1,tk:1,ikon:'bulb',t:'Mengenal Reka Bentuk',ring:'Proses merancang benda agar memecahkan masalah.',mnt:12,
+belajar:[
+{h:'Apa itu reka bentuk?',p:['Reka bentuk (desain) adalah proses merencanakan sebuah benda atau sistem supaya dapat memecahkan masalah.','Hasilnya bisa berupa kursi, tas, aplikasi, atau cara kerja yang baru.'],tip:'Contoh: tas dengan tali lebar dibuat agar bahu tidak sakit.'},
+{h:'Enam langkah proses reka bentuk',v:'proses',l:['Kenali masalah','Kumpulkan ide','Pilih ide terbaik','Buat prototipe','Uji prototipe','Perbaiki dan nilai']},
+{h:'Prototipe',p:['Prototipe adalah model awal untuk menguji ide sebelum produk akhir dibuat.','Prototipe boleh dibuat dari bahan murah, seperti kardus, kertas, atau busa.'],tip:'Menguji prototipe menghemat bahan dan biaya.'},
+{h:'Unsur reka bentuk',l:['Fungsi: produk berguna sesuai tujuannya.','Estetika: tampilannya menarik.','Ergonomi: nyaman dan sesuai ukuran tubuh pengguna.','Keselamatan: aman dipakai.','Biaya: harganya terjangkau.']}],
+kuis:[
+{q:'Langkah pertama dalam proses reka bentuk adalah …',o:['Mengenali masalah','Menjual produk','Membuat produk akhir','Memberi merek'],a:0,w:'Proses dimulai dengan mengenali masalah yang ingin dipecahkan.'},
+{q:'Model awal untuk menguji sebuah ide disebut …',o:['Prototipe','Katalog','Merek','Iklan'],a:0,w:'Prototipe adalah model awal untuk menguji ide.'},
+{q:'Kursi yang nyaman dan pas dengan tubuh pengguna menerapkan unsur …',o:['Ergonomi','Promosi','Warna saja','Harga saja'],a:0,w:'Ergonomi berarti sesuai dan nyaman bagi tubuh pengguna.'},
+{q:'Tampilan produk yang indah dan menarik disebut unsur …',o:['Estetika','Fungsi','Keselamatan','Biaya'],a:0,w:'Estetika berkaitan dengan keindahan tampilan.'},
+{q:'Setelah prototipe dibuat, langkah berikutnya adalah …',o:['Mengujinya','Langsung menjualnya','Membuangnya','Menyimpannya saja'],a:0,w:'Prototipe diuji dulu, lalu diperbaiki bila ada kekurangan.'},
+{q:'Manakah masalah yang dapat dipecahkan dengan reka bentuk?',o:['Tas sekolah terasa berat dan menyakiti bahu','Langit berwarna biru','Hari ini hari Senin','Bel sekolah berbunyi'],a:0,w:'Tas yang berat bisa dirancang ulang agar lebih nyaman dipakai.'}]},
+{id:2,tk:1,ikon:'cube',t:'Bahan dan Sifatnya',ring:'Kayu, logam, dan plastik beserta sifat-sifatnya.',mnt:12,
+belajar:[
+{h:'Kelompok kayu',p:['Kayu keras berasal dari pohon yang tumbuh lambat dan lebih padat, contohnya jati. Kayu lunak tumbuh lebih cepat dan lebih ringan, contohnya pinus.'],tip:'Kayu keras lebih awet, tetapi harganya biasanya lebih mahal.'},
+{h:'Kelompok logam',l:['Logam ferus mengandung besi, misalnya baja. Logam ini bisa berkarat.','Logam bukan ferus tidak mengandung besi, misalnya aluminium dan tembaga.','Tembaga adalah konduktor listrik yang baik, jadi dipakai untuk kabel.']},
+{h:'Kelompok plastik',l:['Termoplastik bisa dilunakkan lagi dengan pemanasan, contohnya akrilik dan PVC.','Termoset tidak bisa dilunakkan lagi setelah mengeras, contohnya melamin.']},
+{h:'Sifat bahan',l:['Kuat: tahan beban besar.','Keras: tidak mudah tergores.','Lentur: dapat dibengkokkan lalu kembali.','Konduktor: dapat menghantarkan listrik atau panas.','Karat: besi atau baja bereaksi dengan oksigen dan air.']}],
+kuis:[
+{q:'Kayu jati termasuk kelompok …',o:['Kayu keras','Kayu lunak','Logam ferus','Plastik'],a:0,w:'Jati adalah kayu keras yang padat dan awet.'},
+{q:'Baja termasuk logam …',o:['Ferus','Bukan ferus','Termoplastik','Kayu lunak'],a:0,w:'Baja mengandung besi, jadi termasuk logam ferus.'},
+{q:'Logam yang tidak mengandung besi disebut logam …',o:['Bukan ferus','Ferus','Termoset','Keras'],a:0,w:'Aluminium dan tembaga adalah contoh logam bukan ferus.'},
+{q:'Plastik yang dapat dilunakkan lagi dengan pemanasan adalah …',o:['Termoplastik','Termoset','Kayu lunak','Baja'],a:0,w:'Termoplastik melunak saat dipanaskan dan dapat dibentuk ulang.'},
+{q:'Bagian dalam kabel listrik dibuat dari tembaga karena tembaga …',o:['Konduktor listrik yang baik','Tidak bisa dilengkungkan','Sangat ringan seperti kayu','Mudah berkarat'],a:0,w:'Tembaga menghantarkan listrik dengan baik.'},
+{q:'Karat paling mudah terbentuk pada …',o:['Besi','Aluminium','Tembaga murni','Plastik akrilik'],a:0,w:'Besi berkarat karena bereaksi dengan oksigen dan air.'}]},
+{id:3,tk:1,ikon:'wrench',t:'Alat dan Keselamatan Bengkel',ring:'Mengenal alat tangan dan aturan aman di bengkel.',mnt:10,
+belajar:[
+{h:'Alat tangan dan fungsinya',l:['Gergaji: memotong kayu.','Ketam: meratakan permukaan kayu.','Pahat: membuat lubang atau alur.','Kikir: menghaluskan dan membentuk logam.','Palu: memukul paku.','Obeng: memasang dan melepas sekrup.']},
+{h:'Pakaian dan pelindung',l:['Pakai kacamata pelindung saat memotong atau mengikir.','Pakai sepatu tertutup.','Ikat rambut panjang dan rapikan lengan baju.','Pakai sarung tangan yang sesuai dengan pekerjaan.']},
+{h:'Aturan di bengkel',l:['Jangan bercanda atau berlari.','Jepit bahan dengan kuat sebelum dipotong.','Simpan alat di tempatnya setelah dipakai.','Laporkan kepada guru bila ada yang terluka.','Ketahui letak kotak P3K dan pintu keluar.']},
+{h:'Mengukur dengan teliti',p:['Gunakan mistar atau meteran. Periksa ukuran sebelum memotong.'],tip:'Ukur dua kali, potong sekali.'}],
+kuis:[
+{q:'Alat tangan untuk memotong kayu adalah …',o:['Gergaji','Obeng','Kikir','Tang'],a:0,w:'Gergaji dipakai untuk memotong kayu.'},
+{q:'Kikir dipakai untuk …',o:['Menghaluskan dan membentuk logam','Mengukur panjang','Memukul paku','Memasang sekrup'],a:0,w:'Kikir menghaluskan serta membentuk permukaan logam.'},
+{q:'Sebelum memotong dengan gergaji, bahan harus …',o:['Dijepit dengan kuat','Dipegang sambil berjalan','Diletakkan di lantai saja','Dibasahi'],a:0,w:'Bahan yang dijepit tidak bergeser saat dipotong.'},
+{q:'Alat pelindung untuk menjaga mata di bengkel adalah …',o:['Kacamata pelindung','Topi','Jam tangan','Kaus kaki'],a:0,w:'Kacamata pelindung menahan serpihan yang beterbangan.'},
+{q:'Jika terluka di bengkel, kamu harus …',o:['Segera lapor kepada guru','Diam saja','Pulang tanpa memberi tahu','Melanjutkan bekerja'],a:0,w:'Luka perlu ditangani segera, jadi lapor kepada guru.'},
+{q:'"Ukur dua kali, potong sekali" berarti …',o:['Memeriksa ukuran dengan teliti sebelum memotong','Memotong dua kali','Mengukur setelah memotong','Memotong tanpa mengukur'],a:0,w:'Ukuran yang diperiksa dengan teliti mencegah bahan terbuang.'}]},
+{id:4,tk:2,ikon:'ruler',t:'Gambar Teknik',ring:'Jenis garis, gambar isometrik, dan skala.',mnt:14,
+belajar:[
+{h:'Jenis garis',v:'garis',p:['Setiap jenis garis punya arti tertentu pada gambar teknik.']},
+{h:'Gambar isometrik',l:['Gambar tiga dimensi dengan tiga sumbu.','Dua sumbu miring membentuk sudut 30° terhadap garis horizontal.','Satu sumbu tegak lurus.','Ukuran sepanjang sumbu digambar sesuai ukuran sebenarnya.']},
+{h:'Proyeksi ortografik',p:['Benda digambar dari beberapa arah dalam bidang datar.'],l:['Pandangan depan.','Pandangan atas.','Pandangan samping.']},
+{h:'Skala gambar',l:['Skala 1:2 berarti gambar setengah dari ukuran asli.','Skala 2:1 berarti gambar dua kali ukuran asli.','Skala 1:1 berarti gambar sama dengan ukuran asli.','Angka ukuran pada gambar tetap ditulis ukuran asli benda.'],tip:'Contoh: benda 40 cm digambar skala 1:4 menjadi 10 cm.'}],
+kuis:[
+{q:'Garis putus-putus pada gambar teknik menunjukkan …',o:['Bagian yang tersembunyi','Tepi benda yang terlihat','Garis ukuran','Pusat lingkaran'],a:0,w:'Garis putus-putus dipakai untuk bagian yang tidak terlihat.'},
+{q:'Sumbu miring pada gambar isometrik membentuk sudut … terhadap garis horizontal.',o:['30°','45°','60°','90°'],a:0,w:'Pada gambar isometrik, sudut sumbunya 30°.'},
+{q:'Skala 1:2 berarti gambar …',o:['Setengah dari ukuran asli','Dua kali ukuran asli','Sama dengan ukuran asli','Tidak ada ukurannya'],a:0,w:'Satu satuan pada gambar mewakili dua satuan benda asli.'},
+{q:'Benda panjangnya 40 cm digambar dengan skala 1:4. Panjang di gambar adalah …',o:['10 cm','20 cm','160 cm','4 cm'],a:0,w:'40 cm dibagi 4 sama dengan 10 cm.'},
+{q:'Tiga pandangan pada proyeksi ortografik adalah …',o:['Depan, atas, samping','Depan, belakang, bawah','Atas, bawah, dalam','Kiri, kanan, tengah'],a:0,w:'Pandangan depan, atas, dan samping adalah pandangan yang umum dipakai.'},
+{q:'Tepi benda pada gambar teknik digambar dengan garis …',o:['Tebal tak putus','Tipis putus-putus','Titik-garis','Bergelombang'],a:0,w:'Garis tebal tak putus menunjukkan tepi benda yang terlihat.'}]},
+{id:5,tk:2,ikon:'gear',t:'Mekanisme dan Gerakan',ring:'Tuas, roda gigi, katrol, dan cam.',mnt:14,
+belajar:[
+{h:'Tuas',v:'tuas',p:['Tuas punya tiga bagian: titik tumpu (T), beban (B), dan usaha (U). Letak ketiganya menentukan kelas tuas.'],l:['Kelas 1: titik tumpu di tengah. Contoh: jungkat-jungkit, gunting.','Kelas 2: beban di tengah. Contoh: gerobak dorong, pembuka botol.','Kelas 3: usaha di tengah. Contoh: pinset, sapu.']},
+{h:'Roda gigi',v:'gigi',l:['Dua roda gigi yang bersentuhan berputar berlawanan arah.','Roda gigi kecil menggerakkan roda gigi besar: putaran lebih lambat, tenaga lebih besar.','Perbandingan putaran = jumlah gigi besar : jumlah gigi kecil.']},
+{h:'Katrol',l:['Katrol tetap mengubah arah gaya.','Katrol bergerak mengurangi gaya yang dibutuhkan.','Gabungan katrol dipakai pada derek.']},
+{h:'Cam dan engkol',l:['Cam dan pengikut mengubah gerak putar menjadi gerak naik-turun.','Engkol mengubah gerak putar menjadi gerak bolak-balik.'],tip:'Cam dipakai pada mainan yang bagiannya naik-turun saat diputar.'}],
+kuis:[
+{q:'Jungkat-jungkit adalah contoh tuas kelas …',o:['1','2','3','4'],a:0,w:'Titik tumpu berada di tengah, jadi kelas 1.'},
+{q:'Gerobak dorong adalah tuas kelas …',o:['2','1','3','4'],a:0,w:'Bebannya berada di antara titik tumpu dan usaha.'},
+{q:'Pinset adalah contoh tuas kelas …',o:['3','1','2','5'],a:0,w:'Usaha berada di tengah, antara titik tumpu dan beban.'},
+{q:'Katrol tetap berfungsi untuk …',o:['Mengubah arah gaya','Menggandakan beban','Menghilangkan gaya','Mengubah warna tali'],a:0,w:'Katrol tetap hanya mengubah arah tarikan.'},
+{q:'Roda gigi penggerak 20 gigi memutar roda gigi 40 gigi. Roda gigi 40 gigi berputar …',o:['Lebih lambat, setengah kecepatan','Lebih cepat, dua kali kecepatan','Sama cepat','Berhenti'],a:0,w:'Perbandingan 40 : 20 sama dengan 2 : 1, jadi putarannya lebih lambat.'},
+{q:'Cam dan pengikut mengubah gerak putar menjadi …',o:['Gerak naik-turun','Gerak melingkar','Gerak diam','Gerak miring'],a:0,w:'Pengikut bergerak naik-turun mengikuti bentuk cam.'}]},
+{id:6,tk:3,ikon:'bolt',t:'Elektronik Dasar',ring:'Komponen, rangkaian seri dan paralel, hukum Ohm.',mnt:15,
+belajar:[
+{h:'Komponen dasar',l:['Baterai: sumber tegangan.','Saklar: menyambung dan memutus arus.','Resistor: membatasi arus.','LED: lampu kecil yang hanya menyala jika arus mengalir ke satu arah.','Buzzer: menghasilkan bunyi.'],tip:'LED perlu resistor agar tidak rusak karena arus terlalu besar.'},
+{h:'Rangkaian seri dan paralel',v:'rangkaian',l:['Seri: satu jalur. Jika satu lampu putus, semua lampu padam.','Paralel: bercabang. Jika satu lampu putus, lampu lain tetap menyala.']},
+{h:'Hukum Ohm',v:'ohm',p:['Tegangan (V, volt) sama dengan arus (I, ampere) dikali hambatan (R, ohm).'],tip:'Contoh: 6 V dan 2 Ω → I = 6 ÷ 2 = 3 A.'},
+{h:'Aman saat berpraktik',l:['Gunakan baterai bertegangan rendah.','Jangan menyentuh stopkontak atau kabel listrik rumah.','Solder di tempat berventilasi dan jangan menyentuh ujung panasnya.','Matikan sumber listrik sebelum mengubah rangkaian.']}],
+kuis:[
+{q:'LED sebaiknya dipasang bersama resistor untuk …',o:['Membatasi arus agar LED tidak rusak','Menambah bunyi','Menyimpan listrik','Mengubah warna LED'],a:0,w:'Resistor membatasi arus yang melewati LED.'},
+{q:'Pada rangkaian seri, jika satu lampu putus maka …',o:['Semua lampu padam','Lampu lain menyala lebih terang','Tidak terjadi apa-apa','Baterai terisi'],a:0,w:'Rangkaian seri hanya punya satu jalur arus.'},
+{q:'Pada rangkaian paralel, jika satu lampu putus maka …',o:['Lampu lain tetap menyala','Semua lampu padam','Baterai meledak','Arus berhenti seluruhnya'],a:0,w:'Rangkaian paralel punya jalur terpisah untuk tiap lampu.'},
+{q:'Sebuah rangkaian bertegangan 6 V dengan hambatan 2 Ω. Arusnya …',o:['3 A','12 A','4 A','0,3 A'],a:0,w:'I = V ÷ R = 6 ÷ 2 = 3 A.'},
+{q:'Satuan hambatan listrik adalah …',o:['Ohm','Volt','Ampere','Watt'],a:0,w:'Hambatan diukur dalam ohm (Ω).'},
+{q:'Saklar berfungsi untuk …',o:['Menyambung dan memutus aliran arus','Menyimpan arus','Menaikkan tegangan','Membatasi arus'],a:0,w:'Saklar menyambung dan memutus rangkaian.'}]},
+{id:7,tk:3,ikon:'code',t:'Berpikir Komputasi dan Pemrograman',ring:'Algoritma, diagram alir, dan dasar IoT.',mnt:14,
+belajar:[
+{h:'Algoritma',p:['Algoritma adalah langkah-langkah berurutan untuk memecahkan masalah.','Contoh: langkah membuat teh manis dari menyiapkan gelas sampai menyajikan.']},
+{h:'Diagram alir',v:'alir',p:['Diagram alir menggambarkan algoritma dengan simbol standar.']},
+{h:'Tiga struktur dasar',l:['Urutan: langkah dikerjakan satu per satu.','Pemilihan: memilih langkah berdasarkan kondisi. Contoh: jika hujan, bawa payung.','Perulangan: mengulang langkah beberapa kali.']},
+{h:'Variabel dan IoT',l:['Variabel adalah wadah untuk menyimpan data, misalnya umur = 13.','IoT (Internet of Things) adalah perangkat bersensor yang terhubung ke internet.','Contoh: sensor suhu mengirim data ke ponsel.','Mikrokontroler, seperti Arduino atau micro:bit, menjalankan program pada perangkat.']}],
+kuis:[
+{q:'Algoritma adalah …',o:['Langkah berurutan untuk memecahkan masalah','Nama bahasa asing','Alat ukur panjang','Jenis plastik'],a:0,w:'Algoritma berupa urutan langkah yang jelas.'},
+{q:'Simbol belah ketupat pada diagram alir berarti …',o:['Keputusan','Mulai atau selesai','Masukan atau keluaran','Proses'],a:0,w:'Belah ketupat dipakai untuk pertanyaan atau keputusan.'},
+{q:'Struktur perulangan dipakai untuk …',o:['Mengulang langkah beberapa kali','Menghapus program','Memilih satu bahan','Menggambar garis'],a:0,w:'Perulangan menjalankan langkah yang sama berulang kali.'},
+{q:'Variabel dalam program berfungsi sebagai …',o:['Wadah untuk menyimpan data','Alat memotong','Sumber listrik','Layar komputer'],a:0,w:'Variabel menyimpan data yang bisa dipakai kembali.'},
+{q:'Pada sistem IoT, sensor suhu bertugas …',o:['Mengukur suhu dan mengirim datanya','Mencetak gambar','Memotong kayu','Menyimpan air'],a:0,w:'Sensor membaca suhu, lalu datanya dikirim ke sistem.'},
+{q:'"Jika hujan, bawa payung" adalah contoh struktur …',o:['Pemilihan','Perulangan','Urutan saja','Variabel'],a:0,w:'Langkah dipilih berdasarkan kondisi, jadi ini pemilihan.'}]},
+{id:8,tk:3,ikon:'pack',t:'Projek dan Produk',ring:'Menghitung harga, 3R, dan menilai produk.',mnt:12,
+belajar:[
+{h:'Menghitung harga jual',l:['Biaya produksi = biaya bahan + biaya lain.','Untung = harga jual − biaya produksi.','Harga jual = biaya produksi + untung.'],tip:'Contoh: biaya Rp15.000 dan untung 20% → untung Rp3.000 → harga jual Rp18.000.'},
+{h:'Prinsip 3R',l:['Reduce: mengurangi, misalnya membeli secukupnya.','Reuse: memakai ulang, misalnya botol bekas jadi pot.','Recycle: mendaur ulang bahan menjadi barang baru.']},
+{h:'Menilai produk',l:['Minta pendapat calon pengguna.','Cek fungsi, keselamatan, dan tampilan.','Catat kekurangan, lalu perbaiki.'],p:['Penilaian membantu produk menjadi lebih baik di versi berikutnya.']}],
+kuis:[
+{q:'Biaya bahan Rp12.000 dan biaya lain Rp3.000. Untung 20% dari biaya produksi. Harga jualnya …',o:['Rp18.000','Rp15.000','Rp20.000','Rp17.000'],a:0,w:'Biaya Rp15.000. Untung 20% = Rp3.000. Harga jual Rp18.000.'},
+{q:'Memakai botol bekas menjadi pot tanaman termasuk prinsip …',o:['Reuse','Reduce','Recycle','Repair'],a:0,w:'Reuse artinya memakai kembali tanpa mengolah ulang.'},
+{q:'Membeli barang secukupnya agar sampah berkurang termasuk prinsip …',o:['Reduce','Reuse','Recycle','Rewrite'],a:0,w:'Reduce artinya mengurangi pemakaian dan sampah.'},
+{q:'Mengolah kertas bekas menjadi kertas baru termasuk prinsip …',o:['Recycle','Reduce','Reuse','Remove'],a:0,w:'Recycle artinya mendaur ulang bahan menjadi barang baru.'},
+{q:'Biaya produksi Rp10.000 dan harga jual Rp14.000. Untungnya …',o:['Rp4.000','Rp10.000','Rp24.000','Rp14.000'],a:0,w:'Untung = 14.000 − 10.000 = Rp4.000.'},
+{q:'Mengapa produk perlu dinilai oleh calon pengguna?',o:['Untuk menemukan kekurangan dan memperbaikinya','Agar harga selalu naik','Agar produk tidak dipakai','Supaya bahan terbuang'],a:0,w:'Masukan pengguna membantu memperbaiki produk.'}]}
+];
+/*DATA-END*/
+
+/* ---------- util ---------- */
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const IC={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',tool:'<path d="M14.5 5a4.5 4.5 0 004 6.3L20 13l-7 7a2 2 0 01-3-3l7-7z"/><path d="M12 8L6 2 3 5l6 6"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0012 3z"/>',cube:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12L4 7.5M12 12v9"/>',wrench:'<path d="M14.5 5a4.5 4.5 0 004 6.3L20 13l-7 7a2 2 0 01-3-3l7-7z"/><path d="M12 8L6 2 3 5l6 6"/>',ruler:'<rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/>',gear:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',code:'<path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/>',pack:'<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+check:'<path d="M4 12l5 5L20 6"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',next:'<path d="M5 12h14M13 6l6 6-6 6"/>',prev:'<path d="M19 12H5M11 6l-6 6 6 6"/>',book:'<path d="M12 6c-2-1.5-5-2-8-2v14c3 0 6 .5 8 2 2-1.5 5-2 8-2V4c-3 0-6 .5-8 2z"/><path d="M12 6v14"/>',flag:'<path d="M5 21V4M5 4h12l-2 4 2 4H5"/>',award:'<circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/>',star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',pen:'<path d="M4 20l1-5L16 4l4 4L9 19z"/><path d="M14 6l4 4"/>',flame:'<path d="M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',save:'<path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',calc:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/>',list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>'};
+const I=(n,s=24)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
+function kotak(e='senang',s=96){const eyes={senang:'<path d="M26 44q5-8 10 0M54 44q5-8 10 0" fill="none" stroke="#1C2B3F" stroke-width="4" stroke-linecap="round"/>',biasa:'<rect x="27" y="38" width="8" height="12" rx="3" fill="#1C2B3F"/><rect x="55" y="38" width="8" height="12" rx="3" fill="#1C2B3F"/>',mikir:'<rect x="27" y="38" width="8" height="12" rx="3" fill="#1C2B3F"/><rect x="55" y="38" width="8" height="12" rx="3" fill="#1C2B3F"/><path d="M52 31l14-4" stroke="#1C2B3F" stroke-width="3.5" stroke-linecap="round"/>',sedih:'<rect x="27" y="42" width="8" height="10" rx="3" fill="#1C2B3F"/><rect x="55" y="42" width="8" height="10" rx="3" fill="#1C2B3F"/><path d="M23 34l14 5M67 34l-14 5" stroke="#1C2B3F" stroke-width="3.5" stroke-linecap="round"/>'};
+const mouth={senang:'<path d="M34 62q11 12 22 0" fill="none" stroke="#1C2B3F" stroke-width="4" stroke-linecap="round"/>',biasa:'<path d="M36 64h18" stroke="#1C2B3F" stroke-width="4" stroke-linecap="round"/>',mikir:'<path d="M38 65q7-4 14 0" fill="none" stroke="#1C2B3F" stroke-width="4" stroke-linecap="round"/>',sedih:'<path d="M34 68q11-10 22 0" fill="none" stroke="#1C2B3F" stroke-width="4" stroke-linecap="round"/>'};
+return`<svg width="${s}" height="${s}" viewBox="0 0 90 90" role="img" aria-label="Kotak, maskot RekaKu"><rect x="43" y="4" width="4" height="10" fill="#2F6FBF"/><circle cx="45" cy="5" r="4" fill="#2F6FBF"/><rect x="8" y="14" width="74" height="70" rx="18" fill="#7DB3F0" stroke="#2F6FBF" stroke-width="3"/><circle cx="19" cy="58" r="5" fill="#BFD6F2"/><circle cx="71" cy="58" r="5" fill="#BFD6F2"/>${eyes[e]}${mouth[e]}</svg>`}
+
+/* ---------- visual pelajaran ---------- */
+function viz(m,s){
+ if(s.v==='proses')return`<div class="cards" style="margin:14px 0">${s.l.map((t,i)=>`<div class="step"><span class="n">${i+1}</span><b>${t}</b></div>`).join('')}</div>`;
+ if(s.v==='garis'){const r=[['Garis tepi benda','stroke-width="4"'],['Garis ukuran','stroke-width="1.5"'],['Bagian tersembunyi','stroke-width="2.5" stroke-dasharray="9 6"'],['Garis pusat atau sumbu','stroke-width="2" stroke-dasharray="16 4 3 4"']];
+  return`<div class="viz"><svg width="320" height="150" viewBox="0 0 320 150" role="img" aria-label="Contoh empat jenis garis">${r.map((x,i)=>`<text x="4" y="${28+i*34}" font-size="14" font-weight="700">${x[0]}</text><line x1="182" x2="314" y1="${24+i*34}" y2="${24+i*34}" stroke="#1C2B3F" ${x[1]}/>`).join('')}</svg></div>`}
+ if(s.v==='tuas'){const st='stroke="#2F6FBF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+  const dn=(x,y)=>`<path d="M${x} ${y-30}V${y-8}M${x-6} ${y-14}L${x} ${y-8}L${x+6} ${y-14}" ${st}/>`;
+  const up=(x,y)=>`<path d="M${x} ${y+30}V${y+8}M${x-6} ${y+14}L${x} ${y+8}L${x+6} ${y+14}" ${st}/>`;
+  const lb=(x,y,t)=>`<text x="${x}" y="${y}" font-size="15" font-weight="800" text-anchor="middle">${t}</text>`;
+  const row=(k,y0,f,els)=>{const y=y0+58;return`<text x="4" y="${y0+16}" font-size="14" font-weight="800">Kelas ${k}</text><line x1="14" x2="306" y1="${y}" y2="${y}" stroke="#1C2B3F" stroke-width="6" stroke-linecap="round"/><path d="M${f} ${y+4}l-13 22h26z" fill="#BFD6F2" stroke="#1C2B3F" stroke-width="2"/>${lb(f,y+44,'T')}${els(y)}`};
+  return`<div class="viz"><svg width="320" height="336" viewBox="0 0 320 336" role="img" aria-label="Tuas kelas 1, 2, dan 3. T titik tumpu, B beban, U usaha">`+
+  row(1,0,160,y=>dn(80,y)+lb(80,y-36,'B')+dn(270,y)+lb(270,y-36,'U'))+
+  row(2,112,30,y=>dn(150,y)+lb(150,y-36,'B')+up(280,y)+lb(280,y+44,'U'))+
+  row(3,224,30,y=>up(150,y)+lb(150,y+44,'U')+dn(280,y)+lb(280,y-36,'B'))+`</svg></div>`}
+ if(s.v==='gigi')return`<div class="viz"><svg width="320" height="158" viewBox="0 0 320 158" role="img" aria-label="Roda gigi kecil 20 gigi menggerakkan roda gigi besar 40 gigi"><circle cx="80" cy="75" r="30" fill="#E6F0FC" stroke="#2F6FBF" stroke-width="8" stroke-dasharray="6 4"/><circle cx="80" cy="75" r="6" fill="#2F6FBF"/><circle cx="196" cy="75" r="52" fill="#E6F0FC" stroke="#2F6FBF" stroke-width="8" stroke-dasharray="6 4"/><circle cx="196" cy="75" r="6" fill="#2F6FBF"/><text x="80" y="128" font-size="14" font-weight="800" text-anchor="middle">20 gigi</text><text x="196" y="152" font-size="14" font-weight="800" text-anchor="middle">40 gigi</text><path d="M60 24a24 24 0 0132-6M92 18l-8-4m8 4l-4 8" stroke="#1C2B3F" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M226 20a30 30 0 00-24-6M202 14l8 4m-8-4l6-6" stroke="#1C2B3F" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>`;
+ if(s.v==='rangkaian'){const lamp=(x,y)=>`<circle cx="${x}" cy="${y}" r="11" fill="#fff" stroke="#1C2B3F" stroke-width="2.5"/><path d="M${x-7} ${y-7}l14 14M${x+7} ${y-7}l-14 14" stroke="#1C2B3F" stroke-width="2"/>`;
+  return`<div class="viz"><svg width="320" height="130" viewBox="0 0 320 130" role="img" aria-label="Rangkaian seri dan paralel"><text x="80" y="16" font-size="14" font-weight="800" text-anchor="middle">Seri</text><path d="M14 100V28H146V100H14" fill="none" stroke="#1C2B3F" stroke-width="2.5"/><rect x="8" y="54" width="12" height="26" fill="#fff" stroke="#2F6FBF" stroke-width="3"/>${lamp(54,28)}${lamp(106,28)}<text x="240" y="16" font-size="14" font-weight="800" text-anchor="middle">Paralel</text><path d="M190 30H270V110H190V30M235 30V110" fill="none" stroke="#1C2B3F" stroke-width="2.5"/><rect x="184" y="57" width="12" height="26" fill="#fff" stroke="#2F6FBF" stroke-width="3"/>${lamp(235,70)}${lamp(270,70)}</svg></div>`}
+ if(s.v==='ohm')return`<div class="viz row wrap" style="justify-content:center;gap:10px">${['V = I × R','I = V ÷ R','R = V ÷ I'].map(t=>`<span class="res">${t}</span>`).join('')}</div>`;
+ if(s.v==='alir'){const T='stroke="#1C2B3F" stroke-width="2.5" fill="#E6F0FC"';
+  return`<div class="viz"><svg width="320" height="130" viewBox="0 0 320 130" role="img" aria-label="Empat simbol diagram alir"><rect x="6" y="18" width="62" height="30" rx="15" ${T}/><text x="37" y="38" font-size="13" font-weight="800" text-anchor="middle">Mulai</text><path d="M96 18h66l-8 30H88z" ${T}/><text x="125" y="38" font-size="12" font-weight="800" text-anchor="middle">Data</text><rect x="178" y="18" width="62" height="30" ${T}/><text x="209" y="38" font-size="13" font-weight="800" text-anchor="middle">Proses</text><path d="M281 10l30 28-30 28-30-28z" ${T}/><text x="281" y="42" font-size="12" font-weight="800" text-anchor="middle">Ya?</text><text x="37" y="80" font-size="12" text-anchor="middle">Mulai/selesai</text><text x="125" y="80" font-size="12" text-anchor="middle">Masukan/keluaran</text><text x="209" y="80" font-size="12" text-anchor="middle">Proses</text><text x="281" y="80" font-size="12" text-anchor="middle">Keputusan</text></svg></div>`}
+ return''}
+
+/* ---------- state ---------- */
+const KEY='rekaku-v1';
+const DEF={name:'',tk:1,onb:false,les:{},quiz:{},days:[],used:{},jurnal:[],seen:[]};
+let S=JSON.parse(JSON.stringify(DEF));
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign({},DEF,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const dk=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const streak=()=>{let n=0,d=new Date();if(!S.days.includes(dk(d)))d.setDate(d.getDate()-1);while(S.days.includes(dk(d))){n++;d.setDate(d.getDate()-1)}return n};
+const les=id=>S.les[id]||{step:0,done:0}, qz=id=>S.quiz[id]||{best:-1,tries:0};
+const pct=id=>(les(id).done?50:0)+(qz(id).best>=3?50:0);
+const selesai=id=>pct(id)===100;
+const status=id=>selesai(id)?['Selesai','ok']:(pct(id)>0||les(id).step>0)?['Sedang belajar','go']:['Belum mulai',''];
+const total=()=>Math.round(MODUL.reduce((a,m)=>a+pct(m.id),0)/MODUL.length);
+const nSel=()=>MODUL.filter(m=>selesai(m.id)).length;
+const nextMod=()=>MODUL.filter(m=>!selesai(m.id)).sort((a,b)=>(a.tk>S.tk)-(b.tk>S.tk)||a.id-b.id)[0];
+const earnedIds=()=>{const e=[];const d=MODUL.filter(m=>les(m.id).done).length,n=nSel();if(d>=1)e.push('pertama');if(n>=1)e.push('satu');if(n>=4)e.push('separuh');if(n>=MODUL.length)e.push('semua');if(MODUL.some(m=>qz(m.id).best===5))e.push('sempurna');if(S.used.ohm)e.push('teknisi');if(S.used.skala)e.push('juru');if(S.jurnal.length)e.push('pencatat');if(streak()>=3)e.push('rajin');return e};
+function touch(){const t=dk(new Date());if(!S.days.includes(t))S.days.push(t);S.days=S.days.slice(-60);save()}
+function checkBadges(){const e=earnedIds(),nw=e.filter(x=>!S.seen.includes(x));if(nw.length){S.seen=e;save();const t='Lencana baru: '+nw.map(x=>BADGES.find(b=>b.id===x).n).join(', ');setTimeout(()=>toast(t),$('.toast')?1800:0)}}
+let tt=0;function toast(t){const w=$('#tw');w.innerHTML=`<div class="toast" role="status">${esc(t)}</div>`;clearTimeout(tt);tt=setTimeout(()=>w.innerHTML='',3200)}
+
+/* ---------- router ---------- */
+let R={n:'home'},L=null,Q=null;
+const FOCUS=['onboard','belajar','kuis','hasil'];
+const TAB={home:'home',modul:'modul',detail:'modul',alat:'alat',ohm:'alat',skala:'alat',jurnal:'alat',profil:'profil'};
+const V={},B={},ACT={};
+function go(n,a={}){R=Object.assign({n},a);render();window.scrollTo(0,0)}
+function render(){const app=$('#app');
+ try{$('#shell').classList.toggle('focus',FOCUS.includes(R.n));$('#tw').className=FOCUS.includes(R.n)?'f':'';
+  $('#nav').innerHTML=`<div class="brand">${kotak('senang',40)}<span>RekaKu</span></div>`+[['home','Beranda','home'],['modul','Modul','grid'],['alat','Alat','tool'],['profil','Profil','user']].map(([k,l,i])=>`<button class="nb" data-a="tab" data-k="${k}" ${TAB[R.n]===k?'aria-current="page"':''}>${I(i)}<span>${l}</span></button>`).join('');
+  app.innerHTML=V[R.n]();const b=B[R.n];b&&b();
+ }catch(e){console.error(e);app.innerHTML=`<h1>Ada masalah</h1><p>Halaman gagal tampil. Muat ulang halaman. Kemajuanmu tetap aman.</p><button class="btn" data-a="reload">Muat ulang</button>`}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const f=ACT[b.dataset.a];if(f)f(b.dataset,b,e)});
+ACT.tab=d=>go(d.k);ACT.reload=()=>location.reload();
+
+/* ---------- onboarding ---------- */
+V.onboard=()=>{const s=R.s||0;
+ const c=[`<div style="text-align:center">${kotak('senang',150)}<h1 style="margin-top:12px">Halo, aku Kotak</h1><p class="mut">Aku akan menemanimu belajar Reka Bentuk dan Teknologi dengan langkah yang singkat.</p></div>`,
+ `<h1>Cara belajar</h1><div class="cards">${[['book','Baca pelajaran','Setiap modul dibagi menjadi kartu pendek.'],['check','Kerjakan kuis','Dapat jawaban dan penjelasan seketika.'],['flag','Pantau kemajuan','Lihat persen kemajuan dan kumpulkan lencana.']].map(([i,t,d])=>`<div class="card row"><div class="ico">${I(i)}</div><div><b>${t}</b><br><span class="mut sm">${d}</span></div></div>`).join('')}</div>`,
+ `<h1>Kenalan dulu</h1><label class="l" for="nm">Namamu</label><input id="nm" class="field" maxlength="20" autocomplete="off" placeholder="Contoh: Rani" value="${esc(S.name)}"><div id="ne"></div><label class="l">Kelasmu</label><div class="chips" role="group" aria-label="Pilih tingkatan">${[1,2,3].map(t=>`<button class="sel" data-a="tk" data-t="${t}" aria-pressed="${S.tk===t}">Tingkatan ${t}</button>`).join('')}</div><p class="sm mut" style="margin-top:12px">Tingkatan 1, 2, 3 setara kelas 7, 8, 9 SMP.</p>`][s];
+ return`<div style="max-width:520px;margin:0 auto;padding-top:20px">${c}<div class="row" style="margin-top:24px">${s>0?`<button class="btn o" data-a="oprev">Kembali</button>`:''}<button class="btn sp" data-a="onext">${s===2?'Mulai belajar':'Lanjut'}</button></div><div class="row" style="justify-content:center;gap:8px;margin-top:20px">${[0,1,2].map(i=>`<i style="width:10px;height:10px;border-radius:50%;background:${i===s?'var(--blue)':'var(--line)'}"></i>`).join('')}</div></div>`};
+B.onboard=()=>{const i=$('#nm');if(i){i.oninput=()=>{S.name=i.value;$('#ne').innerHTML=''};i.onkeydown=e=>{if(e.key==='Enter')ACT.onext()}}};
+ACT.oprev=()=>go('onboard',{s:(R.s||0)-1});
+ACT.tk=(d)=>{S.tk=+d.t;$$('.sel').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t==d.t))};
+ACT.onext=()=>{const c=R.s||0;if(c<2)return go('onboard',{s:c+1});const n=S.name.trim();if(!n){$('#ne').innerHTML='<div class="msg no">Isi namamu dulu ya.</div>';$('#nm').focus();return}S.name=n;S.onb=true;touch();save();go('home')};
+
+/* ---------- beranda ---------- */
+const ring=p=>{const c=2*Math.PI*46;return`<div class="ring" role="img" aria-label="Kemajuan ${p} persen"><svg width="112" height="112" viewBox="0 0 112 112"><circle cx="56" cy="56" r="46" fill="none" stroke="#fff" stroke-width="12"/><circle cx="56" cy="56" r="46" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 56 56)"/></svg><b>${p}%</b></div>`};
+const modCard=m=>{const[st,k]=status(m.id);return`<button class="card itm" data-a="detail" data-m="${m.id}"><div class="ico">${I(m.ikon,28)}</div><div class="b"><b>${m.t}</b><span class="sm mut">${m.ring}</span><div class="row wrap" style="gap:6px;margin-top:6px"><span class="chip">Tingkatan ${m.tk}</span><span class="chip ${k}">${st}</span></div><div class="bar" style="margin-top:8px" aria-hidden="true"><i style="width:${pct(m.id)}%"></i></div></div></button>`};
+V.home=()=>{const p=total(),nx=nextMod(),scores=MODUL.filter(m=>qz(m.id).best>=0),avg=scores.length?Math.round(scores.reduce((a,m)=>a+qz(m.id).best,0)/scores.length/5*100)+'%':'-';
+ return`<div class="row" style="margin-bottom:14px">${kotak('senang',64)}<div><h1 style="margin:0">Halo, ${esc(S.name)}</h1><span class="mut">Tingkatan ${S.tk} · Reka Bentuk dan Teknologi</span></div></div>
+<div class="hero">${ring(p)}<div><h2>Kemajuanmu</h2><p style="margin:0">${nSel()} dari ${MODUL.length} modul selesai.</p></div></div>
+<div class="stats" style="margin:14px 0"><div class="card stat"><b>${avg}</b><span>Rata-rata kuis</span></div><div class="card stat"><b>${streak()}</b><span>Hari beruntun</span></div><div class="card stat"><b>${earnedIds().length}</b><span>Lencana</span></div></div>
+${nx?`<h2>Lanjutkan belajar</h2>${modCard(nx)}`:`<div class="card row">${kotak('senang',64)}<div><b>Semua modul selesai.</b><br><span class="mut sm">Hebat! Ulangi kuis kapan saja untuk berlatih.</span></div></div>`}
+<h2 style="margin-top:20px">Untuk Tingkatan ${S.tk}</h2><div class="cards">${MODUL.filter(m=>m.tk===S.tk).map(modCard).join('')}</div>
+<h2 style="margin-top:20px">Alat cepat</h2><div class="g2">${[['ohm','bolt','Hukum Ohm'],['skala','ruler','Skala gambar'],['jurnal','pen','Catatan projek']].map(([k,i,t])=>`<button class="card itm" style="min-height:72px" data-a="tab" data-k="${k}"><div class="ico">${I(i)}</div><b>${t}</b></button>`).join('')}</div>`};
+ACT.detail=d=>go('detail',{m:+d.m});
+
+/* ---------- daftar modul ---------- */
+V.modul=()=>{const f=R.f||0,l=MODUL.filter(m=>!f||m.tk===f);
+ return`<h1>Modul</h1><p class="mut">${MODUL.length} modul untuk Tingkatan 1 sampai 3.</p><div class="chips" role="group" aria-label="Saring tingkatan" style="margin-bottom:14px">${[[0,'Semua'],[1,'Tingkatan 1'],[2,'Tingkatan 2'],[3,'Tingkatan 3']].map(([k,t])=>`<button class="sel" data-a="filt" data-f="${k}" aria-pressed="${f===k}">${t}</button>`).join('')}</div><div class="cards">${l.map(modCard).join('')}</div>`};
+ACT.filt=d=>go('modul',{f:+d.f});
+V.detail=()=>{const m=MODUL[R.m-1],l=les(m.id),q=qz(m.id),[st,k]=status(m.id);
+ return`<button class="btn t" data-a="tab" data-k="modul">${I('prev',20)}Semua modul</button>
+<div class="row" style="margin:8px 0 12px"><div class="ico" style="width:64px;height:64px">${I(m.ikon,34)}</div><div><h1 style="margin:0">${m.t}</h1><div class="row wrap" style="gap:6px"><span class="chip">Tingkatan ${m.tk}</span><span class="chip ${k}">${st}</span></div></div></div>
+<p>${m.ring}</p>
+<div class="row wrap" style="gap:14px;margin-bottom:12px"><span class="sm mut row" style="gap:6px">${I('list',18)}${m.belajar.length} kartu</span><span class="sm mut row" style="gap:6px">${I('check',18)}5 soal kuis</span><span class="sm mut row" style="gap:6px">${I('clock',18)}±${m.mnt} menit</span></div>
+<div class="row"><div class="bar sp"><i style="width:${pct(m.id)}%"></i></div><b>${pct(m.id)}%</b></div>
+<div class="row wrap" style="margin:16px 0"><button class="btn sp" data-a="mulai" data-m="${m.id}">${l.done?'Ulangi pelajaran':l.step>0?'Lanjut belajar':'Mulai belajar'}</button><button class="btn o sp" data-a="kuis" data-m="${m.id}">Kerjakan kuis</button></div>
+${q.best>=0?`<div class="msg ${q.best>=3?'ok':'no'}">Nilai kuis terbaik: <b>${q.best} dari 5</b>${q.best>=3?'. Lulus.':'. Perlu minimal 3 untuk lulus.'}</div>`:''}
+${l.done?'':'<div class="msg">Selesaikan pelajaran dan lulus kuis (minimal 3 dari 5) agar modul ini berstatus selesai.</div>'}
+<h2>Isi pelajaran</h2><div class="cards">${m.belajar.map((s,i)=>`<div class="card row"><span class="chip">${i+1}</span><b>${s.h}</b></div>`).join('')}</div>`};
+
+/* ---------- pelajaran ---------- */
+ACT.mulai=d=>{const id=+d.m;L={m:id,i:les(id).done?0:Math.min(les(id).step,MODUL[id-1].belajar.length-1)};go('belajar')};
+V.belajar=()=>{const m=MODUL[L.m-1],n=m.belajar.length;
+ if(L.end)return`<div style="max-width:520px;margin:0 auto;padding:48px 16px;text-align:center">${kotak('senang',140)}<h1 style="margin-top:12px">Pelajaran selesai</h1><p class="mut">Kamu sudah membaca semua kartu ${m.t}. Sekarang kerjakan kuis untuk menguji pemahamanmu.</p><div class="cards" style="margin-top:20px"><button class="btn w" data-a="kuis" data-m="${m.id}">Kerjakan kuis</button><button class="btn o w" data-a="detail" data-m="${m.id}">Kembali ke modul</button></div></div>`;
+ const s=m.belajar[L.i];
+ return`<div class="top"><button class="ib" data-a="detail" data-m="${m.id}" aria-label="Tutup pelajaran">${I('x')}</button><div class="bar sp" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${L.i+1}"><i style="width:${(L.i+1)/n*100}%"></i></div><span class="sm mut">${L.i+1}/${n}</span></div>
+<div class="main"><p class="sm mut" style="margin-bottom:4px">${m.t}</p><h1>${s.h}</h1>${(s.p||[]).map(t=>`<p>${t}</p>`).join('')}${viz(m,s)}${s.v!=='proses'&&s.l?`<div class="cards">${s.l.map(t=>`<div class="card" style="padding:12px 14px">${t}</div>`).join('')}</div>`:''}${s.tip?`<div class="tip"><b>Ingat:</b> ${s.tip}</div>`:''}</div>
+<div class="foot"><div class="in">${L.i>0?`<button class="btn o" data-a="lprev" style="flex:0 0 auto">${I('prev',20)}Kembali</button>`:''}<button class="btn" data-a="lnext">${L.i===n-1?'Selesai belajar':'Lanjut'}${I('next',20)}</button></div></div>`};
+ACT.lprev=()=>{L.i--;go('belajar')};
+ACT.lnext=()=>{const m=MODUL[L.m-1];if(L.i<m.belajar.length-1){L.i++;const l=les(m.id);if(!l.done)l.step=Math.max(l.step,L.i);S.les[m.id]=l;save();return go('belajar')}
+ const l=les(m.id);l.done=1;l.step=m.belajar.length-1;S.les[m.id]=l;touch();save();L.end=1;go('belajar');checkBadges()};
+
+/* ---------- kuis ---------- */
+ACT.kuis=d=>{const id=+d.m;Q={m:id,qs:shuf(MODUL[id-1].kuis).slice(0,5).map(q=>{const idx=shuf(q.o.map((_,i)=>i));return{q:q.q,o:idx.map(i=>q.o[i]),a:idx.indexOf(q.a),w:q.w}}),i:0,ok:0,done:false,miss:[]};go('kuis')};
+V.kuis=()=>{const q=Q.qs[Q.i],n=Q.qs.length,m=MODUL[Q.m-1];
+ return`<div class="top"><button class="ib" data-a="detail" data-m="${m.id}" aria-label="Keluar dari kuis">${I('x')}</button><div class="bar sp" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${Q.i}"><i style="width:${Q.i/n*100}%"></i></div><span class="sm mut">${Q.i+1}/${n}</span></div>
+<div class="main"><p class="sm mut" style="margin-bottom:4px">Kuis · ${m.t}</p><h2>${esc(q.q)}</h2><div class="opts" role="group" aria-label="Pilihan jawaban">${q.o.map((o,i)=>`<button class="opt" data-a="jawab" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span>${esc(o)}</span></button>`).join('')}</div><div id="fb" aria-live="polite"></div></div>
+<div class="foot"><div class="in"><button class="btn" id="nx" data-a="lanjutq" hidden>${Q.i===n-1?'Lihat hasil':'Lanjut'}${I('next',20)}</button></div></div>`};
+ACT.jawab=(d,b)=>{if(Q.done)return;Q.done=true;const q=Q.qs[Q.i],i=+d.i,ok=i===q.a;if(ok)Q.ok++;else Q.miss.push(q);
+ $$('.opt').forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add('ok')});if(!ok)b.classList.add('no');
+ $('#fb').innerHTML=`<div class="msg fb ${ok?'ok':'no'}" role="status"><div class="row" style="align-items:flex-start">${kotak(ok?'senang':'sedih',56)}<div><b>${ok?'Benar.':'Belum tepat.'}</b> ${q.w}</div></div></div>`;
+ const nx=$('#nx');nx.hidden=false;nx.scrollIntoView({block:'nearest'});$('#fb').scrollIntoView({block:'nearest',behavior:'smooth'})};
+ACT.lanjutq=()=>{if(Q.i<Q.qs.length-1){Q.i++;Q.done=false;return go('kuis')}
+ const id=Q.m,q=qz(id),first=q.best<0;q.best=Math.max(q.best,Q.ok);q.tries++;S.quiz[id]=q;touch();save();go('hasil',{ok:Q.ok,m:id,miss:Q.miss});checkBadges()};
+V.hasil=()=>{const m=MODUL[R.m-1],ok=R.ok,pass=ok>=3,nx=MODUL[R.m];
+ return`<div style="max-width:560px;margin:0 auto;padding:36px 16px 24px;text-align:center">${kotak(ok===5?'senang':pass?'senang':'mikir',130)}<h1 style="margin-top:12px">${ok===5?'Sempurna':pass?'Kamu lulus':'Belum lulus'}</h1><p class="mut">${m.t}</p><div class="res pop" style="font-size:32px">${ok} dari 5</div><p style="margin-top:12px">${pass?(selesai(m.id)?'Modul ini sekarang berstatus selesai.':'Kuis lulus. Selesaikan juga semua kartu pelajaran agar modul selesai.'):'Perlu minimal 3 dari 5. Baca pelajaran sekali lagi, lalu coba kuis lagi.'}</p>
+${R.miss.length?`<div style="text-align:left"><h3>Pembahasan</h3><div class="cards">${R.miss.map(q=>`<div class="card"><b>${esc(q.q)}</b><br><span class="sm mut">Jawaban benar: ${esc(q.o[q.a])}.</span><br><span class="sm">${q.w}</span></div>`).join('')}</div></div>`:''}
+<div class="cards" style="margin-top:20px">${pass&&nx?`<button class="btn w" data-a="detail" data-m="${nx.id}">Modul berikutnya</button>`:pass?`<button class="btn w" data-a="tab" data-k="profil">Lihat pencapaian</button>`:`<button class="btn w" data-a="mulai" data-m="${m.id}">Baca pelajaran lagi</button>`}<button class="btn o w" data-a="kuis" data-m="${m.id}">Ulangi kuis</button><button class="btn t" data-a="detail" data-m="${m.id}">Kembali ke modul</button></div></div>`};
+
+/* ---------- alat ---------- */
+V.alat=()=>`<h1>Alat</h1><p class="mut">Alat bantu untuk berlatih dan mencatat projek.</p><div class="cards">${[['ohm','bolt','Kalkulator Hukum Ohm','Hitung tegangan, arus, atau hambatan.'],['skala','ruler','Kalkulator Skala','Ubah ukuran asli menjadi ukuran gambar.'],['jurnal','pen','Catatan Projek','Tulis ide projek dan bahannya. Tersimpan di perangkat ini.']].map(([k,i,t,d])=>`<button class="card itm" data-a="tab" data-k="${k}"><div class="ico">${I(i,28)}</div><div class="b"><b>${t}</b><span class="sm mut">${d}</span></div></button>`).join('')}</div>`;
+const back=`<button class="btn t" data-a="tab" data-k="alat">${I('prev',20)}Semua alat</button>`;
+const num=v=>{const x=parseFloat(String(v).replace(',','.'));return isFinite(x)?x:NaN};
+const fmt=x=>String(Math.round(x*1000)/1000).replace('.',',');
+V.ohm=()=>`${back}<h1>Kalkulator Hukum Ohm</h1><p class="mut">V = I × R. Isi dua kotak, kosongkan satu kotak yang ingin dicari.</p>
+${[['v','Tegangan V (volt)'],['i','Arus I (ampere)'],['r','Hambatan R (ohm)']].map(([k,t])=>`<label class="l" for="o_${k}">${t}</label><input id="o_${k}" class="field" inputmode="decimal" autocomplete="off">`).join('')}
+<div class="row" style="margin-top:16px"><button class="btn sp" data-a="hohm">Hitung</button><button class="btn o" data-a="rohm">Kosongkan</button></div><div id="ohr" aria-live="polite"></div>`;
+ACT.rohm=()=>{['v','i','r'].forEach(k=>$('#o_'+k).value='');$('#ohr').innerHTML=''};
+ACT.hohm=()=>{const f={v:$('#o_v').value.trim(),i:$('#o_i').value.trim(),r:$('#o_r').value.trim()},ks=Object.keys(f),fill=ks.filter(k=>f[k]!==''),em=ks.filter(k=>f[k]===''),o=$('#ohr');
+ if(fill.length!==2){o.innerHTML='<div class="msg no">Isi tepat dua kotak. Kosongkan satu kotak yang dicari.</div>';return}
+ const n={};for(const k of fill){n[k]=num(f[k]);if(!(n[k]>0)){o.innerHTML='<div class="msg no">Isi dengan angka lebih besar dari 0.</div>';return}}
+ const k=em[0];let r,t;if(k==='v'){r=n.i*n.r;t=`V = I × R = ${fmt(n.i)} × ${fmt(n.r)} = ${fmt(r)} V`}else if(k==='i'){r=n.v/n.r;t=`I = V ÷ R = ${fmt(n.v)} ÷ ${fmt(n.r)} = ${fmt(r)} A`}else{r=n.v/n.i;t=`R = V ÷ I = ${fmt(n.v)} ÷ ${fmt(n.i)} = ${fmt(r)} Ω`}
+ $('#o_'+k).value=fmt(r);o.innerHTML=`<div class="msg ok pop"><b>Hasil:</b><br><span class="res" style="margin-top:6px">${t}</span></div>`;S.used.ohm=1;touch();save();checkBadges()};
+V.skala=()=>`${back}<h1>Kalkulator Skala</h1><p class="mut">Skala a:b berarti 1 satuan gambar mewakili b satuan benda asli, jika a = 1.</p>
+<div class="chips" role="group" aria-label="Arah hitung"><button class="sel" data-a="sm" data-s="g" aria-pressed="true">Cari ukuran gambar</button><button class="sel" data-a="sm" data-s="a" aria-pressed="false">Cari ukuran asli</button></div>
+<label class="l" for="sz" id="szl">Ukuran asli benda (cm)</label><input id="sz" class="field" inputmode="decimal" autocomplete="off" placeholder="Contoh: 40">
+<label class="l">Skala</label><div class="row"><input id="sa" class="field" inputmode="decimal" value="1" aria-label="Angka kiri skala"><b style="font-size:24px">:</b><input id="sb" class="field" inputmode="decimal" value="4" aria-label="Angka kanan skala"></div>
+<div class="chips" style="margin-top:10px">${['1:2','1:5','1:10','2:1'].map(s=>`<button class="sel" data-a="sp" data-s="${s}">${s}</button>`).join('')}</div>
+<div style="margin-top:16px"><button class="btn w" data-a="hsk">Hitung</button></div><div id="skr" aria-live="polite"></div>`;
+B.skala=()=>{R.sm='g'};
+ACT.sm=(d)=>{R.sm=d.s;$$('[data-a=sm]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===d.s));$('#szl').textContent=d.s==='g'?'Ukuran asli benda (cm)':'Ukuran pada gambar (cm)';$('#skr').innerHTML=''};
+ACT.sp=d=>{const[a,b]=d.s.split(':');$('#sa').value=a;$('#sb').value=b};
+ACT.hsk=()=>{const z=num($('#sz').value),a=num($('#sa').value),b=num($('#sb').value),o=$('#skr');
+ if(!(z>0)||!(a>0)||!(b>0)){o.innerHTML='<div class="msg no">Isi ukuran dan skala dengan angka lebih besar dari 0.</div>';return}
+ const g=R.sm!=='a',r=g?z*a/b:z*b/a;
+ o.innerHTML=`<div class="msg ok pop"><b>Hasil:</b><br><span class="res" style="margin-top:6px">${g?`${fmt(z)} cm × ${fmt(a)}/${fmt(b)} = ${fmt(r)} cm di gambar`:`${fmt(z)} cm × ${fmt(b)}/${fmt(a)} = ${fmt(r)} cm ukuran asli`}</span></div>`;S.used.skala=1;touch();save();checkBadges()};
+V.jurnal=()=>`${back}<h1>Catatan Projek</h1><p class="mut">Tulis rencana projek Reka Bentuk dan Teknologi milikmu.</p>
+<div class="card"><label class="l" for="jn" style="margin-top:0">Nama projek</label><input id="jn" class="field" maxlength="40" placeholder="Contoh: Rak sepatu lipat">
+<label class="l" for="jm">Masalah yang dipecahkan</label><textarea id="jm" class="field" maxlength="200" placeholder="Contoh: Sepatu berserakan di depan pintu."></textarea>
+<label class="l" for="jb">Bahan dan alat</label><input id="jb" class="field" maxlength="80" placeholder="Contoh: Kayu pinus, paku, gergaji">
+<div id="je"></div><div style="margin-top:14px"><button class="btn w" data-a="sj">${I('save',20)}Simpan catatan</button></div></div>
+<h2 style="margin-top:22px">Catatan tersimpan (${S.jurnal.length})</h2>
+${S.jurnal.length?`<div class="cards">${S.jurnal.map((j,i)=>`<div class="card"><div class="row" style="align-items:flex-start"><div class="sp"><b>${esc(j.n)}</b><br><span class="sm mut">${esc(j.d)}</span></div><button class="btn t" data-a="dj" data-i="${i}" aria-label="Hapus catatan ${esc(j.n)}">${I('trash',20)}</button></div><p class="sm" style="margin:8px 0 0"><b>Masalah:</b> ${esc(j.m)}</p>${j.b?`<p class="sm" style="margin:4px 0 0"><b>Bahan:</b> ${esc(j.b)}</p>`:''}</div>`).join('')}</div>`:`<div class="card row">${kotak('mikir',56)}<span class="mut">Belum ada catatan. Tulis ide projek pertamamu.</span></div>`}`;
+ACT.sj=()=>{const n=$('#jn').value.trim(),m=$('#jm').value.trim(),b=$('#jb').value.trim(),e=$('#je');
+ if(!n||!m){e.innerHTML='<div class="msg no">Nama projek dan masalah wajib diisi.</div>';return}
+ S.jurnal.unshift({n,m,b,d:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})});touch();save();go('jurnal');toast('Catatan tersimpan.');checkBadges()};
+ACT.dj=(d,b)=>{if(b.dataset.c!=='1'){b.dataset.c='1';b.innerHTML='Hapus?';b.classList.add('d');return}S.jurnal.splice(+d.i,1);save();go('jurnal');toast('Catatan dihapus.')};
+
+/* ---------- profil ---------- */
+V.profil=()=>{const e=earnedIds();
+ return`<h1>Profil</h1><div class="card"><div class="row">${kotak('senang',64)}<div><h2 style="margin:0">${esc(S.name)}</h2><span class="mut sm">Tingkatan ${S.tk} · ${nSel()} modul selesai · ${total()}%</span></div></div>
+<label class="l" for="pn">Ubah nama</label><input id="pn" class="field" maxlength="20" value="${esc(S.name)}"><label class="l">Tingkatan</label><div class="chips" role="group" aria-label="Tingkatan">${[1,2,3].map(t=>`<button class="sel" data-a="tk" data-t="${t}" aria-pressed="${S.tk===t}">Tingkatan ${t}</button>`).join('')}</div><div id="pe"></div><div style="margin-top:14px"><button class="btn w" data-a="sp2">${I('save',20)}Simpan perubahan</button></div></div>
+<h2 style="margin-top:22px">Pencapaian (${e.length} dari ${BADGES.length})</h2><div class="g2">${BADGES.map(b=>`<div class="card badge ${e.includes(b.id)?'on':'off'}"><div class="ico">${I(b.i,28)}</div><b>${b.n}</b><br><span class="sm mut">${b.d}</span><br><span class="chip ${e.includes(b.id)?'ok':''}" style="margin-top:6px">${e.includes(b.id)?'Didapat':'Belum'}</span></div>`).join('')}</div>
+<h2 style="margin-top:22px">Kemajuan per modul</h2><div class="cards">${MODUL.map(m=>`<div class="card"><div class="row"><b class="sp">${m.id}. ${m.t}</b><span class="chip ${status(m.id)[1]}">${status(m.id)[0]}</span></div><div class="row" style="margin-top:8px"><div class="bar sp"><i style="width:${pct(m.id)}%"></i></div><b class="sm">${pct(m.id)}%</b></div></div>`).join('')}</div>
+<h2 style="margin-top:22px">Reset</h2><p class="mut">Menghapus kemajuan, nilai kuis, lencana, dan catatan projek. Nama tetap tersimpan.</p><div id="rs"><button class="btn d" data-a="rs1">${I('trash',20)}Reset kemajuan</button></div>`};
+ACT.sp2=()=>{const n=$('#pn').value.trim();if(!n){$('#pe').innerHTML='<div class="msg no">Nama tidak boleh kosong.</div>';return}S.name=n;save();toast('Perubahan tersimpan.');go('profil')};
+ACT.rs1=()=>{$('#rs').innerHTML=`<div class="msg no">Hapus semua kemajuan? Tindakan ini tidak bisa dibatalkan.</div><div class="row"><button class="btn d" data-a="rs2">Ya, reset</button><button class="btn o" data-a="rs3">Batal</button></div>`};
+ACT.rs3=()=>go('profil');
+ACT.rs2=()=>{S.les={};S.quiz={};S.days=[];S.used={};S.jurnal=[];S.seen=[];save();go('profil');toast('Kemajuan sudah direset.')};
+
+go(S.onb&&S.name?'home':'onboard');
+</script>
+</body>
+</html>
