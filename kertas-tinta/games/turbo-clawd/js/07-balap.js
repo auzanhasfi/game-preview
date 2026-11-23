@@ -175,7 +175,7 @@ function kontrolAI(r, dt) {
   // gerbang: pilih lajur
   const gA = G.gerbangAbs[r.gerbangKe];
   if (gA && gA.s - r.s < 80 && gA.s - r.s > 0) {
-    if (ai.keputusan !== r.gerbangKe) { ai.keputusan = r.gerbangKe; const benar = Math.random() < ai.akur; ai.lajur = benar ? 1 : (Math.random() < 0.5 ? 0 : 2); ai.lajurBenar = benar; }
+    if (ai.keputusan !== r.gerbangKe) { ai.keputusan = r.gerbangKe; const benar = Math.random() < ai.akur; const lb = G.soal[r.gerbangKe] ? G.soal[r.gerbangKe].benar : 1; ai.lajur = benar ? lb : (lb + 1 + Math.floor(Math.random() * 2)) % 3; ai.lajurBenar = benar; }
     tx = (ai.lajur - 1) * (2 * W / 3);
   }
   // hindari mobil & bom di depan
