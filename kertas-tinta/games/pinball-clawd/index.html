@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Pinball Clawd</title>
+<meta name="description" content="Game pinball 3D di browser: flipper, bumper, ramp, orbit, multiball, dan soal matematika yang dijawab dengan menembak bola ke jawaban yang benar. Bahasa Indonesia dan Melayu.">
+<meta property="og:title" content="Pinball Clawd · Meja Angka"><meta property="og:description" content="Pinball 3D + soal matematika: tembak bola ke jawaban yang benar."><meta property="og:image" content="sampul.jpg">
+<meta name="theme-color" content="#060913">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="css/gaya.css">
+<script type="importmap">{ "imports": { "three": "./js/vendor/three/three.module.js" } }</script>
+</head>
+<body>
+<div id="kanvas"></div>
+
+<!-- layar DMD + pilihan jawaban (selalu di atas) -->
+<div id="atas">
+  <div class="dmd-bingkai"><canvas id="dmd" width="1024" height="256"></canvas></div>
+  <div id="pilihan" class="pilihan"></div>
+</div>
+
+<!-- kontrol permainan -->
+<div id="hud" hidden>
+  <button class="xbtn jeda" id="bJeda" data-uji="jeda" aria-label="Jeda"><span data-ic="pause"></span></button>
+  <div class="info-bola" id="infoBola"></div>
+  <div id="zKiri" class="zona kiri" aria-label="Flipper kiri"></div>
+  <div id="zKanan" class="zona kanan" aria-label="Flipper kanan"></div>
+  <button id="tPlunger" class="plunger-btn" data-uji="plunger" aria-label="Plunger"><span class="isi"><i id="tPlungerKuat"></i></span><span data-t="tarik"></span></button>
+  <button id="tGoyang" class="goyang-btn" aria-label="Goyang meja"><span data-ic="goyang"></span></button>
+  <div class="petunjuk" id="petunjuk"></div>
+  <aside class="sisi kiri" id="panelStat"></aside>
+  <aside class="sisi kanan" id="panelKontrol"></aside>
+</div>
+
+<!-- memuat -->
+<section id="muat" class="layar aktif"><div class="muat-isi"><div class="logo"><span>PINBALL</span><b>CLAWD</b></div><div class="batang"><i id="muatBatang"></i></div></div></section>
+
+<!-- menu -->
+<section id="menu" class="layar">
+  <div class="menu-panel">
+    <div class="logo besar"><span>PINBALL</span><b>CLAWD</b></div>
+    <p class="sub" data-t="sub"></p>
+    <p class="rekor" id="menuRekor"></p>
+    <h3 data-t="level"></h3><div class="segmen" id="segLevelMenu"></div><p class="ket" id="ketLevelMenu"></p>
+    <div class="tombol-kolom">
+      <button class="btn utama" id="bMain" data-uji="main"><span data-ic="play"></span><span data-t="main"></span></button>
+      <div class="baris2">
+        <button class="btn" id="bBantuan" data-uji="bantuan"><span data-ic="help"></span><span data-t="bantuan"></span></button>
+        <button class="btn" id="bAtur" data-uji="atur"><span data-ic="sliders"></span><span data-t="atur"></span></button>
+      </div>
+    </div>
+    <div class="menu-bawah">
+      <button class="chip" id="bBahasa" data-uji="bahasa"></button>
+      <button class="chip" id="bSuara" aria-label="Suara"></button>
+    </div>
+  </div>
+</section>
+
+<!-- pengaturan -->
+<section id="pAtur" class="layar panel-layar">
+  <div class="dialog lebar">
+    <header class="kepala"><button class="xbtn" data-kembali aria-label="Kembali"><span data-ic="back"></span></button><h2 data-t="atur"></h2></header>
+    <h3 data-t="level"></h3><div class="segmen" id="segLevel"></div><p class="ket" id="ketLevel"></p>
+    <h3 data-t="bahasa"></h3><div class="segmen" id="segBahasa"></div>
+    <h3 data-t="suara"></h3><div class="segmen" id="segSuara"></div>
+  </div>
+</section>
+
+<!-- bantuan -->
+<section id="pBantuan" class="layar panel-layar">
+  <div class="dialog lebar">
+    <header class="kepala"><button class="xbtn" data-kembali aria-label="Kembali"><span data-ic="back"></span></button><h2 data-t="bantuan"></h2></header>
+    <ol id="isiBantuan" class="bantuan"></ol>
+    <div class="peta-tembak" id="petaTembak"></div>
+    <p class="ket" id="ketKontrol"></p>
+  </div>
+</section>
+
+<!-- jeda -->
+<section id="jeda" class="layar panel-layar">
+  <div class="dialog"><h2 data-t="jeda"></h2>
+    <button class="btn utama" id="bTeruskan" data-uji="teruskan"><span data-ic="play"></span><span data-t="teruskan"></span></button>
+    <button class="btn" id="bUlangJeda"><span data-ic="redo"></span><span data-t="ulangi"></span></button>
+    <button class="btn" id="bKeluar" data-uji="keluar"><span data-ic="home"></span><span data-t="keluar"></span></button>
+  </div>
+</section>
+
+<!-- hasil -->
+<section id="hasil" class="layar panel-layar">
+  <div class="dialog lebar"><h2 data-t="hasil"></h2>
+    <div class="hasil-atas"><div class="hasil-skor" id="hasilSkor"></div><div class="hasil-bintang" id="hasilBintang"></div></div>
+    <div class="hasil-stat" id="hasilStat"></div>
+    <ol class="hasil-daftar" id="hasilDaftar"></ol>
+    <p class="ket" id="hasilPesan"></p>
+    <div class="hasil-aksi">
+      <button class="btn" id="bMenuHasil" data-uji="menuHasil"><span data-ic="home"></span><span data-t="menu"></span></button>
+      <button class="btn utama" id="bUlangi" data-uji="ulangi"><span data-ic="redo"></span><span data-t="ulangi"></span></button>
+    </div>
+  </div>
+</section>
+
+<script type="module" src="js/99-main.js"></script>
+</body></html>
